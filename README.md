@@ -4,7 +4,7 @@ R package for running a Shiny app for DEA analysis
 
 ## Installation
 
-pioneeR depends on the `saiUI` package. The package can be installed with `devtools`:
+pioneeR depends on the R-package `saiUI`. The package is not yet on CRAN and must be installed with `devtools`:
 
 ```r
 devtools::install_gitlab('ohjakobsen/saiUI')
@@ -16,7 +16,7 @@ pioneeR can then be installed in a similar fashion:
 devtools::install_github('riksrevisjonen/pioneeR')
 ```
 
-Note that pioneer will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
+Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
 
 ```sh
 sudo apt-get install libglpk-dev
