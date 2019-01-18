@@ -1,0 +1,34 @@
+/* Styles for pioneeR */
+
+h2 {
+    font-weight: bold;
+}
+
+.clear {
+    clear: both;
+}
+
+.highlight {
+    background-color: #edf389;
+}
+
+.irs-grid-pol.small {
+    display: none;
+}
+
+.dataTables_info, .dt-buttons {
+    width: 50%;
+    text-align: left;
+}
+
+.dataTables_length, .dataTables_paginate {
+    width: 50%;
+}
+
+.form-control {
+  height: 2.4rem;
+}
+
+.input-group-btn {
+  width: auto;
+}
