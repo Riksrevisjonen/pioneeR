@@ -28,10 +28,19 @@ On macOS, we recommend that you install `glpk` with [Homebrew](https://brew.sh).
 brew install glpk
 ```
 
+### Exporting reports as PDF
+
+pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.name/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
+
+```
+install.packages('tinytex')
+tinytex::install_tinytex()
+```
+
 ## Guideline for contribution
 
-We welcome contributions to the pioneeR package. Please see our CONTRIBUTING.md file for detailed guidelines of how to contribute.
+We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines of how to contribute.
 
 ## License
 
-The pioneeR package as a whole is licensed under the GPLv3. See the LICENSE file for more details.
+The pioneeR package as a whole is licensed under the GPLv3. See the [LICENSE](LICENSE) file for more details.
