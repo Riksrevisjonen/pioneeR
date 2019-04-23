@@ -35,3 +35,10 @@ vignettes/*.pdf
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
 .Rproj.user
+
+# Do not include development directories
+/dev/
+/docs/
+
+# Ignore macOS specific files
+.DS_Store
