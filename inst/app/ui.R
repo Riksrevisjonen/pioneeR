@@ -1,6 +1,4 @@
-# This is the user-interface definition of a Shiny web application
-
-require(saiUI)
+# Load required packages
 require(plotly)
 require(data.table)
 require(DT)
@@ -8,27 +6,23 @@ require(DT)
 ver <- utils::packageVersion('pioneeR')
 
 vals <- list(
-  'rts' = c('Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
-            'Non-decreasing RTS' = 'irs'),
+  'rts' = c(
+    'Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
+    'Non-decreasing RTS' = 'irs'),
   'malm.rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
 
 # Define UI for application that draws a histogram
 ui <- function(request) { saiPage(
-  'pioneeR',
 
-  # Return to scale (VRS, CRS, NIRS, NDRS)
-  # Non-increasing Returns to Scale (NIRS)
-  # Non-decreasing Returns to Scale (NDRS)
-
+  title = 'pioneeR',
   id = 'pioneer',
 
   # Add custom CSS
   header = tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
-    tags$script(src = 'pioneer.min.js'),
-    tags$script(src = '/shiny/assets/js/piwik.js')
+    tags$script(src = 'pioneer.min.js')
   ),
 
   tabPanel(
@@ -40,6 +34,29 @@ ui <- function(request) { saiPage(
           'datafile', 'Choose a file', buttonLabel = 'Browse', multiple = FALSE,
           accept = c('text/csv', 'text/plain', 'text/comma-separated-values',
                      '.csv', '.xls', '.xlsx', '.dta', '.rds')),
+        div(
+          class = 'btn-group mb-2',
+          tags$button(
+            id = 'upload_opts_btn', class = 'dropdown-toggle btn btn-dark btn-sm', type = 'button',
+            `data-toggle` = 'dropdown', `aria-haspopup` = 'true', `aria-expanded` = 'false',
+            'Upload options'
+          ),
+          div(class = 'dropdown-menu p-3', style = 'min-width: 325px;', div(id = 'uopts_menu',
+            radioButtons(
+              'data.dec.point', 'Decimal point', c('Decimal', 'Period'),
+              selected = 'Decimal', inline = TRUE),
+            hr(),
+            checkboxInput('data.header', label = 'Variables names in first row', TRUE),
+            hr(),
+            selectizeInput(
+              'data.encoding', 'File encoding', c('UTF-8', 'Windows' = 'CP1252')
+            ))
+          )
+        ),
+        p(class = 'small', helpText(paste(
+          'Upload a file for analysis. If you are uploading time series data, the data needs',
+          'to be in long format (ie. one column for year and one column for each variable).'
+        ))),
         uiOutput('ui.idvar'),
         uiOutput('ui.inputs'),
         uiOutput('ui.outputs'),
@@ -171,11 +188,10 @@ ui <- function(request) { saiPage(
     )
   ),
 
-  footer = list(
+  footer = div( class = 'small text-center', tagList(
     hr(),
-    p(
-      class = 'text-center',
-      HTML(paste('&copy;', format(Sys.Date(), '%Y'), 'Riksrevisjonen.', 'Version', ver)))
-  )
+    p('Developed by the Data Science team at the Office of the Auditor General of Norway.'),
+    p(HTML(sprintf('&copy; %s Riksrevisjonen. Version %s', format(Sys.Date(), '%Y'), ver)))
+  ))
 
 )}
