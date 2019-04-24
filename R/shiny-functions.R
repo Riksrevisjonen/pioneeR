@@ -28,6 +28,6 @@ runPioneeR <- function(x = NULL, port = NULL, ...) {
   else
     Sys.setenv('PIONEER_DATA' = '')
 
-  runApp(system.file('app', package = 'pioneeR'), port = port)
+  runApp(system.file('app', package = 'pioneeR'), port = port, ...)
 
 }
