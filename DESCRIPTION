@@ -14,10 +14,12 @@ Depends:
     shiny (>= 1.2.0)
 Imports:
     Benchmarking (>= 0.27),
+    DT (>= 0.5),
     haven (>= 2.0.0),
     lpSolve,
     lpSolveAPI,
     magrittr,
+    markdown,
     plotly,
     productivity (>= 1.1.0),
     readxl,

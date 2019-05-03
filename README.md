@@ -1,6 +1,6 @@
 # pioneeR
 
-R package for running a Shiny app for DEA analysis
+R package for running a Shiny app for DEA analysis. Full documentation is available on our [GitHub Pages](https://riksrevisjonen.github.io/pioneeR/).
 
 ## Installation
 
