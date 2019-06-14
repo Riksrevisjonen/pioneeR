@@ -133,10 +133,13 @@ ui <- function(request) { saiPage(
             hr(),
             div(
               bs4Dropdown(
-                'Plot options', size = 'sm', color = 'light',
-                textInput('salter.color', 'Color', value = '123456'),
+                'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                textInput('salter.color', 'Color', value = '85c9f7'),
                 textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
-                textInput('salter.ytitle', 'Y-axis title', 'Efficiency')
+                textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
+                selectizeInput('salter.size', 'Image size', choices = c(
+                  'A5', 'A4', 'A3'
+                ))
               ),
               downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')
             ),

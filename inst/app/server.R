@@ -365,7 +365,12 @@ shinyServer(function(input, output, session) {
   output$salter.save <- downloadHandler(
     filename = 'salterplot.png',
     content = function(file) {
-      ggsave(file, salterPlot())
+      dims <- switch (input$salter.size,
+        A5 = c(210, 148),
+        A4 = c(297, 210),
+        A3 = c(420, 297)
+      )
+      ggsave(file, salterPlot(), width = dims[1], height = dims[2], units = 'mm')
     }
   )
 
