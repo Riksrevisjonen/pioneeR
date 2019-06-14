@@ -13,7 +13,7 @@ devtools::install_gitlab('ohjakobsen/saiUI')
 pioneeR can then be installed in a similar fashion:
 
 ```r
-devtools::install_github('riksrevisjonen/pioneeR')
+devtools::install_git('http://github.com/Riksrevisjonen/pioneeR.git')
 ```
 
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
