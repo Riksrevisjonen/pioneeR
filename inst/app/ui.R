@@ -139,6 +139,9 @@ ui <- function(request) { saiPage(
                 textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
                 selectizeInput('salter.size', 'Image size', choices = c(
                   'A5', 'A4', 'A3'
+                )),
+                selectizeInput('salter.format', 'Image format', choices = c(
+                  'PNG' = 'png', 'PDF' = 'pdf'
                 ))
               ),
               downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')

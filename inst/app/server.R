@@ -363,7 +363,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$salter.save <- downloadHandler(
-    filename = 'salterplot.png',
+    filename = sprintf('salterplot-%s.%s', Sys.Date(), input$salter.format),
     content = function(file) {
       dims <- switch (input$salter.size,
         A5 = c(210, 148),
