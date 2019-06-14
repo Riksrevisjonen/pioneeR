@@ -130,8 +130,17 @@ ui <- function(request) { saiPage(
           ),
           tabPanel('Plot',
             plotlyOutput('plot.dea', height = 500),
+            hr(),
+            div(
+              bs4Dropdown(
+                'Plot options', size = 'sm', color = 'light',
+                textInput('salter.color', 'Color', value = '123456'),
+                textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
+                textInput('salter.ytitle', 'Y-axis title', 'Efficiency')
+              ),
+              downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')
+            ),
             plotlyOutput('dea.salter.plot', height = 500)
-            # plotOutput('dea.static.plot')
           ),
           tabPanel(
             'Peers',

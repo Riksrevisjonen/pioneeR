@@ -324,7 +324,7 @@ shinyServer(function(input, output, session) {
 
   })
 
-  output$dea.salter.plot <- renderPlotly({
+  salterPlot <- reactive({
 
     d <- data.frame(
       dmu = selection()[[input$dea.idvar]],
@@ -339,15 +339,35 @@ shinyServer(function(input, output, session) {
     d$wm <- d$w - d$inputs
     d$wt <- with(d, wm + (w - wm)/2)
 
-    text <- paste(d$dmu, '\n', 'Efficiency score:', round(d$eff, 4))
+    text <- list(
+      labels = sprintf('%s\nEfficiency score: %s', d$dmu, round(d$eff, 4)),
+      xtitle = input$salter.xtitle,
+      ytitle = input$salter.ytitle
+    )
 
-    plot_ly(d) %>%
-      add_bars(x = ~wt, y = ~eff, width = ~inputs, marker = list(
-        line = list(color = 'rgb(8,48,107)', width = .6)
-      ), text = text, hoverinfo = 'text') %>%
-      layout(xaxis = list(title = 'Combined inputs'), yaxis = list(title = 'Efficiency'))
+    color <- sprintf('#%s', input$salter.color) # 'rgb(8,48,107)'
+
+    g <- ggplot(d, aes(x = wt, y = eff, width = inputs)) +
+      geom_bar(color = '#444444', fill = color,
+               stat = 'identity', position = 'identity') +
+      labs(x = input$salter.xtitle, y = input$salter.ytitle) +
+      theme_minimal()
 
   })
+
+  output$dea.salter.plot <- renderPlotly({
+
+    g <- salterPlot()
+    ggplotly(g)
+
+  })
+
+  output$salter.save <- downloadHandler(
+    filename = 'salterplot.png',
+    content = function(file) {
+      ggsave(file, salterPlot())
+    }
+  )
 
   output$summary.dea <- renderUI({
 
