@@ -80,7 +80,7 @@ ui <- function(request) { saiPage(
   ),
 
   tabPanel(
-    'Analyse', value = 'pioneer_analysis', hidden = TRUE,
+    'Analyse', value = 'pioneeranalysis', hidden = TRUE,
     sidebarLayout(
       saiMenu(
         width = 3,

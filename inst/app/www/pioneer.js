@@ -14,10 +14,10 @@ $(document).ready(function() {
     if (event.name === 'hasyear') {
       if (event.value === true) {
         $('#malmquist-tab').parent('li').show();
-        $('#pioneer_analysis-tab').parent('li').hide();
+        $('#pioneeranalysis-tab').parent('li').hide();
       } else if (event.value === false) {
         $('#malmquist-tab').parent('li').hide();
-        $('#pioneer_analysis-tab').parent('li').show();
+        $('#pioneeranalysis-tab').parent('li').show();
       }
     }
   });
