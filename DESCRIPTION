@@ -1,6 +1,6 @@
 Package: pioneeR
 Title: Perform productivity analyses in a web browser
-Version: 0.0.0.9200
+Version: 0.0.0.9300
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jan-roar.beckstrom@riksrevisjonen.no"),
@@ -32,5 +32,5 @@ Remotes: gitlab::ohjakobsen/saiUI
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.0
 VignetteBuilder: knitr
