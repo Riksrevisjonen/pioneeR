@@ -2,6 +2,10 @@
 
 $(document).ready(function() {
 
+  // Hide tabs on start-up (not working atm )
+  $('#pioneeranalysis-tab').parent('li').hide();
+  $('#malmquist-tab').parent('li').hide();
+
   // We want to disable the default behaviour of dropdown menus in Bootstrap so
   // that the dropdown does not immediately close when the user selects an input
   // value

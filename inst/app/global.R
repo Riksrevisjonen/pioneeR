@@ -1,5 +1,10 @@
 # Load packages
-require(saiUI)
+library(shiny)
+library(bslib)
+source('utils.R')
+
+# Set Bootstrap version
+bs_ver <- 5
 
 enableBookmarking(store = 'server')
 

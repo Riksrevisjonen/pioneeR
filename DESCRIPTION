@@ -6,6 +6,7 @@ Authors@R: c(
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jan-roar.beckstrom@riksrevisjonen.no"),
     person("Lars Skaage", "Engebretsen", role = "ctb", email = ""),
     person("Jonas", "Månsson", role = "ctb", email = "jonas.mansson@riksrevisjonen.no"),
+    person("Aleksander", "Eilertsen", role = "ctb", email = "ale@riksrevisjonen.no"),
     person(family = "Riksrevisjonen", role = "cph"))
 Description: What the package does (one paragraph).
 License: GPL-3 | file LICENSE
@@ -23,12 +24,11 @@ Imports:
     plotly,
     productivity (>= 1.1.0),
     readxl,
-    saiUI (>= 0.6.0),
-    writexl
+    writexl,
+    bslib
 Suggests:
     rmarkdown,
     knitr
-Remotes: gitlab::ohjakobsen/saiUI
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
