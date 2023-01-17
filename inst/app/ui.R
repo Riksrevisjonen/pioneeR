@@ -202,9 +202,9 @@ ui <- function(request) { page_navbar(
 
   tabPanel(
     'About', value = 'pioneeR_about',
-    singleLayout(
-      includeMarkdown('about.md')
-    )
+    tags$div(class = 'container mt-1',
+             tags$div(class = 'row',
+                      tags$div(class = 'col-12', includeMarkdown('about.md')))),
   ),
 
   footer = div( class = 'small text-center', tagList(

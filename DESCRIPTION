@@ -25,7 +25,7 @@ Imports:
     productivity (>= 1.1.0),
     readxl,
     writexl,
-    bslib
+    bslib (>= 0.4.2)
 Suggests:
     rmarkdown,
     knitr
