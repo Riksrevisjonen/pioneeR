@@ -608,7 +608,7 @@ shinyServer(function(input, output, session) {
 
     df <- checkBalance(selection(), input$dea.idvar, input$dea.year)
     if (df$listwise)
-      out <- bs4Alert(color = 'warning', icon = 'warning', df$message)
+      out <- alert(color = 'warning', icon = 'warning', df$message)
     else
       out <- NULL
 
