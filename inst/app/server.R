@@ -451,23 +451,23 @@ shinyServer(function(input, output, session) {
       card(
         card(
           card_header('Min'),
-          card_body(round(min(eff), out.decimals))
+          card_body(round(min(eff), input$out.decimals))
         ),
         card(
           card_header('1st Qu'),
-          card_body(round(quantile(eff)[[2]], out.decimals))
+          card_body(round(quantile(eff)[[2]], input$out.decimals))
         ),
         card(
           card_header('Median'),
-          card_body(round(median(eff), out.decimals))
+          card_body(round(median(eff), input$out.decimals))
         ),
         card(
           card_header('3rd Qu.'),
-          card_body(round(quantile(eff)[[4]], out.decimals))
+          card_body(round(quantile(eff)[[4]], input$out.decimals))
         ),
         card(
           card_header('Max'),
-          card_body(round(max(eff), out.decimals))
+          card_body(round(max(eff), input$out.decimals))
         )
       ),
       hr(),
