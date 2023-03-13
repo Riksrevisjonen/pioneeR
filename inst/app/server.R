@@ -59,7 +59,7 @@ shinyServer(function(input, output, session) {
 
   # ---- Data ----
 
-  # Update data when a data file is uploaded
+   # Update data when a data file is uploaded
   observeEvent(input$datafile, {
     dp <- switch(input$data.dec.point, Decimal = ',', Period = '.')
     reactives$data <- fileImport(
@@ -135,26 +135,27 @@ shinyServer(function(input, output, session) {
   output$data.preview <- renderUI({
 
     if (is.null(data()$file) && !is.null(data()$error)) {
-      dashboardCard(
-        header = 'Error!', color = 'warning',
-        paste(
-          'An error occured while reading the file. Please try another file or adjust the',
-          'upload settings.'
+      card(
+        card_header('Error!', class = 'bg-warning'),
+        card_body(
+          paste(
+            'An error occured while reading the file. Please try another file or adjust the',
+            'upload settings.'
+          )
         )
       )
     } else if (is.null(data()$file)) {
-      dashboardCard(
-        header = 'Select data',
-        list(
-          p(paste(
+      card(
+        card_header('Select data'),
+        card_body(
+          paste(
             'Upload a file to get started. The file must have variable names in the first row.',
             'Accepted file types are Excel files, Stata files, R data frames stored as RDS-files',
             '(objects of type tibble and data.table will be converted to data frames), and comma',
             'separated files.'
           )),
-          p('Click on Upload options to adjust the settings for reading the file.')
-        )
-      )
+        p('Click on Upload options to adjust the settings for reading the file.'
+        ))
     } else {
       list(
         h2('Data preview'),
@@ -277,7 +278,7 @@ shinyServer(function(input, output, session) {
     )
 
     p <- plot_ly(x = as.vector(x), y = as.vector(y), type = 'scatter', mode = 'markers',
-            text = o, hoverinfo = 'text', source = 'deaplot', name = 'Units') %>%
+                 text = o, hoverinfo = 'text', source = 'deaplot', name = 'Units') %>%
       layout(xaxis = list(title = xt, titlefont = list(size = 10)),
              yaxis = list(title = yt, titlefont = list(size = 10)))
 
@@ -368,9 +369,9 @@ shinyServer(function(input, output, session) {
     },
     content = function(file) {
       dims <- switch (input$salter.size,
-        A5 = c(210, 148),
-        A4 = c(297, 210),
-        A3 = c(420, 297)
+                      A5 = c(210, 148),
+                      A4 = c(297, 210),
+                      A3 = c(420, 297)
       )
       ggsave(file, salterPlot(), width = dims[1], height = dims[2], units = 'mm')
     }
@@ -447,12 +448,27 @@ shinyServer(function(input, output, session) {
       p(list('Technology is ', tags$em(dea.prod()$RTS), ' and ', tags$em(dea.prod()$ORIENTATION))),
       p(paste('Mean efficiency:', round(mean(eff), input$out.decimals))),
       p(paste('Weighted efficiency:',round(sum.eff, input$out.decimals))),
-      cardGroup(
-        dashboardCard(header = 'Min', round(min(eff), input$out.decimals)),
-        dashboardCard(header = '1st Qu.', round(quantile(eff)[[2]], input$out.decimals)),
-        dashboardCard(header = 'Median', round(median(eff), input$out.decimals)),
-        dashboardCard(header = '3rd Qu.', round(quantile(eff)[[4]], input$out.decimals)),
-        dashboardCard(header = 'Max', round(max(eff), input$out.decimals))
+      card(
+        card(
+          card_header('Min'),
+          card_body(round(min(eff), input$out.decimals))
+        ),
+        card(
+          card_header('1st Qu'),
+          card_body(round(quantile(eff)[[2]], input$out.decimals))
+        ),
+        card(
+          card_header('Median'),
+          card_body(round(median(eff), input$out.decimals))
+        ),
+        card(
+          card_header('3rd Qu.'),
+          card_body(round(quantile(eff)[[4]], input$out.decimals))
+        ),
+        card(
+          card_header('Max'),
+          card_body(round(max(eff), input$out.decimals))
+        )
       ),
       hr(),
       renderTable({ eff.tbl }),
@@ -592,7 +608,7 @@ shinyServer(function(input, output, session) {
 
     df <- checkBalance(selection(), input$dea.idvar, input$dea.year)
     if (df$listwise)
-      out <- bs4Alert(color = 'warning', icon = 'warning', df$message)
+      out <- alert(color = 'warning', icon = 'warning', df$message)
     else
       out <- NULL
 
@@ -638,7 +654,7 @@ shinyServer(function(input, output, session) {
     withProgress(DT::datatable(
       d, rownames = FALSE, extensions = c('Responsive'),
       options = list(pageLength = 100)) %>%
-      formatStyle(columns = 1:ncol(d), fontSize = '90%'))
+        formatStyle(columns = 1:ncol(d), fontSize = '90%'))
 
   })
 

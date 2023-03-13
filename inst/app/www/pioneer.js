@@ -2,22 +2,25 @@
 
 $(document).ready(function() {
 
-  // We want to disable the default behaviour of dropdown menus in Bootstrap so
-  // that the dropdown does not immediately close when the user selects an input
-  // value
-  $(document).on('click', '#uopts_menu', function(e) {
-     e.stopPropagation();
+  document.querySelector('[data-value="malmquist"]').closest('li').style.display = 'none';
+  document.querySelector('[data-value="pioneeranalysis"]').closest('li').style.display = 'none';
+
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'uopts_menu') {
+      e.target.stopPropagation();
+    }
   });
 
-  // Change the analysis tab based on if we have time series data or not
-  $(document).on('shiny:inputchanged', function(event) {
-    if (event.name === 'hasyear') {
-      if (event.value === true) {
-        $('#malmquist-tab').parent('li').show();
-        $('#pioneeranalysis-tab').parent('li').hide();
-      } else if (event.value === false) {
-        $('#malmquist-tab').parent('li').hide();
-        $('#pioneeranalysis-tab').parent('li').show();
+  $(document).on('shiny:inputchanged', function(e) {
+    if (e.name === 'hasyear') {
+      let el_m = document.querySelector('[data-value="malmquist"]').closest('li');
+      let el_a = document.querySelector('[data-value="pioneeranalysis"]').closest('li');
+      if (e.value === true) {
+        el_m.style.display = 'block';
+        el_a.style.display = 'none';
+      } else if (e.value === false) {
+        el_m.style.display = 'none';
+        el_a.style.display = 'block';
       }
     }
   });

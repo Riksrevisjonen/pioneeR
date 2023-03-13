@@ -14,44 +14,47 @@ vals <- list(
 )
 
 # Define UI for application that draws a histogram
-ui <- function(request) { saiPage(
+ui <- function(request) { page_navbar(
 
   title = 'pioneeR',
   id = 'pioneer',
+  theme = bslib::bs_theme(version = bs_ver),
+  fluid = TRUE,
 
   # Add custom CSS
   header = tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
-    tags$script(src = 'pioneer.min.js')
+    tags$script(src = 'pioneer.js') # pioneer.min.js
   ),
 
   tabPanel(
     'Data', value = 'pioneer_upload',
     sidebarLayout(
-      saiMenu(
+      sidebarPanel(
         width = 3,
-        fileInput(
-          'datafile', 'Choose a file', buttonLabel = 'Browse', multiple = FALSE,
-          accept = c('text/csv', 'text/plain', 'text/comma-separated-values',
-                     '.csv', '.xls', '.xlsx', '.dta', '.rds')),
+        div(class = 'input-group mb-3',
+            tags$input(
+              class = 'form-control', type = 'file', id = 'datafile',
+              accept='text/csv,text/plain,text/comma-separated-values,.csv,.xls,.xlsx,.dta,.rds')#,
+        ),
         div(
-          class = 'btn-group mb-2',
+          class = 'dropdown',
           tags$button(
             id = 'upload_opts_btn', class = 'dropdown-toggle btn btn-dark btn-sm', type = 'button',
-            `data-toggle` = 'dropdown', `aria-haspopup` = 'true', `aria-expanded` = 'false',
+            `data-bs-toggle` = 'dropdown', `aria-haspopup` = 'true', `aria-expanded` = 'false',
             'Upload options'
           ),
-          div(class = 'dropdown-menu p-3', style = 'min-width: 325px;', div(id = 'uopts_menu',
-            radioButtons(
-              'data.dec.point', 'Decimal point', c('Decimal', 'Period'),
-              selected = 'Decimal', inline = TRUE),
-            hr(),
-            checkboxInput('data.header', label = 'Variables names in first row', TRUE),
-            hr(),
-            selectizeInput(
-              'data.encoding', 'File encoding', c('UTF-8', 'Windows' = 'CP1252')
-            ))
-          )
+          div(class = 'dropdown-menu p-3', style = 'min-width: 325px;',
+              div(id = 'uopts_menu',
+                  radioButtons(
+                    'data.dec.point', 'Decimal point', c('Decimal', 'Period'),
+                    selected = 'Decimal', inline = TRUE),
+              ),
+              hr(),
+              checkboxInput('data.header', label = 'Variables names in first row', TRUE),
+              selectizeInput(
+                'data.encoding', 'File encoding', c('UTF-8', 'Windows' = 'CP1252')
+              ))
         ),
         p(class = 'small', helpText(paste(
           'Upload a file for analysis. If you are uploading time series data, the data needs',
@@ -72,17 +75,16 @@ ui <- function(request) { saiPage(
           'and that states might be deleted by the server administrator.'
         )))
       ),
-      saiMain(
+      mainPanel(
         width = 9,
         uiOutput('data.preview')
       )
     )
   ),
-
   tabPanel(
-    'Analyse', value = 'pioneeranalysis', hidden = TRUE,
+    'Analyse', value = 'pioneeranalysis',
     sidebarLayout(
-      saiMenu(
+      sidebarPanel(
         width = 3,
         selectInput('plot.rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
         selectInput('plot.orientation', 'Orientation', choices = vals$orient, selected = 'in'),
@@ -117,7 +119,7 @@ ui <- function(request) { saiPage(
                 'analysis report.')
         ))
       ),
-      saiMain(
+      mainPanel(
         width = 9,
         tabsetPanel(
           tabPanel(
@@ -129,24 +131,25 @@ ui <- function(request) { saiPage(
             dataTableOutput('dea.slack')
           ),
           tabPanel('Plot',
-            plotlyOutput('plot.dea', height = 500),
-            hr(),
-            div(
-              bs4Dropdown(
-                'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                textInput('salter.color', 'Color', value = '85c9f7'),
-                textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
-                textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
-                selectizeInput('salter.size', 'Image size', choices = c(
-                  'A5', 'A4', 'A3'
-                )),
-                selectizeInput('salter.format', 'Image format', choices = c(
-                  'PNG' = 'png', 'PDF' = 'pdf'
-                ))
-              ),
-              downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')
-            ),
-            plotlyOutput('dea.salter.plot', height = 500)
+                   plotlyOutput('plot.dea', height = 500),
+                   hr(),
+                   div(
+                     dropdown_button(
+                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                       textInput('salter.color', 'Color', value = '85c9f7'),
+                       textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
+                       textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
+                       selectizeInput('salter.size', 'Image size', choices = c(
+                         'A5', 'A4', 'A3'
+                       )
+                       ),
+                       selectizeInput('salter.format', 'Image format', choices = c(
+                         'PNG' = 'png', 'PDF' = 'pdf'
+                       ))
+                     ),
+                     downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')
+                   ),
+                   plotlyOutput('dea.salter.plot', height = 500)
           ),
           tabPanel(
             'Peers',
@@ -169,28 +172,29 @@ ui <- function(request) { saiPage(
 
     # TODO: Print back results from analysis
 
-    'Malmquist', hidden = TRUE,
+    title = 'Malmquist',
+    value = 'malmquist',
 
     sidebarLayout(
-      saiMenu(width = 3,
-        selectInput('malm.rts', 'Returns to scale', choices = vals$malm.rts, selected = 'crs'),
-        selectInput('malm.orient', 'Orientation', choices = vals$orient, selected = 'in'),
-        hr(),
-        p(strong('Output options')),
-        numericInput('malm.out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
-        hr(),
-        downloadButton('malm.export', 'Export results', class = 'btn-dark'),
-        p(class = 'small', helpText(
-          'Download the analysis results as shown in the table to the right.'
-        )),
-        selectizeInput(
-          'malm.fileformat', 'Choose file format',
-          choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
+      sidebarPanel(width = 3,
+                   selectInput('malm.rts', 'Returns to scale', choices = vals$malm.rts, selected = 'crs'),
+                   selectInput('malm.orient', 'Orientation', choices = vals$orient, selected = 'in'),
+                   hr(),
+                   p(strong('Output options')),
+                   numericInput('malm.out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
+                   hr(),
+                   downloadButton('malm.export', 'Export results', class = 'btn-dark'),
+                   p(class = 'small', helpText(
+                     'Download the analysis results as shown in the table to the right.'
+                   )),
+                   selectizeInput(
+                     'malm.fileformat', 'Choose file format',
+                     choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
       ),
-      saiMain(width = 9,
-        # Output malmquist$Changes as DT (with pretty lables)
-        # Viz of malmquist score?
-        uiOutput('malm.dt')
+      mainPanel(width = 9,
+                # Output malmquist$Changes as DT (with pretty lables)
+                # Viz of malmquist score?
+                uiOutput('malm.dt')
       )
     )
 
@@ -198,9 +202,9 @@ ui <- function(request) { saiPage(
 
   tabPanel(
     'About', value = 'pioneeR_about',
-    singleLayout(
-      includeMarkdown('about.md')
-    )
+    tags$div(class = 'container mt-1',
+             tags$div(class = 'row',
+                      tags$div(class = 'col-12', includeMarkdown('about.md')))),
   ),
 
   footer = div( class = 'small text-center', tagList(

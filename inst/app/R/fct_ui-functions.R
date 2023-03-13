@@ -1,0 +1,16 @@
+alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
+
+  cls <- sprintf('alert alert-%s', color)
+  if (dismissable) cls <- paste(cls, 'alert-dismissible fade show')
+
+  divTag <- div(class = cls, role = 'alert', ...)
+
+  if (dismissable)
+    divTag <- tagAppendChild(divTag, tags$button(
+      class = 'close', type = 'button', `data-dismiss` = 'alert', `aria-label` = 'Close',
+      tags$span(`aria-hidden` = TRUE, HTML('&times;'))
+    ))
+
+  divTag
+
+}
