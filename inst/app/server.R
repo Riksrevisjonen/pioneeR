@@ -607,12 +607,22 @@ shinyServer(function(input, output, session) {
     req(data()$file, input$dea.year)
 
     df <- checkBalance(selection(), input$dea.idvar, input$dea.year)
-    if (df$listwise)
-      out <- alert(color = 'warning', icon = 'warning', df$message)
-    else
-      out <- NULL
+    if (nrow(df$data) == 0) {
+      out <- alert(
+        color = 'danger', icon = 'danger',
+        'Balancing the data set returned 0 rows. Unable to perform analysis.
+        Upload a new data set that can be balanced.'
+      )
+    } else if (df$listwise) {
+      out <- tagList(
+        alert(color = 'warning', icon = 'warning', df$message),
+        dataTableOutput('malm.render')
+      )
+    } else {
+      out <- dataTableOutput('malm.render')
+    }
 
-    list(out, dataTableOutput('malm.render'))
+    return(out)
 
   })
 
