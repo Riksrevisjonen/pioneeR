@@ -15,7 +15,6 @@ Depends:
     shiny (>= 1.5.0)
 Imports:
     Benchmarking (>= 0.27),
-    DT (>= 0.5),
     haven (>= 2.0.0),
     lpSolve,
     lpSolveAPI,
