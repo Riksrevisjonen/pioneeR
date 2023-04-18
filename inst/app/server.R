@@ -9,9 +9,16 @@ require(productivity)
 require(plotly)
 require(haven)
 require(writexl)
+require(reactable)
+require(rlang)
 
 # Define server logic
 shinyServer(function(input, output, session) {
+
+  reactable_opts <- list(
+    compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
+    class = 'small', defaultPageSize = 100, rownames = FALSE
+  )
 
   # ---- Set reactive variables ----
 
@@ -96,40 +103,48 @@ shinyServer(function(input, output, session) {
     req(preview())
 
     d <- preview()
+    selected <- preview_selected()
 
-    if (input$data.subset && length(input$preview_rows_selected) > 0)
-      d <- d[input$preview_rows_selected, ]
+    if (!is.null(selected) && length(selected) > 0) {
+      d <- d[selected,]
+    }
 
-    return(d)
+    d
 
   })
 
   source('conditionalUI.R', local = TRUE, encoding = 'UTF-8')
 
-  output$preview <- renderDataTable({
-
+  output$preview <- renderReactable({
     # Input file is required. If input is NULL, return NULL
     req(preview())
 
-    if (!is.null(restoreVals$subset))
-      selected <- restoreVals$subset
-    else
-      selected <- NULL
+    df <- preview()
 
-    DT::datatable(
-      preview(), rownames = FALSE, extensions = c('Responsive'),
-      selection = list(mode = 'multiple', selected = selected, target = 'row'),
-      options = list(pageLength = 100)) %>%
-      formatStyle(columns = 1:ncol(preview()), fontSize = '90%')
+    selected <- if (!is.null(restoreVals$subset)) restoreVals$subset else NULL
+    id <- input$dea.idvar
+
+    coldefs <- list()
+    if (!is.null(id)) coldefs[[id]] <- colDef(sticky = 'left')
+
+    reactable(
+      df, selection = 'multiple', selectionId = NULL, onClick = 'select',
+      columns = coldefs,
+      theme = reactableTheme(
+        rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset .2em 0 0 0 #0d6efd")
+      )
+    )
 
   })
 
-  preview.proxy <- dataTableProxy('preview')
+  preview_selected <- reactive(getReactableState('preview', 'selected'))
 
   observeEvent(input$data.subset.select, {
-    # n <- nrow(data()$file)
-    n <- nrow(preview())
-    selectRows(preview.proxy, c(1:n))
+    updateReactable('preview', selected = seq_len(nrow(preview())))
+  })
+
+  observeEvent(input$data.subset.deselect, {
+    updateReactable('preview', selected = NA)
   })
 
   output$data.preview <- renderUI({
@@ -160,7 +175,7 @@ shinyServer(function(input, output, session) {
       list(
         h2('Data preview'),
         p(class = 'lead', 'This is a preview of the imported data'),
-        dataTableOutput('preview')
+        reactableOutput('preview')
       )
     }
 
@@ -530,44 +545,35 @@ shinyServer(function(input, output, session) {
 
   })
 
-  output$dea.table <- renderDataTable({
-
+  output$dea.table <- renderReactable({
     df <- dea.tbl()
-
-    DT::datatable(
-      df, rownames = FALSE, extensions = c('Responsive'),
-      options = list(pageLength = 100)) %>%
-      formatStyle(columns = 1:ncol(df), fontSize = '90%')
-
+    opts <- list2(!!!reactable_opts, data = df, columns = list(
+      DMU = colDef(sticky = 'left')
+    ))
+    do.call(reactable, opts)
   })
 
-  output$dea.slack <- renderDataTable({
-
+  output$dea.slack <- renderReactable({
     sl <- dea.slack()
     df <- data.frame(round(cbind(sl$sx, sl$sy, sl$sum), 3))
     colnames(df)[ncol(df)] <- 'Total'
 
-    DT::datatable(
-      df, rownames = FALSE,
-      options = list(pageLength = 100)) %>%
-      formatStyle(columns = c(1:8), fontSize = '90%')
-
+    opts <- list2(!!!reactable_opts, data = df)
+    do.call(reactable, opts)
   })
 
-  output$peers.table <- renderDataTable({
-
+  output$peers.table <- renderReactable({
     pr <- dea.prod()
-
     pe <- Benchmarking::peers(pr, NAMES = TRUE)
-
     df <- data.frame(
       cbind(selection()[, input$dea.idvar], pe),
       stringsAsFactors = FALSE)
     colnames(df)[1] <- 'DMU'
 
-    DT::datatable(df, rownames = FALSE,
-                  options = list(pageLength = 100))
-
+    opts <- list2(!!!reactable_opts, data = df, columns = list(
+      DMU = colDef(sticky = 'left')
+    ))
+    do.call(reactable, opts)
   })
 
   output$exporttable <- downloadHandler(
@@ -589,15 +595,15 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  output$scaleeff.tbl <- renderDataTable({
-
+  output$scaleeff.tbl <- renderReactable({
     df <- dea.scaleeff()
 
-    DT::datatable(
-      df, rownames = FALSE, extensions = c('Responsive'),
-      options = list(pageLength = 100)) %>%
-      formatStyle(columns = 1:ncol(df), fontSize = '90%')
-
+    opts <- list2(!!!reactable_opts, data = df, columns = list(
+      DMU = colDef(sticky = 'left'),
+      scale_eff = colDef(name = 'crs/vrs'),
+      vrs_nirs = colDef(name = 'vrs/nirs')
+    ))
+    do.call(reactable, opts)
   })
 
   # ---- Malmquist ----
@@ -616,7 +622,7 @@ shinyServer(function(input, output, session) {
     } else if (df$listwise) {
       out <- tagList(
         alert(color = 'warning', icon = 'warning', df$message),
-        dataTableOutput('malm.render')
+        reactableOutput('malm.render')
       )
     } else {
       out <- dataTableOutput('malm.render')
@@ -654,18 +660,14 @@ shinyServer(function(input, output, session) {
 
   })
 
-  output$malm.render <- renderDataTable({
-
+  output$malm.render <- renderReactable({
     req(input$dea.year)
 
     d <- malm.calc()
-
-    # TODO: Fix progress bar
-    withProgress(DT::datatable(
-      d, rownames = FALSE, extensions = c('Responsive'),
-      options = list(pageLength = 100)) %>%
-        formatStyle(columns = 1:ncol(d), fontSize = '90%'))
-
+    withProgress(reactable(
+      d, compact = TRUE, sortable = TRUE, filterable = TRUE,
+      defaultPageSize = 100, class = 'small'
+    ))
   })
 
   output$malm.export <- downloadHandler(

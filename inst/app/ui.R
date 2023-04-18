@@ -1,7 +1,7 @@
 # Load required packages
 require(plotly)
 require(data.table)
-require(DT)
+require(reactable)
 
 ver <- utils::packageVersion('pioneeR')
 
@@ -124,11 +124,11 @@ ui <- function(request) { page_navbar(
         tabsetPanel(
           tabPanel(
             'Efficiency',
-            dataTableOutput('dea.table')
+            reactableOutput('dea.table')
           ),
           tabPanel(
             'Slack',
-            dataTableOutput('dea.slack')
+            reactableOutput('dea.slack')
           ),
           tabPanel('Plot',
                    plotlyOutput('plot.dea', height = 500),
@@ -153,7 +153,7 @@ ui <- function(request) { page_navbar(
           ),
           tabPanel(
             'Peers',
-            dataTableOutput('peers.table')
+            reactableOutput('peers.table')
           ),
           tabPanel(
             'Summary',
@@ -161,7 +161,7 @@ ui <- function(request) { page_navbar(
           ),
           tabPanel(
             'Scale efficiency',
-            dataTableOutput('scaleeff.tbl')
+            reactableOutput('scaleeff.tbl')
           )
         )
       )
