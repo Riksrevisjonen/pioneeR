@@ -30,6 +30,7 @@ Imports:
 Suggests:
     rmarkdown,
     knitr,
+    scales,
     rlang
 Language: en-GB
 Encoding: UTF-8
