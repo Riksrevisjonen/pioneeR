@@ -41,7 +41,7 @@ output$ui.outputs <- renderUI({
     selected <- NULL
 
   choices <- data()$cols
-  if (!is.null(input$dea.input) && input$dea.input != '')
+  if (!is.null(input$dea.input) && !any(input$dea.input == ''))
     choices <- choices[!(choices %in% c(input$datafile, input$dea.input))]
   selectInput('dea.output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
 
