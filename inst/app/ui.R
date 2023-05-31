@@ -32,6 +32,7 @@ ui <- function(request) { page_navbar(
     sidebarLayout(
       sidebarPanel(
         width = 3,
+        file_upload_ui('file_upload', wrap = TRUE, class = 'mb-2'),
         div(class = 'input-group mb-3',
             tags$input(
               class = 'form-control', type = 'file', id = 'datafile',

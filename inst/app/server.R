@@ -66,35 +66,29 @@ shinyServer(function(input, output, session) {
 
   # ---- Data ----
 
-   # Update data when a data file is uploaded
-  observeEvent(input$datafile, {
-    dp <- switch(input$data.dec.point, Decimal = ',', Period = '.')
-    reactives$data <- fileImport(
-      input$datafile$datapath, dec.point = dp, fileEncoding = input$data.encoding
-    )
+  user_file <- file_upload_srv('file_upload')
+
+  # Update data when a data file is uploaded
+  observeEvent(user_file(), {
+    x <- user_file()
+    if (!is.null(x$file) && all(dim(x$file) > 0)) {
+      reactives$data <- x
+    }
   }, ignoreInit = TRUE)
 
   data <- reactive({
-
     # Return the active data object. This can be a data frame sent with the runPioneeR
     # call, a restored data object from a previous session, or a new dataset uploaded
     # by the user.
     reactives$data
-
   })
 
   preview <- reactive({
 
     d <- data()$file
-
-    cols <- c()
-    if (isTRUE(length(input$dea.idvar) > 0)) cols <- append(cols, input$dea.idvar)
-    if (isTRUE(length(input$dea.input) > 0)) cols <- append(cols, input$dea.input)
-    if (isTRUE(length(input$dea.output) > 0)) cols <- append(cols, input$dea.output)
-    if (isTRUE(length(input$dea.year) > 0)) cols <- append(cols, input$dea.year)
-    if (isTRUE(length(cols) > 1)) d <- d[, cols]
-
-    return(d)
+    cols <- list(input$dea.idvar, input$dea.input, input$dea.output, input$dea.year)
+    if (!is.null(cols) && length(unlist(cols)) > 1) d <- d[, unlist(cols)]
+    d
 
   })
 
