@@ -33,7 +33,7 @@ h2 {
   width: auto;
 }
 
-#plot_dea_tooltip {
+#plot_dea_tooltip, #plot_salter_tooltip {
   position: absolute;
   width: auto;
   z-index: 9999;

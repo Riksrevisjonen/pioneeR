@@ -349,7 +349,7 @@ shinyServer(function(input, output, session) {
 
   # ---- DEA output functions ----
 
-  salterPlot <- reactive({
+  salter_plot_df <- reactive({
 
     d <- data.frame(
       dmu = selection()[[input$dea.idvar]],
@@ -364,6 +364,14 @@ shinyServer(function(input, output, session) {
     d$w <- cumsum(d$inputs)
     d$wm <- d$w - d$inputs
     d$wt <- with(d, wm + (w - wm)/2)
+
+    d
+
+  })
+
+  salterPlot <- reactive({
+
+    d <- salter_plot_df()
 
     text <- list(
       labels = sprintf('%s\nEfficiency score: %s', d$dmu, round(d$eff, 4)),
@@ -386,6 +394,29 @@ shinyServer(function(input, output, session) {
   output$dea_salter_plot <- renderPlot({
     g <- salterPlot()
     g
+  })
+
+  salterPoint <- function(df, coords) {
+    # If outside plot area, return and empty data.frame
+    if (is.null(coords$y) || is.null(coords$x) || coords$y < 0) return(data.frame())
+    # We need the cumulative sum of the inputs to get the boundaries for each dmu
+    df$wmc <- cumsum(df$inputs)
+    df <- df[df$eff > coords$y & df$wm < coords$x & df$wmc > coords$x,]
+    return(df)
+  }
+
+  output$plot_salter_tooltip <- renderUI({
+    d <- salter_plot_df()
+    x <- salterPoint(d, input$salter_hover)
+    if (nrow(x) > 0) {
+      msg <- sprintf(
+        '<p class="p-1 m-0" style="font-size: .75rem">DMU: %s<br />Input: %s<br />Output: %s</p>',
+        x$dmu[1], x$inputs[1], x$outputs[1]
+      )
+      tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
+    } else {
+      return()
+    }
   })
 
   output$salter.save <- downloadHandler(

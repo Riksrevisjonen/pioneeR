@@ -152,6 +152,7 @@ ui <- function(request) { page_navbar(
                    plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
                      id = 'salter_hover', delay = 100, delayType = 'throttle')
                    ),
+                   uiOutput('plot_salter_tooltip'),
                    div(
                      dropdown_button(
                        'Plot options', size = 'sm', color = 'light', autoclose = FALSE,

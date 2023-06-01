@@ -11,9 +11,9 @@ $(document).ready(function() {
     }
   });
 
-  $('#plot_dea').mousemove(function(e) {
+  const positionTooltip = function(e, id) {
     // Use scrollWidth and scrollHeight on the html element to get document width and height
-    let el = document.getElementById('plot_dea_tooltip');
+    let el = document.getElementById(id);
     let docX = document.documentElement.scrollWidth;
     let docY = document.documentElement.scrollHeight;
     // If we are far from the right edge, position with left, else position with right
@@ -32,7 +32,15 @@ $(document).ready(function() {
       el.style.top = null;
       el.style.bottom = (docY - e.pageY + 5) + "px";
     }
+  }
+
+  $('#plot_dea').mousemove(function(e) {
+    positionTooltip(e, 'plot_dea_tooltip');
   });
+
+  $('#dea_salter_plot').mousemove(function(e) {
+    positionTooltip(e, 'plot_salter_tooltip');
+  })
 
   $(document).on('shiny:inputchanged', function(e) {
     if (e.name === 'hasyear') {
