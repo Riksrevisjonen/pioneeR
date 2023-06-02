@@ -6,7 +6,8 @@ require(lpSolveAPI)
 require(lpSolve)
 require(Benchmarking)
 require(productivity)
-require(plotly)
+require(ggplot2)
+require(scales)
 require(haven)
 require(writexl)
 require(reactable)
@@ -66,7 +67,7 @@ shinyServer(function(input, output, session) {
 
   # ---- Data ----
 
-   # Update data when a data file is uploaded
+  # Update data when a data file is uploaded
   observeEvent(input$datafile, {
     dp <- switch(input$data.dec.point, Decimal = ',', Period = '.')
     reactives$data <- fileImport(
@@ -247,63 +248,77 @@ shinyServer(function(input, output, session) {
 
   })
 
-  plot.dea <- reactive({
-
+  dea_plot_df <- reactive({
     req(data(), input$dea.input, input$dea.output)
 
     x <- dea.in()
     y <- dea.out()
 
-    # If `x` is a matrix, we collapse each row to a single value
-    if (is.matrix(x) && dim(x)[2] > 1) {
-      wx <- matrix(1, nrow = dim(x)[2], ncol = 1)
-      x <- x %*% wx
-    }
-    # If `y` is a matrix, we collapse each row to a single value
-    if (is.matrix(y) && dim(y)[2] > 1) {
-      wy <- matrix(1, nrow = dim(y)[2], ncol = 1)
-      y <- y %*% wy
-    }
+    # If x or y is a matrix, get vector with row sums instead
+    if (is.matrix(x)) x <- rowSums(x)
+    if (is.matrix(y)) y <- rowSums(y)
 
-    xt <- paste('Inputs:\n', paste(input$dea.input, collapse = ', '))
-    yt <- paste('Outputs:\n', paste(input$dea.output, collapse = ', '))
-
-    p_ <- switch(
-      input$plot.rts,
-      'crs' = {
-        slope <- max(as.vector(y) / as.vector(x))
-        top <- max(as.vector(y) / slope)
-        coords <- list(x = c(0, top), y = c(0, top * slope))
-      },
-      'vrs' = {
-        hpts <- chull(unname(x), unname(y))
-        hpts <- hpts[c(which(x[hpts] == min(x[hpts])), which(head(x[hpts], -1) < tail(x[hpts], -1)) + 1)]
-
-        coords <- list(
-          x = c(min(x[hpts]), x[hpts], max(x[hpts])),
-          y = c(0, y[hpts], max(y[hpts])))
-      }
-    )
-
-    o <- paste0(
-      selection()[, input$dea.idvar], '\n',
-      'Efficiency score: ', round(dea.prod()$eff, 4), '\n',
-      'Combined inputs: ', round(as.vector(x), 4), '\n',
-      'Combined outputs: ', round(as.vector(y), 4)
-    )
-
-    p <- plot_ly(x = as.vector(x), y = as.vector(y), type = 'scatter', mode = 'markers',
-                 text = o, hoverinfo = 'text', source = 'deaplot', name = 'Units') %>%
-      layout(xaxis = list(title = xt, titlefont = list(size = 10)),
-             yaxis = list(title = yt, titlefont = list(size = 10)))
-
-    if (input$plot.rts %in% c('crs', 'vrs'))
-      p <- add_trace(p, x = coords$x, y = coords$y, type = 'scatter', mode = 'lines',
-                     text = 'Front', name = 'Front')
-
-    p
-
+    data.frame(dmu = rownames(dea.in()), x = unname(x), y = unname(y))
   })
+
+  dea_plot <- reactive({
+    req(data(), input$dea.input, input$dea.output)
+
+    d <- dea_plot_df()
+
+    p <- ggplot(d, aes(x = x, y = y)) +
+      geom_point(color = '#084887') +
+      xlab(paste('Inputs:\n', paste(input$dea.input, collapse = ', '))) +
+      ylab(paste('Outputs:\n', paste(input$dea.output, collapse = ', '))) +
+      scale_y_continuous(labels = label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
+      scale_x_continuous(labels = label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
+      theme_pioneer()
+
+    if (input$plot.rts %in% c('crs', 'vrs')) {
+      if (input$plot.rts == 'crs') {
+        p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55')
+      } else if (input$plot.rts == 'vrs') {
+        hpts <- chull(d$x, d$y)
+        hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+
+        coords <- data.frame(
+          x = c(min(d$x[hpts]), d$x[hpts], max(d$x[hpts])),
+          y = c(0, d$y[hpts], max(d$y[hpts])))
+        p <- p + geom_line(data = coords, aes(x = x, y = y), color = '#f9ab55')
+      }
+    }
+
+    return(p)
+  })
+
+  output$plot_dea <- renderPlot({
+    p <- dea_plot()
+    p
+  })
+
+  output$plot_dea_tooltip <- renderUI({
+    x <- nearPoints(dea_plot_df(), input$dea_hover)
+    if (nrow(x) > 0) {
+      msg <- sprintf(
+        '<p class="p-1 m-0" style="font-size: .75rem">DMU: %s<br />Input: %s<br />Output: %s</p>',
+        x$dmu[1], x$x[1], x$y[1]
+      )
+      tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
+    } else {
+      return()
+    }
+  })
+
+  output$dea.plot.save <- downloadHandler(
+    filename = function() {
+      sprintf('dea-plot-%s.%s', Sys.Date(), input$dea_dl_format)
+    },
+    content = function(file) {
+      ggsave_(
+        file, dea_plot(), format = tolower(input$dea_dl_format),
+        size = input$dea_dl_size)
+    }
+  )
 
   dea.scaleeff <- reactive({
 
@@ -334,13 +349,7 @@ shinyServer(function(input, output, session) {
 
   # ---- DEA output functions ----
 
-  output$plot.dea <- renderPlotly({
-
-    plot.dea()
-
-  })
-
-  salterPlot <- reactive({
+  salter_plot_df <- reactive({
 
     d <- data.frame(
       dmu = selection()[[input$dea.idvar]],
@@ -351,9 +360,18 @@ shinyServer(function(input, output, session) {
     )
 
     d <- d[order(d$eff),]
+    rownames(d) <- NULL
     d$w <- cumsum(d$inputs)
     d$wm <- d$w - d$inputs
     d$wt <- with(d, wm + (w - wm)/2)
+
+    d
+
+  })
+
+  salterPlot <- reactive({
+
+    d <- salter_plot_df()
 
     text <- list(
       labels = sprintf('%s\nEfficiency score: %s', d$dmu, round(d$eff, 4)),
@@ -363,32 +381,52 @@ shinyServer(function(input, output, session) {
 
     color <- sprintf('#%s', input$salter.color) # 'rgb(8,48,107)'
 
-    g <- ggplot(d, aes(x = wt, y = eff, width = inputs)) +
-      geom_bar(color = '#444444', fill = color,
-               stat = 'identity', position = 'identity') +
+    g <- ggplot(d, aes(x = wt, y = eff, width = inputs, fill = as.character(row.names(d)))) +
+      geom_bar(stat = 'identity', position = 'identity', show.legend = FALSE) +
+      scale_fill_manual(values = rep(c('#084887', '#f9ab55'), length.out = nrow(d))) +
       labs(x = input$salter.xtitle, y = input$salter.ytitle) +
-      theme_minimal()
+      scale_x_continuous(labels = label_number(suffix = find_scale(d$wt)[[1]], scale = find_scale(d$wt)[[2]])) +
+      scale_y_continuous(labels = label_number(suffix = find_scale(d$eff)[[1]], scale = find_scale(d$eff)[[2]])) +
+      theme_pioneer()
 
   })
 
-  output$dea.salter.plot <- renderPlotly({
-
+  output$dea_salter_plot <- renderPlot({
     g <- salterPlot()
-    ggplotly(g)
+    g
+  })
 
+  salterPoint <- function(df, coords) {
+    # If outside plot area, return and empty data.frame
+    if (is.null(coords$y) || is.null(coords$x) || coords$y < 0) return(data.frame())
+    # We need the cumulative sum of the inputs to get the boundaries for each dmu
+    df$wmc <- cumsum(df$inputs)
+    df <- df[df$eff > coords$y & df$wm < coords$x & df$wmc > coords$x,]
+    return(df)
+  }
+
+  output$plot_salter_tooltip <- renderUI({
+    d <- salter_plot_df()
+    x <- salterPoint(d, input$salter_hover)
+    if (nrow(x) > 0) {
+      msg <- sprintf(
+        '<p class="p-1 m-0" style="font-size: .75rem">DMU: %s<br />Input: %s<br />Output: %s</p>',
+        x$dmu[1], x$inputs[1], x$outputs[1]
+      )
+      tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
+    } else {
+      return()
+    }
   })
 
   output$salter.save <- downloadHandler(
     filename = function() {
-      sprintf('salterplot-%s.%s', Sys.Date(), input$salter.format)
+      sprintf('salterplot-%s.%s', Sys.Date(), input$salter_dl_format)
     },
     content = function(file) {
-      dims <- switch (input$salter.size,
-                      A5 = c(210, 148),
-                      A4 = c(297, 210),
-                      A3 = c(420, 297)
-      )
-      ggsave(file, salterPlot(), width = dims[1], height = dims[2], units = 'mm')
+      ggsave_(
+        file, salterPlot(), format = tolower(input$salter_dl_format),
+        size = input$salter_dl_size)
     }
   )
 

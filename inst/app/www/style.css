@@ -32,3 +32,10 @@ h2 {
 .input-group-btn {
   width: auto;
 }
+
+#plot_dea_tooltip, #plot_salter_tooltip {
+  position: absolute;
+  width: auto;
+  z-index: 9999;
+  padding: 0;
+}
