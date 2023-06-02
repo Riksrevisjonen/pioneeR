@@ -1,5 +1,4 @@
 # Load required packages
-require(plotly)
 require(data.table)
 require(reactable)
 
@@ -132,25 +131,44 @@ ui <- function(request) { page_navbar(
             reactableOutput('dea.slack')
           ),
           tabPanel('Plot',
-                   plotlyOutput('plot.dea', height = 500),
+                   plotOutput('plot_dea', height = 600, hover = hoverOpts(
+                     id = 'dea_hover', delay = 100, delayType = 'throttle')
+                   ),
+                   uiOutput('plot_dea_tooltip'),
+                   div(
+                     dropdown_button(
+                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                       textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
+                       textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
+                       selectizeInput('dea_dl_size', 'Image size', choices = c(
+                         'A5', 'A4', 'A3'
+                       )),
+                       selectizeInput('dea_dl_format', 'Image format', choices = c(
+                         'PNG' = 'png', 'PDF' = 'pdf'
+                       ))
+                     ),
+                     downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                   ),
                    hr(),
+                   plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
+                     id = 'salter_hover', delay = 100, delayType = 'throttle')
+                   ),
+                   uiOutput('plot_salter_tooltip'),
                    div(
                      dropdown_button(
                        'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
                        textInput('salter.color', 'Color', value = '85c9f7'),
                        textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
                        textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
-                       selectizeInput('salter.size', 'Image size', choices = c(
+                       selectizeInput('salter_dl_size', 'Image size', choices = c(
                          'A5', 'A4', 'A3'
-                       )
-                       ),
-                       selectizeInput('salter.format', 'Image format', choices = c(
+                       )),
+                       selectizeInput('salter_dl_format', 'Image format', choices = c(
                          'PNG' = 'png', 'PDF' = 'pdf'
                        ))
                      ),
-                     downloadButton('salter.save', 'Save plot', size = 'sm', color = 'light')
-                   ),
-                   plotlyOutput('dea.salter.plot', height = 500)
+                     downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
+                   )
           ),
           tabPanel(
             'Peers',
