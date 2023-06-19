@@ -14,3 +14,12 @@ alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
   divTag
 
 }
+
+bs_modal_button <- function(
+    label = 'Close', color = 'default', size = c('normal', 'sm', 'lg'))
+{
+  size <- match.arg(size)
+  size <- switch(size, normal = '', sprintf('btn-%s', size))
+  cls <- sprintf('btn %s btn-%s', size, color)
+  tags$button(type = 'button', class = cls, `data-bs-dismiss` = 'modal', label)
+}

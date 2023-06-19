@@ -67,10 +67,24 @@ output$ui.year <- renderUI({
   # We only want to show the input if we have time series data
   if (!input$hasyear) return(NULL)
 
-  chk.min <- sapply(data()$cols, function(c) min(data()$file[[c]]), USE.NAMES = FALSE)
-  chk.max <- sapply(data()$cols, function(c) max(data()$file[[c]]), USE.NAMES = FALSE)
+  df <- data()$file
 
-  choices <- data()$cols[chk.min > 1900 & chk.max < 2100]
+  check_within <- function(min, max) {
+    if (!is.numeric(min) || !is.numeric(max)) {
+      return(NA)
+    }
+    if (is.na(min) || is.na(max)) {
+      return(NA)
+    }
+    return(min > 1900 & max < 2100)
+  }
+
+  year_vars <- mapply(
+    check_within,
+    min = lapply(data()$file, min),
+    max = lapply(data()$file, max))
+
+  choices <- data()$cols[which(year_vars)] #names(chk_min > 1900 & chk_max < 2100)
   selected <- ifelse(length(choices) == 1, choices[[1]], NULL)
   selectInput('dea.year', 'Year variable', choices = choices, selected = selected, multiple = TRUE)
 
