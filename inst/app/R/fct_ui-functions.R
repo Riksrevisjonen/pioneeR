@@ -14,3 +14,15 @@ alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
   divTag
 
 }
+
+content_div <- function(...) {
+  tags$div(
+    class = 'container mt-1',
+    tags$div(
+      class = 'row',
+      tags$div(
+        class = 'col-12', ...
+      )
+    )
+  )
+}
