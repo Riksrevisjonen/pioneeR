@@ -31,33 +31,11 @@ ui <- function(request) { page_navbar(
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        div(class = 'input-group mb-3',
-            tags$input(
-              class = 'form-control', type = 'file', id = 'datafile',
-              accept='text/csv,text/plain,text/comma-separated-values,.csv,.xls,.xlsx,.dta,.rds')#,
-        ),
-        div(
-          class = 'dropdown',
-          tags$button(
-            id = 'upload_opts_btn', class = 'dropdown-toggle btn btn-dark btn-sm', type = 'button',
-            `data-bs-toggle` = 'dropdown', `aria-haspopup` = 'true', `aria-expanded` = 'false',
-            'Upload options'
-          ),
-          div(class = 'dropdown-menu p-3', style = 'min-width: 325px;',
-              div(id = 'uopts_menu',
-                  radioButtons(
-                    'data.dec.point', 'Decimal point', c('Decimal', 'Period'),
-                    selected = 'Decimal', inline = TRUE),
-              ),
-              hr(),
-              checkboxInput('data.header', label = 'Variables names in first row', TRUE),
-              selectizeInput(
-                'data.encoding', 'File encoding', c('UTF-8', 'Windows' = 'CP1252')
-              ))
-        ),
-        p(class = 'small', helpText(paste(
-          'Upload a file for analysis. If you are uploading time series data, the data needs',
-          'to be in long format (ie. one column for year and one column for each variable).'
+        file_upload_ui('file_upload', wrap = TRUE, class = 'mb-2'),
+        p(class = 'small', helpText(HTML(
+          'Upload a file for analysis. If you are uploading <strong>time series data</strong>,
+          the data needs to be in long format (ie. one column for year and one column for
+          each variable).'
         ))),
         uiOutput('ui.idvar'),
         uiOutput('ui.inputs'),

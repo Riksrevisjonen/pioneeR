@@ -40,7 +40,7 @@ $(document).ready(function() {
 
   $('#dea_salter_plot').mousemove(function(e) {
     positionTooltip(e, 'plot_salter_tooltip');
-  })
+  });
 
   $(document).on('shiny:inputchanged', function(e) {
     if (e.name === 'hasyear') {
