@@ -41,7 +41,7 @@ $(document).ready(function() {
 
   $('#dea_salter_plot').mousemove(function(e) {
     positionTooltip(e, 'plot_salter_tooltip');
-  })
+  });
 
   Shiny.addCustomMessageHandler('toggle_compare', function(msg) {
     let el = document.querySelector('[data-value="pioneer_compare"]').closest('li');
