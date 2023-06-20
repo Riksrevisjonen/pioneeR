@@ -7,8 +7,7 @@ alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
 
   if (dismissable)
     divTag <- tagAppendChild(divTag, tags$button(
-      class = 'close', type = 'button', `data-dismiss` = 'alert', `aria-label` = 'Close',
-      tags$span(`aria-hidden` = TRUE, HTML('&times;'))
+      class = 'btn-close', type = 'button', `data-bs-dismiss` = 'alert', `aria-label` = 'Close'
     ))
 
   divTag

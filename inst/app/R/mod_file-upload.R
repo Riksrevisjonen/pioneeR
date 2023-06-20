@@ -38,7 +38,7 @@ file_upload_srv <- function(id) {
               class = 'input-group mb-3',
               tags$input(
                 class = 'form-control', type = 'file', id = ns('fileInput'),
-                accept='text/csv,text/plain,text/comma-separated-values,.tsv,.csv,.xls,.xlsx,.dta,.rds')
+                accept='text/csv,text/plain,text/comma-separated-values,.tsv,.csv,.xls,.xlsx,.dta,.rds,.sav')
             ),
             uiOutput(ns('file_opts')),
             uiOutput(ns('clean_file'))
@@ -70,10 +70,11 @@ file_upload_srv <- function(id) {
       })
 
       clean_file <- reactive({
-        req(raw_file(), input$file_sep, input$file_dec)
+        req(raw_file())
         ext <- file_params$ext
         if (is.null(ext)) return()
         if (ext %in% c('csv', 'tsv', 'dsv', 'txt')) {
+          req(input$file_sep, input$file_dec)
           header <- if (is.null(input$file_header)) TRUE else as.logical(input$file_header)
           clean_doc <- read.table(
             textConnection(raw_file()),
@@ -137,7 +138,7 @@ file_upload_srv <- function(id) {
             ),
             column(
               selectizeInput(
-                ns('file_enc'), 'Enkoding',
+                ns('file_enc'), 'Encoding',
                 c(
                   'UTF-8' = 'utf-8',
                   'Windows (Western)' = 'cp1252',
@@ -165,9 +166,20 @@ file_upload_srv <- function(id) {
             )
           )
         } else {
-          return(NULL)
+          ui <- NULL
         }
-        ui
+        tagList(
+          ui,
+          fluidRow(
+            column(
+              alert(
+                'If the data looks OK, click the Save button to add the data for analysis.',
+                dismissable = TRUE
+              ),
+              width = 12
+            )
+          )
+        )
       })
 
       output$clean_file <- renderUI({
