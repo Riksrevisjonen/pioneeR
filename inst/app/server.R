@@ -662,6 +662,12 @@ shinyServer(function(input, output, session) {
       )
     )
     models(append(models(), list(mod_save)))
+    # Toggle the compare button in the UI
+    if (length(models()) >= 2) {
+      session$sendCustomMessage('toggle_compare', TRUE)
+    } else {
+      session$sendCustomMessage('toggle_compare', FALSE)
+    }
   })
 
   output$compare_models_tbl <- renderUI({
@@ -685,11 +691,51 @@ shinyServer(function(input, output, session) {
       )
       df <- merge(df, dfa, by = 'dmu', all = TRUE)
     }
+    # Display UI
+    tagList(
+      actionButton('manage_models', 'Manage models'),
     reactable(
       df, compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
       defaultPageSize = 100, class = 'small',
       defaultColDef = colDef(html = TRUE)
     )
+    )
+  })
+
+  observeEvent(input$manage_models, {
+    mods <- models()
+    mods_ui <- function(el) {
+      tags$div(
+        class = 'row',
+        tags$div(class = 'col-6', p(el$id)),
+        tags$div(class = 'col-2', p(el$params$rts)),
+        tags$div(class = 'col-2', p(el$params$orientation)),
+        tags$div(class = 'col-2', tags$button(
+          class = 'btn btn-danger btn-sm', 'Delete',
+          `data-app-delete-id` = el$id
+        ))
+      )
+    }
+    showModal(
+      modalDialog(
+        tags$div(
+          class = 'row',
+          tags$div(class = 'col-6', p('Model ID')),
+          tags$div(class = 'col-2', p('RTS')),
+          tags$div(class = 'col-2', p('Orientation')),
+          tags$div(class = 'col-2', '')
+        ),
+        lapply(mods, mods_ui),
+        size = 'l'
+      )
+    )
+  })
+
+  observeEvent(input$delete_mod_id, {
+    mods <- models()
+    to_delete <- which(sapply(mods, \(x) x$id == input$delete_mod_id$id))
+    mods[[to_delete]] <- NULL
+    models(mods)
   })
 
   # ---- Malmquist ----

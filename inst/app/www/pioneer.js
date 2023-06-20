@@ -4,6 +4,7 @@ $(document).ready(function() {
 
   document.querySelector('[data-value="malmquist"]').closest('li').style.display = 'none';
   document.querySelector('[data-value="pioneeranalysis"]').closest('li').style.display = 'none';
+  document.querySelector('[data-value="pioneer_compare"]').closest('li').style.display = 'none';
 
   document.addEventListener('click', function(e) {
     if (e.target.id === 'uopts_menu') {
@@ -41,6 +42,18 @@ $(document).ready(function() {
   $('#dea_salter_plot').mousemove(function(e) {
     positionTooltip(e, 'plot_salter_tooltip');
   })
+
+  Shiny.addCustomMessageHandler('toggle_compare', function(msg) {
+    let el = document.querySelector('[data-value="pioneer_compare"]').closest('li');
+    el.style.display = msg === true ? 'block' : 'none';
+  });
+
+  $(document).on('click', '[data-app-delete-id]', function(e) {
+    let id = e.target.getAttribute('data-app-delete-id');
+    let parent = e.target.closest('div.row');
+    parent.remove();
+    Shiny.onInputChange('delete_mod_id', { id: id, nounce: Math.random() });
+  });
 
   $(document).on('shiny:inputchanged', function(e) {
     if (e.name === 'hasyear') {
