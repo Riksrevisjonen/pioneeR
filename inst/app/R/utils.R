@@ -105,3 +105,9 @@ ggsave_ <- function(filename, plot, format = 'png', size = c('A5', 'A4', 'A3')) 
       units = 'mm'
     ))
 }
+
+rand_id <- function() {
+  # For true random IDs, we should use uuid or openssl libraries, but this will do
+  hex_digits <- c(0:9, letters[1:6])
+  paste(sample(hex_digits, 32, replace = TRUE), collapse = '')
+}

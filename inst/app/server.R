@@ -644,6 +644,54 @@ shinyServer(function(input, output, session) {
     do.call(reactable, opts)
   })
 
+  # ---- Model comparison ----
+
+  models <- reactiveVal(value = list())
+
+  observeEvent(input$save_model, {
+    mod <- dea.prod()
+    mod_save <- list(
+      id = rand_id(),
+      data = data.frame(
+        dmu = names(mod$eff),
+        eff = round(unname(mod$eff), 5)
+      ),
+      params = list(
+        rts = mod$RTS,
+        orientation = mod$ORIENTATION
+      )
+    )
+    models(append(models(), list(mod_save)))
+  })
+
+  output$compare_models_tbl <- renderUI({
+    mods <- models()
+    if (is.null(mods) || length(mods) < 2) {
+      return(
+        alert('You must save at least two models in order to compare them')
+      )
+    }
+    df <- mods[[1]]$data
+    colnames(df)[2] <- sprintf(
+      'eff_mod1<br /><span class="text-muted small">RTS: %s, Orient: %s',
+      mods[[1]]$params$rts, mods[[1]]$params$orientation
+    )
+    for (i in 2:length(mods)) {
+      dfa <- mods[[i]]$data
+      # colnames(dfa)[2] <- sprintf('eff_mod%s', i)
+      colnames(dfa)[2] <- sprintf(
+        'eff_mod%s<br /><span class="text-muted small">RTS: %s, Orient: %s</span>',
+        i, mods[[i]]$params$rts, mods[[i]]$params$orientation
+      )
+      df <- merge(df, dfa, by = 'dmu', all = TRUE)
+    }
+    reactable(
+      df, compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
+      defaultPageSize = 100, class = 'small',
+      defaultColDef = colDef(html = TRUE)
+    )
+  })
+
   # ---- Malmquist ----
 
   output$malm.dt <- renderUI({
