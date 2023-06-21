@@ -643,12 +643,13 @@ shinyServer(function(input, output, session) {
   models <- reactiveVal(value = list())
 
   observeEvent(input$save_model, {
+    if (length(models()) >= 6) return()
     mod <- dea.prod()
     mod_save <- list(
       id = rand_id(),
       data = data.frame(
         dmu = names(mod$eff),
-        eff = round(unname(mod$eff), 5)
+        eff = round(unname(mod$eff), input$out.decimals)
       ),
       params = list(
         rts = mod$RTS,
@@ -657,37 +658,48 @@ shinyServer(function(input, output, session) {
     )
     models(append(models(), list(mod_save)))
     # Toggle the compare button in the UI
-    if (length(models()) >= 2) {
+    if (length(models()) >= 1) {
       session$sendCustomMessage('toggle_compare', TRUE)
     } else {
       session$sendCustomMessage('toggle_compare', FALSE)
     }
   })
 
-  output$compare_models_tbl <- renderUI({
+  models_df <- reactive({
     mods <- models()
-    if (is.null(mods) || length(mods) < 2) {
-      return(
-        alert('You must save at least two models in order to compare them')
-      )
+    if (is.null(mods) || length(mods) < 1) {
+      # Return NULL if there are no models
+      return()
     }
     df <- mods[[1]]$data
     colnames(df)[2] <- sprintf(
       'eff_mod1<br /><span class="text-muted small">RTS: %s, Orient: %s',
       mods[[1]]$params$rts, mods[[1]]$params$orientation
     )
+    # If we only have one model, return now
+    if (length(mods) == 1) return(df)
     for (i in 2:length(mods)) {
       dfa <- mods[[i]]$data
-      # colnames(dfa)[2] <- sprintf('eff_mod%s', i)
       colnames(dfa)[2] <- sprintf(
         'eff_mod%s<br /><span class="text-muted small">RTS: %s, Orient: %s</span>',
         i, mods[[i]]$params$rts, mods[[i]]$params$orientation
       )
       df <- merge(df, dfa, by = 'dmu', all = TRUE)
     }
+    df
+  })
+
+  output$compare_models_tbl <- renderUI({
+    df <- models_df()
+    if (is.null(df)) {
+      return(
+        alert('You must save at least one model to show the comparison table.')
+      )
+    }
     # Display UI
     tagList(
       actionButton('manage_models', 'Manage models'),
+      downloadButton('download_models', 'Download table'),
     reactable(
       df, compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
       defaultPageSize = 100, class = 'small',
@@ -730,6 +742,27 @@ shinyServer(function(input, output, session) {
     to_delete <- which(sapply(mods, \(x) x$id == input$delete_mod_id$id))
     mods[[to_delete]] <- NULL
     models(mods)
+  })
+
+  output$download_models <- downloadHandler(
+    filename = 'dea-models-comparison.xlsx',
+    content = function(file) {
+      df <- models_df()
+      colnames(df) <- c('dmu', paste0('eff_mod', seq_len(ncol(df)-1)))
+      writexl::write_xlsx(df, file)
+    }
+  )
+
+  output$saved_models_info <- renderUI({
+    n_mods <- length(models())
+    cls <- if (n_mods >= 6) 'text-danger small' else 'text-muted small'
+    tags$p(
+      class = cls,
+      sprintf(
+        '%s models saved (6 maximum)',
+        n_mods
+      )
+    )
   })
 
   # ---- Malmquist ----

@@ -70,6 +70,7 @@ ui <- function(request) { page_navbar(
         checkboxInput('out.slack', 'Show slack', value = TRUE),
         checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
         actionButton('save_model', 'Save model'),
+        uiOutput('saved_models_info'),
         hr(),
         numericInput('out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
         radioButtons(
