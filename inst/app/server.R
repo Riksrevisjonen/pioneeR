@@ -771,6 +771,10 @@ shinyServer(function(input, output, session) {
     models(mods)
   })
 
+  observeEvent(input$delete_all_models, {
+    models(list())
+  })
+
   output$download_models <- downloadHandler(
     filename = 'dea-models-comparison.xlsx',
     content = function(file) {

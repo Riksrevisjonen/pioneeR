@@ -28,7 +28,7 @@ file_upload_srv <- function(id) {
       observeEvent(input$file_modal, {
         showModal(
           modalDialog(
-            easyClose = TRUE, size = 'xl', minwidth = 1000, maxwidth = 1440,
+            easyClose = TRUE, size = 'xl',
             title = 'Upload file',
             footer = tagList(
               actionButton(ns('file_save'), 'Save'),
