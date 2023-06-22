@@ -69,6 +69,10 @@ ui <- function(request) { page_navbar(
         p(strong('Output options')),
         checkboxInput('out.slack', 'Show slack', value = TRUE),
         checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
+        actionButton('save_model', 'Save model'),
+        actionButton('delete_all_models', 'Delete all models'),
+        uiOutput('saved_models_info'),
+        hr(),
         numericInput('out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
         radioButtons(
           'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
@@ -197,10 +201,17 @@ ui <- function(request) { page_navbar(
   ),
 
   tabPanel(
+    'Compare', value = 'pioneer_compare',
+    content_div(
+      uiOutput('compare_models_tbl')
+    )
+  ),
+
+  tabPanel(
     'About', value = 'pioneeR_about',
-    tags$div(class = 'container mt-1',
-             tags$div(class = 'row',
-                      tags$div(class = 'col-12', includeMarkdown('about.md')))),
+    content_div(
+      includeMarkdown('about.md')
+    )
   ),
 
   footer = div( class = 'small text-center', tagList(

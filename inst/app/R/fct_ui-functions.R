@@ -22,3 +22,15 @@ bs_modal_button <- function(
   cls <- sprintf('btn %s btn-%s', size, color)
   tags$button(type = 'button', class = cls, `data-bs-dismiss` = 'modal', label)
 }
+
+content_div <- function(...) {
+  tags$div(
+    class = 'container mt-1',
+    tags$div(
+      class = 'row',
+      tags$div(
+        class = 'col-12', ...
+      )
+    )
+  )
+}
