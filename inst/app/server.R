@@ -643,11 +643,12 @@ shinyServer(function(input, output, session) {
   models <- reactiveVal(value = list())
 
   observeEvent(input$save_model, {
-    if (length(models()) >= 6) return()
+    if (length(models()) >= 10) return()
     mod <- dea.prod()
     mod_save <- list(
       id = rand_id(),
       data = data.frame(
+        idx = seq_len(length(mod$eff)),
         dmu = names(mod$eff),
         eff = round(unname(mod$eff), input$out.decimals)
       ),
@@ -672,19 +673,27 @@ shinyServer(function(input, output, session) {
       return()
     }
     df <- mods[[1]]$data
-    colnames(df)[2] <- sprintf(
+    colnames(df)[3] <- sprintf(
       'eff_mod1<br /><span class="text-muted small">RTS: %s, Orient: %s',
       mods[[1]]$params$rts, mods[[1]]$params$orientation
     )
     # If we only have one model, return now
     if (length(mods) == 1) return(df)
+    n_rows <- sapply(mods, \(x) nrow(x$data))
+    if (var(n_rows) != 0) {
+      return(NA)
+    }
     for (i in 2:length(mods)) {
       dfa <- mods[[i]]$data
-      colnames(dfa)[2] <- sprintf(
+      colnames(dfa)[3] <- sprintf(
         'eff_mod%s<br /><span class="text-muted small">RTS: %s, Orient: %s</span>',
         i, mods[[i]]$params$rts, mods[[i]]$params$orientation
       )
-      df <- merge(df, dfa, by = 'dmu', all = TRUE)
+      df <- merge(df, dfa, by = 'idx', all = TRUE)
+      if (identical(df$dmu.x, df$dmu.y)) {
+        df$dmu.y <- NULL
+        colnames(df)[2] <- 'dmu'
+      }
     }
     df
   })
@@ -696,15 +705,31 @@ shinyServer(function(input, output, session) {
         alert('You must save at least one model to show the comparison table.')
       )
     }
+    btns <- tagList(
+      actionButton('manage_models', 'Manage models'),
+      downloadButton('download_models', 'Download table')
+    )
+    if (length(df) == 1 && is.na(df)) {
+      return(
+        tagList(
+          alert(
+            'Your models differ in the number of DMU units. Please manage your models.',
+            color = 'warning'),
+          btns
+        )
+      )
+    }
     # Display UI
     tagList(
-      actionButton('manage_models', 'Manage models'),
-      downloadButton('download_models', 'Download table'),
-    reactable(
-      df, compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
-      defaultPageSize = 100, class = 'small',
-      defaultColDef = colDef(html = TRUE)
-    )
+      btns,
+      reactable(
+        df, compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
+        defaultPageSize = 100, class = 'small',
+        columns = list(
+          idx = colDef(show = FALSE)
+        ),
+        defaultColDef = colDef(html = TRUE)
+      )
     )
   })
 
@@ -712,11 +737,12 @@ shinyServer(function(input, output, session) {
     mods <- models()
     mods_ui <- function(el) {
       tags$div(
-        class = 'row',
-        tags$div(class = 'col-6', p(el$id)),
+        class = 'row small',
+        tags$div(class = 'col-5', p(el$id)),
+        tags$div(class = 'col-2', p(paste(dim(el$data), collapse = ', '))),
         tags$div(class = 'col-2', p(el$params$rts)),
         tags$div(class = 'col-2', p(el$params$orientation)),
-        tags$div(class = 'col-2', tags$button(
+        tags$div(class = 'col-1', tags$button(
           class = 'btn btn-danger btn-sm', 'Delete',
           `data-app-delete-id` = el$id
         ))
@@ -725,14 +751,15 @@ shinyServer(function(input, output, session) {
     showModal(
       modalDialog(
         tags$div(
-          class = 'row',
-          tags$div(class = 'col-6', p('Model ID')),
+          class = 'row small',
+          tags$div(class = 'col-5', p('Model ID')),
+          tags$div(class = 'col-2', p('Dimensions')),
           tags$div(class = 'col-2', p('RTS')),
           tags$div(class = 'col-2', p('Orientation')),
-          tags$div(class = 'col-2', '')
+          tags$div(class = 'col-1', '')
         ),
         lapply(mods, mods_ui),
-        size = 'l'
+        size = 'xl'
       )
     )
   })
@@ -755,11 +782,11 @@ shinyServer(function(input, output, session) {
 
   output$saved_models_info <- renderUI({
     n_mods <- length(models())
-    cls <- if (n_mods >= 6) 'text-danger small' else 'text-muted small'
+    cls <- if (n_mods >= 10) 'text-danger small' else 'text-muted small'
     tags$p(
       class = cls,
       sprintf(
-        '%s models saved (6 maximum)',
+        '%s models saved (10 maximum)',
         n_mods
       )
     )
