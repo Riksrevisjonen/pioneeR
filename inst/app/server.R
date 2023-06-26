@@ -241,7 +241,14 @@ shinyServer(function(input, output, session) {
   })
 
   dea.slack <- reactive({
+    x <- tryCatch({
     Benchmarking::slack(dea.in(), dea.out(), dea.prod())
+    }, warning = function(e) {
+      NULL
+    }, error = function(e) {
+      NULL
+    })
+    x
   })
 
   sdea.prod <- reactive({
