@@ -54,7 +54,7 @@ ui <- function(request) { page_navbar(
       ),
       mainPanel(
         width = 9,
-        uiOutput('data.preview')
+        uiOutput('data_preview')
       )
     )
   ),
