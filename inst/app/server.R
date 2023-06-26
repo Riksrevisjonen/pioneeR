@@ -242,7 +242,7 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-    Benchmarking::slack(dea.in(), dea.out(), dea.prod())
+      Benchmarking::slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -527,12 +527,27 @@ shinyServer(function(input, output, session) {
     else if (input$plot.orientation == 'out')
       sum.eff <- sum(dea.out() * eff) / sum(dea.out())
 
+    rts <- switch(dea.prod()$RTS,
+      crs = 'constant returns to scale',
+      vrs = 'variable returns to scale',
+      drs = 'non-increasing returns to scale',
+      irs = 'non-decreasing returns to scale',
+      'UNKNOWN'
+    )
+
+    orient <- switch(dea.prod()$ORIENTATION,
+      'in' = 'input oriented',
+      'out' = 'output oriented',
+      'UNKNOWN'
+    )
+
     list(
       p(class = 'h5', 'Summary of DEA analysis'),
-      p(list('Technology is ', tags$em(dea.prod()$RTS), ' and ', tags$em(dea.prod()$ORIENTATION))),
+      p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
       p(paste('Mean efficiency:', round(mean(eff), input$out.decimals))),
       p(paste('Weighted efficiency:',round(sum.eff, input$out.decimals))),
-      card(
+      layout_column_wrap(
+        width = 1/5,
         card(
           card_header('Min'),
           card_body(round(min(eff), input$out.decimals))
