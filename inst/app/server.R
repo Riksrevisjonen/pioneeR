@@ -30,7 +30,7 @@ shinyServer(function(input, output, session) {
   if (is_local && nzchar(Sys.getenv('PIONEER_DATA'))) {
     # Data must be a data frame
     if (inherits(get(Sys.getenv('PIONEER_DATA')), 'data.frame')) {
-      load_data <- checkFile(local_data)
+      load_data <- check_file(local_data)
     } else {
       warning('The selected object is not a data frame. Skipping.')
     }
@@ -88,7 +88,11 @@ shinyServer(function(input, output, session) {
 
     d <- data()$file
     cols <- list(input$dea.idvar, input$dea.input, input$dea.output, input$dea.year)
-    if (!is.null(cols) && length(unlist(cols)) > 1) d <- d[, unlist(cols)]
+    if (!is.null(cols) && length(unlist(cols)) > 1) {
+      d <- d[, unlist(cols)]
+      # Perform list wise deletion if there are incomplete cases
+      d <- d[complete.cases(d),]
+    }
     d
 
   })
@@ -142,7 +146,7 @@ shinyServer(function(input, output, session) {
     updateReactable('preview', selected = NA)
   })
 
-  output$data.preview <- renderUI({
+  output$data_preview <- renderUI({
 
     if (is.null(data()$file) && !is.null(data()$error)) {
       card(
@@ -158,18 +162,25 @@ shinyServer(function(input, output, session) {
       card(
         card_header('Select data'),
         card_body(
-          paste(
-            'Upload a file to get started. The file must have variable names in the first row.',
-            'Accepted file types are Excel files, Stata files, R data frames stored as RDS-files',
-            '(objects of type tibble and data.table will be converted to data frames), and comma',
-            'separated files.'
-          )),
-        p('Click on Upload options to adjust the settings for reading the file.'
+          'Upload a file to get started by pressing the Upload file button in the vertical
+          menu to the left. Accepted file types are Excel, Stata, R data.frames stored as
+          RDS-files, comma-, semicolon- og tabseparated files (.tsv, .csv or .txt). When you
+          upload a file, you get a preview of the contents. You can adjust the file import
+          settings if needed. Remember to save the file to the current session.'
         ))
     } else {
-      list(
+      # Check for list wise deletion and inform the user if observations have been removed
+      msg_lw <- if (nrow(preview()) < nrow(data()$file)) {
+        alert(
+          'Some DMUs have missing observations on one or more variables. List wise deletion
+          has been performed')
+      } else {
+        NULL
+      }
+      tagList(
         h2('Data preview'),
         p(class = 'lead', 'This is a preview of the imported data'),
+        msg_lw,
         reactableOutput('preview')
       )
     }
@@ -230,7 +241,14 @@ shinyServer(function(input, output, session) {
   })
 
   dea.slack <- reactive({
-    Benchmarking::slack(dea.in(), dea.out(), dea.prod())
+    x <- tryCatch({
+      Benchmarking::slack(dea.in(), dea.out(), dea.prod())
+    }, warning = function(e) {
+      NULL
+    }, error = function(e) {
+      NULL
+    })
+    x
   })
 
   sdea.prod <- reactive({
@@ -247,12 +265,13 @@ shinyServer(function(input, output, session) {
 
     x <- dea.in()
     y <- dea.out()
+    prod <- dea.prod()
 
     # If x or y is a matrix, get vector with row sums instead
     if (is.matrix(x)) x <- rowSums(x)
     if (is.matrix(y)) y <- rowSums(y)
 
-    data.frame(dmu = rownames(dea.in()), x = unname(x), y = unname(y))
+    data.frame(dmu = rownames(dea.in()), x = unname(x), y = unname(y), eff = unname(prod$eff))
   })
 
   dea_plot <- reactive({
@@ -268,17 +287,29 @@ shinyServer(function(input, output, session) {
       scale_x_continuous(labels = label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
       theme_pioneer()
 
-    if (input$plot.rts %in% c('crs', 'vrs')) {
+    # Add frontier line
+    if (input$plot.rts %in% c('crs', 'vrs', 'drs')) {
       if (input$plot.rts == 'crs') {
-        p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55')
-      } else if (input$plot.rts == 'vrs') {
-        hpts <- chull(d$x, d$y)
-        hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
-
-        coords <- data.frame(
-          x = c(min(d$x[hpts]), d$x[hpts], max(d$x[hpts])),
-          y = c(0, d$y[hpts], max(d$y[hpts])))
-        p <- p + geom_line(data = coords, aes(x = x, y = y), color = '#f9ab55')
+        p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55', linewidth = 1)
+      } else {
+        if (input$plot.rts == 'vrs') {
+          # Use chull to find the points which lie on the convex hull
+          hpts <- chull(d$x, d$y)
+          hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          y <- c(0, d$y[hpts], max(d$y))
+          x <- c(min(d$x), d$x[hpts], max(d$x))
+        } else if (input$plot.rts == 'drs') {
+          # If we have NIRS, the front starts at origo, so we add origo to our coordinates
+          hpts <- chull(c(0, d$x), c(0, d$y))
+          hpts <- hpts[hpts != 1]-1
+          hpts <- hpts[c(which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          y <- c(0, d$y[hpts], max(d$y))
+          x <- c(0, d$x[hpts], max(d$x))
+        }
+        # Remove observations where the value on the y-axis is reduced
+        rm <- c(TRUE, mapply(\(t1, t2) t2 < t1, t1 = tail(y, -1), t2 = head(y, -1)))
+        coords <- data.frame(y = y[rm], x = x[rm])
+        p <- p + geom_line(data = coords, aes(x = x, y = y), color = '#f9ab55', linewidth = 1)
       }
     }
 
@@ -294,8 +325,11 @@ shinyServer(function(input, output, session) {
     x <- nearPoints(dea_plot_df(), input$dea_hover)
     if (nrow(x) > 0) {
       msg <- sprintf(
-        '<p class="p-1 m-0" style="font-size: .75rem">DMU: %s<br />Input: %s<br />Output: %s</p>',
-        x$dmu[1], x$x[1], x$y[1]
+        '<p class="p-1 m-0" style="font-size: .75rem">DMU: %s<br />
+        Input: %s<br />
+        Output: %s<br />
+        Efficiency score: %s</p>',
+        x$dmu[1], x$x[1], x$y[1], round(x$eff[1], input$out.decimals)
       )
       tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
     } else {
@@ -308,8 +342,11 @@ shinyServer(function(input, output, session) {
       sprintf('dea-plot-%s.%s', Sys.Date(), input$dea_dl_format)
     },
     content = function(file) {
+      p <- dea_plot() +
+        xlab(input$dea_xtitle) +
+        ylab(input$dea_ytitle)
       ggsave_(
-        file, dea_plot(), format = tolower(input$dea_dl_format),
+        file, p, format = tolower(input$dea_dl_format),
         size = input$dea_dl_size)
     }
   )
@@ -490,12 +527,27 @@ shinyServer(function(input, output, session) {
     else if (input$plot.orientation == 'out')
       sum.eff <- sum(dea.out() * eff) / sum(dea.out())
 
+    rts <- switch(dea.prod()$RTS,
+      crs = 'constant returns to scale',
+      vrs = 'variable returns to scale',
+      drs = 'non-increasing returns to scale',
+      irs = 'non-decreasing returns to scale',
+      'UNKNOWN'
+    )
+
+    orient <- switch(dea.prod()$ORIENTATION,
+      'in' = 'input oriented',
+      'out' = 'output oriented',
+      'UNKNOWN'
+    )
+
     list(
       p(class = 'h5', 'Summary of DEA analysis'),
-      p(list('Technology is ', tags$em(dea.prod()$RTS), ' and ', tags$em(dea.prod()$ORIENTATION))),
+      p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
       p(paste('Mean efficiency:', round(mean(eff), input$out.decimals))),
       p(paste('Weighted efficiency:',round(sum.eff, input$out.decimals))),
-      card(
+      layout_column_wrap(
+        width = 1/5,
         card(
           card_header('Min'),
           card_body(round(min(eff), input$out.decimals))

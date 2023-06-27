@@ -23,7 +23,7 @@ output$ui.inputs <- renderUI({
   else
     selected <- NULL
 
-  choices <- data()$cols
+  choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
   selectInput('dea.input', 'Inputs', choices = choices, selected = selected, multiple = TRUE)
 
 })
@@ -40,7 +40,7 @@ output$ui.outputs <- renderUI({
   else
     selected <- NULL
 
-  choices <- data()$cols
+  choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
   if (!is.null(input$dea.input) && !any(input$dea.input == ''))
     choices <- choices[!(choices %in% c(input$datafile, input$dea.input))]
   selectInput('dea.output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
