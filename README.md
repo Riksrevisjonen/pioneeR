@@ -10,6 +10,12 @@ pioneeR can be installed using the `remotes` package:
 remotes::install_github('riksrevisjonen/pioneeR')
 ```
 
+If you want to install a specific version of pioneeR, you can add the release version:
+
+```r
+remotes::install_github('riksrevisjonen/pioneeR@v0.1.0')
+```
+
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
 
 ```sh
