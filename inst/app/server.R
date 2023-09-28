@@ -867,7 +867,7 @@ shinyServer(function(input, output, session) {
         reactableOutput('malm.render')
       )
     } else {
-      out <- dataTableOutput('malm.render')
+      out <- reactableOutput('malm.render')
     }
 
     return(out)
