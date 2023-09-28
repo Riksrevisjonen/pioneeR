@@ -98,7 +98,9 @@ ui <- function(request) { page_navbar(
           paste('Download the data used for the analysis in RDS format for use in R.',
                 'The file can be used in conjunction with the code supplied in the',
                 'analysis report.')
-        ))
+        )),
+        hr(),
+        actionButton('save_and_close_dea', 'Quit app and return results')
       ),
       mainPanel(
         width = 9,

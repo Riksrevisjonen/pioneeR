@@ -973,4 +973,17 @@ shinyServer(function(input, output, session) {
     }
   )
 
+  observeEvent(input$save_and_close_dea, {
+    x <- list(
+      data = reactives$data,
+      models = models(),
+      current_model = dea.prod()
+    )
+    stopApp(x)
+  })
+
+  onStop(function() {
+    Sys.unsetenv('PIONEER_DATA')
+  })
+
 })
