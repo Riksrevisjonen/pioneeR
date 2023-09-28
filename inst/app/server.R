@@ -28,11 +28,20 @@ shinyServer(function(input, output, session) {
 
   # If we are running locally, and we have data, load the data
   if (is_local && nzchar(Sys.getenv('PIONEER_DATA'))) {
-    # Data must be a data frame
-    if (inherits(get(Sys.getenv('PIONEER_DATA')), 'data.frame')) {
-      load_data <- check_file(local_data)
-    } else {
-      warning('The selected object is not a data frame. Skipping.')
+    local_data <- NULL
+    if (file.exists(Sys.getenv('PIONEER_DATA'))) {
+      tryCatch({
+        tmp <- Sys.getenv('PIONEER_DATA')
+        local_data <- readRDS(tmp)
+        if (inherits(local_data, 'data.frame')) {
+          load_data$file <- check_file(local_data)
+          load_data$cols <- colnames(local_data)
+        } else {
+          cli::cli_warn('The selected object is not a data frame. Skipping.')
+        }
+      }, error = function(e) {
+        cli::cli_warn('Unable to read temp file')
+      })
     }
   }
 
