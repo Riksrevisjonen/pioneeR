@@ -27,12 +27,17 @@ Imports:
     ggplot2 (>= 3.3.0),
     reactable (>= 0.4.0)
 Suggests:
+    cli,
+    data.table,
     rmarkdown,
     knitr,
     scales,
-    rlang
+    rlang,
+    testthat (>= 3.0.0),
+    tibble
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+Config/testthat/edition: 3
