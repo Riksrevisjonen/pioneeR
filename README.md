@@ -10,6 +10,12 @@ pioneeR can be installed using the `remotes` package:
 remotes::install_github('riksrevisjonen/pioneeR')
 ```
 
+If you want to install a specific version of pioneeR, you can add the release version:
+
+```r
+remotes::install_github('riksrevisjonen/pioneeR@v0.1.0')
+```
+
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
 
 ```sh
@@ -43,6 +49,22 @@ The app should start automatically in a new browser window. By default, Shiny wi
 
 ```r
 pioneeR::runPioneeR(port = 3939)
+```
+
+### Use a data set from the current session
+
+If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument `x` in the `runPioneeR`-function. The argument supports an object of type `data.frame`, `tbl_df`, `data.table` or `matrix`.
+
+```r
+runPioneeR(x = my_data_frame)
+```
+
+### Save results to the current session
+
+You can write back results from the analysis to the current R session. In the "Analyse"-tab, there is a button to quit the app and return the results. When the button is clicked, the app will close and the current data set along with any saved models and the current model, will be returned to the active R session. If you want to capture the results to an object, you can initiate the app by assigning it to a new object:
+
+```r
+x <- runPioneeR()
 ```
 
 ## Guideline for contribution

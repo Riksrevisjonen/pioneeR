@@ -21,12 +21,9 @@ NULL
 #' @export
 runPioneeR <- function(x = NULL, port = NULL, ...) {
 
-  if (inherits(x, 'data.frame'))
-    Sys.setenv('PIONEER_DATA' = deparse(substitute(x)))
-  else if (inherits(x, 'character'))
-    Sys.setenv('PIONEER_DATA' = x)
-  else
-    Sys.setenv('PIONEER_DATA' = '')
+  if (!is.null(x)) {
+    set_local_data(x)
+  }
 
   runApp(system.file('app', package = 'pioneeR'), port = port, ...)
 
