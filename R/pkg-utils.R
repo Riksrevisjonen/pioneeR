@@ -27,3 +27,21 @@ set_local_data <- function(x) {
   return(invisible())
 
 }
+
+unsafe_ports <- function() {
+  return(
+    c(3659, 4045, 5060, 5061, 6000, 6566, 6665:6669, 6697)
+  )
+}
+
+check_for_unsafe_port <- function(port) {
+  if (is.null(port)) return()
+  port <- as.numeric(port)
+  if (port %in% unsafe_ports()) {
+    cli::cli_warn(
+      'Port {.strong {port}} is considered unsafe. A random port will be used instead.'
+    )
+    port <- NULL
+  }
+  return(invisible(port))
+}
