@@ -37,13 +37,13 @@ ui <- function(request) { page_navbar(
           the data needs to be in long format (ie. one column for year and one column for
           each variable).'
         ))),
-        uiOutput('ui.idvar'),
-        uiOutput('ui.inputs'),
-        uiOutput('ui.outputs'),
-        uiOutput('ui.timeseries'),
-        uiOutput('ui.year'),
-        uiOutput('ui.subset'),
-        uiOutput('ui.subset.info'),
+        uiOutput('ui_id'),
+        uiOutput('ui_inputs'),
+        uiOutput('ui_outputs'),
+        uiOutput('ui_timeseries'),
+        uiOutput('ui_year'),
+        uiOutput('ui_subset'),
+        uiOutput('ui_subset_info'),
         hr(),
         bookmarkButton('Bookmark state'),
         p(class = 'small', helpText(paste(

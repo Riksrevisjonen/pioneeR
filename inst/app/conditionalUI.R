@@ -1,17 +1,17 @@
 # Functions to render the UI based on other input
 
-output$ui.idvar <- renderUI({
+output$ui_id <- renderUI({
 
   req(data())
 
   if (is.null(data()$file)) return(NULL)
 
   choices <- colnames(data()$file)
-  selectInput('dea.idvar', 'ID variable', choices = choices, multiple = FALSE)
+  selectInput('dea_id', 'Firm ID', choices = choices, multiple = FALSE)
 
 })
 
-output$ui.inputs <- renderUI({
+output$ui_inputs <- renderUI({
 
   req(data())
 
@@ -24,11 +24,11 @@ output$ui.inputs <- renderUI({
     selected <- NULL
 
   choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
-  selectInput('dea.input', 'Inputs', choices = choices, selected = selected, multiple = TRUE)
+  selectInput('dea_input', 'Inputs', choices = choices, selected = selected, multiple = TRUE)
 
 })
 
-output$ui.outputs <- renderUI({
+output$ui_outputs <- renderUI({
 
   req(data())
 
@@ -43,24 +43,24 @@ output$ui.outputs <- renderUI({
   choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
   if (!is.null(input$dea.input) && !any(input$dea.input == ''))
     choices <- choices[!(choices %in% c(input$datafile, input$dea.input))]
-  selectInput('dea.output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
+  selectInput('dea_output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
 
 })
 
-output$ui.timeseries <- renderUI({
+output$ui_timeseries <- renderUI({
 
-  req(data()$file, input$dea.idvar)
+  req(data()$file, params()$id)
 
-  if (!(input$dea.idvar %in% colnames(data()$file))) return(NULL)
+  if (!(params()$id %in% colnames(data()$file))) return(NULL)
 
   # If the ID variable is not unique, we assume time series
-  value <- any(duplicated(data()$file[, input$dea.idvar]))
+  value <- any(duplicated(data()$file[, params()$id]))
 
   checkboxInput('hasyear', 'Time series data', value = value)
 
 })
 
-output$ui.year <- renderUI({
+output$ui_year <- renderUI({
 
   req(data(), input$hasyear)
 
@@ -86,11 +86,11 @@ output$ui.year <- renderUI({
 
   choices <- data()$cols[which(year_vars)] #names(chk_min > 1900 & chk_max < 2100)
   selected <- ifelse(length(choices) == 1, choices[[1]], NULL)
-  selectInput('dea.year', 'Year variable', choices = choices, selected = selected, multiple = TRUE)
+  selectInput('dea_year', 'Year variable', choices = choices, selected = selected, multiple = TRUE)
 
 })
 
-output$ui.subset <- renderUI({
+output$ui_subset <- renderUI({
 
   req(data()$file)
 
@@ -100,7 +100,7 @@ output$ui.subset <- renderUI({
 
 })
 
-output$ui.subset.info <- renderUI({
+output$ui_subset_info <- renderUI({
 
   req(data()$file)
 
