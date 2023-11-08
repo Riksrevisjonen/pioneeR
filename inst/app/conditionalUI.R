@@ -18,14 +18,24 @@ output$ui_inputs <- renderUI({
   if (is.null(data()$file)) return(NULL)
 
   # Restore input if we are restoring previous state
-  if (!is.null(restoreVals$inputs))
-    selected <- restoreVals$inputs
-  else
-    selected <- NULL
-
+  selected <- if (!is.null(restoreVals$inputs)) restoreVals$inputs else NULL
   choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+
   selectInput('dea_input', 'Inputs', choices = choices, selected = selected, multiple = TRUE)
 
+})
+
+observeEvent(input$dea_input, {
+  selected_inputs <- input$dea_input
+  selected <- input$dea_output
+  choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+  if (length(selected_inputs) > 0) {
+    choices <- choices[!(choices %in% selected_inputs)]
+  }
+  if (!is.null(selected) && any(selected %in% selected_inputs)) {
+    selected <- selected[!(selected %in% selected_inputs)]
+  }
+  updateSelectInput(session, 'dea_output', choices = choices, selected = selected)
 })
 
 output$ui_outputs <- renderUI({
@@ -35,16 +45,24 @@ output$ui_outputs <- renderUI({
   if (is.null(data()$file)) return(NULL)
 
   # Restore input if we are restoring previous state
-  if (!is.null(restoreVals$outputs))
-    selected <- restoreVals$outputs
-  else
-    selected <- NULL
-
+  selected <- if (!is.null(restoreVals$outputs)) restoreVals$outputs else NULL
   choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
-  if (!is.null(input$dea.input) && !any(input$dea.input == ''))
-    choices <- choices[!(choices %in% c(input$datafile, input$dea.input))]
+
   selectInput('dea_output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
 
+})
+
+observeEvent(input$dea_output, {
+  selected_outputs <- input$dea_output
+  selected <- input$dea_input
+  choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+  if (length(selected_outputs) > 0) {
+    choices <- choices[!(choices %in% selected_outputs)]
+  }
+  if (!is.null(selected) && any(selected %in% selected_outputs)) {
+    selected <- selected[!(selected %in% selected_outputs)]
+  }
+  updateSelectInput(session, 'dea_input', choices = choices, selected = selected)
 })
 
 output$ui_timeseries <- renderUI({
