@@ -28,3 +28,10 @@ runPioneeR <- function(x = NULL, port = NULL, ...) {
   runApp(system.file('app', package = 'pioneeR'), port = port, ...)
 
 }
+
+#' Unset environment variables
+#'
+#' Unsets the environment variables set by pioneeR
+#'
+#' @export
+unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
