@@ -222,7 +222,7 @@ shinyServer(function(input, output, session) {
 
     if (input$dea.norm) {
       v <- colSums(x) / nrow(x)
-      for (i in 1:ncol(x)) {
+      for (i in seq_len(ncol(x))) {
         x[,i] <- x[,i] / v[i]
       }
     }
@@ -242,7 +242,7 @@ shinyServer(function(input, output, session) {
 
     if (input$dea.norm) {
       v <- colSums(y) / nrow(y)
-      for (i in 1:ncol(y)) {
+      for (i in seq_len(ncol(y))) {
         y[,i] <- y[,i] / v[i]
       }
     }
@@ -410,8 +410,8 @@ shinyServer(function(input, output, session) {
 
     d <- data.frame(
       dmu = selection()[[params()$id]],
-      inputs = sapply(1:nrow(dea.in()), function(i) sum(dea.in()[i,])),
-      outputs = sapply(1:nrow(dea.out()), function(i) sum(dea.out()[i,])),
+      inputs = sapply(seq_len(nrow(dea.in())), function(i) sum(dea.in()[i,])),
+      outputs = sapply(seq_len(nrow(dea.out())), function(i) sum(dea.out()[i,])),
       eff = dea.prod()$eff,
       stringsAsFactors = FALSE
     )
@@ -499,14 +499,14 @@ shinyServer(function(input, output, session) {
       minE <- floor(10 * min(eff))/10
       dec <- seq(from = minE, to = 1, by = 0.1)
 
-      estr <- sapply(1:length(dec), function(i) {
+      estr <- sapply(seq_len(length(dec)), function(i) {
         if (i < length(dec))
           paste(dec[i], '<= E <', dec[i + 1])
         else if (i == length(dec))
           "E == 1"
       })
 
-      num <- sapply(1:length(dec), function(i) {
+      num <- sapply(seq_len(length(dec)), function(i) {
         if (i < length(dec))
           sum(dec[i] - eps <= eff & eff < dec[i + 1] - eps)
         else if (i == length(dec))
@@ -522,7 +522,7 @@ shinyServer(function(input, output, session) {
         dec <- dec_[1:(max(which(dec_ < maxF)) + 1)]
       }
 
-      estr <- sapply(1:length(dec), function(i) {
+      estr <- sapply(seq_len(length(dec)), function(i) {
         if (i == 1)
           "F == 1"
         else if (i > 1)
