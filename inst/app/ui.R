@@ -12,12 +12,18 @@ vals <- list(
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
 
+if (utils::packageVersion('bslib') > '0.5.0') {
+  theme_args = list(version = bs_ver, preset = 'bootstrap')
+} else {
+  theme_args = list(version = bs_ver)
+}
+
 # Define UI for application that draws a histogram
 ui <- function(request) { page_navbar(
 
   title = 'pioneeR',
   id = 'pioneer',
-  theme = bslib::bs_theme(version = bs_ver),
+  theme = do.call(bslib::bs_theme, theme_args),
   fluid = TRUE,
 
   # Add custom CSS
