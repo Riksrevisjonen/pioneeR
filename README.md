@@ -46,7 +46,7 @@ library(pioneeR)
 run_pioneer()
 ```
 
-The app should start automatically in a new browser window. By default, Shiny will start with a random port number. If you want to start the app with a specific port number, you can set the `port` argument:
+The app should start automatically in a new browser window. By default, Shiny will start with a random port number. If you want to start the app with a specific port number, you can set the `port` argument. Valid port numbers are in the range 3000 through 65535:
 
 ```r
 run_pioneer(port = 3939)

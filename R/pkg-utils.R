@@ -37,10 +37,14 @@ unsafe_ports <- function() {
 check_for_unsafe_port <- function(port) {
   if (is.null(port)) return()
   port <- as.numeric(port)
-  if (port %in% unsafe_ports()) {
-    cli::cli_warn(
-      'Port {.strong {port}} is considered unsafe. A random port will be used instead.'
-    )
+  if (!port %in% 3000:65535 || port %in% unsafe_ports()) {
+    msg <- 'A random port will be used instead'
+    if (port %in% unsafe_ports()) {
+      msg <- sprintf('Port {.strong {port}} is considered unsafe. %s', msg)
+    } else {
+      msg <- sprintf('Port number must be in the range 3000 through 65535. %s', msg)
+    }
+    cli::cli_warn(msg)
     port <- NULL
   }
   return(invisible(port))
