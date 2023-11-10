@@ -13,7 +13,7 @@ remotes::install_github('riksrevisjonen/pioneeR')
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.1.0')
+remotes::install_github('riksrevisjonen/pioneeR@v0.2.0')
 ```
 
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
@@ -32,7 +32,7 @@ brew install glpk
 
 pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.name/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
 
-```
+```r
 install.packages('tinytex')
 tinytex::install_tinytex()
 ```
@@ -42,14 +42,17 @@ tinytex::install_tinytex()
 To start up the pioneeR app, simply type the following into your R console:
 
 ```r
-pioneeR::runPioneeR()
+library(pioneeR)
+run_pioneer()
 ```
 
-The app should start automatically in a new browser window. By default, Shiny will start with a random port number. If you want to start the app with a spesific port number, you can set the `port` argument:
+The app should start automatically in a new browser window. By default, Shiny will start with a random port number. If you want to start the app with a specific port number, you can set the `port` argument:
 
 ```r
-pioneeR::runPioneeR(port = 3939)
+run_pioneer(port = 3939)
 ```
+
+Note that Shiny will not run with port numbers that Google Chrome considers unsafe. If you select an unsafe port number, the port number will be overridden and a random port number selected instead. See `?shiny::runApp` for details.
 
 ### Use a data set from the current session
 
@@ -64,7 +67,7 @@ runPioneeR(x = my_data_frame)
 You can write back results from the analysis to the current R session. In the "Analyse"-tab, there is a button to quit the app and return the results. When the button is clicked, the app will close and the current data set along with any saved models and the current model, will be returned to the active R session. If you want to capture the results to an object, you can initiate the app by assigning it to a new object:
 
 ```r
-x <- runPioneeR()
+x <- run_pioneer()
 ```
 
 ## Guideline for contribution
