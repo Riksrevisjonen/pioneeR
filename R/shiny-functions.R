@@ -19,12 +19,27 @@ NULL
 #' @importFrom shiny runApp
 #'
 #' @export
-runPioneeR <- function(x = NULL, port = NULL, ...) {
+run_pioneer <- function(x = NULL, port = NULL, ...) {
 
   if (!is.null(x)) {
     set_local_data(x)
   }
 
+  if (!is.null(port)) {
+    port <- check_for_unsafe_port(port)
+  }
+
   runApp(system.file('app', package = 'pioneeR'), port = port, ...)
 
 }
+
+#' @rdname run_pioneer
+#' @export
+runPioneeR <- run_pioneer
+
+#' Unset environment variables
+#'
+#' Unsets the environment variables set by pioneeR
+#'
+#' @export
+unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')

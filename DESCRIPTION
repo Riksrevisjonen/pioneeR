@@ -1,6 +1,6 @@
 Package: pioneeR
 Title: Perform productivity analyses in a web browser
-Version: 0.2.0
+Version: 0.2.0.9000
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),

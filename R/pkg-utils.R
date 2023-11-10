@@ -27,3 +27,25 @@ set_local_data <- function(x) {
   return(invisible())
 
 }
+
+unsafe_ports <- function() {
+  return(
+    c(3659, 4045, 5060, 5061, 6000, 6566, 6665:6669, 6697)
+  )
+}
+
+check_for_unsafe_port <- function(port) {
+  if (is.null(port)) return()
+  port <- as.numeric(port)
+  if (!port %in% 3000:65535 || port %in% unsafe_ports()) {
+    msg <- 'A random port will be used instead'
+    if (port %in% unsafe_ports()) {
+      msg <- sprintf('Port {.strong {port}} is considered unsafe. %s', msg)
+    } else {
+      msg <- sprintf('Port number must be in the range 3000 through 65535. %s', msg)
+    }
+    cli::cli_warn(msg)
+    port <- NULL
+  }
+  return(invisible(port))
+}

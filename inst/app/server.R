@@ -50,6 +50,16 @@ shinyServer(function(input, output, session) {
     data = load_data,
     filename = NULL
   )
+  # Add model parameters to a reactive with debounce so that they do not
+  # fire immediately
+  params <- reactive(
+    list(
+      id = input$dea_id,
+      inputs = input$dea_input,
+      outputs = input$dea_output,
+      year = input$dea_year
+    )
+  ) |> debounce(100)
   restoreVals <- reactiveValues(
     subset = NULL,
     inputs = NULL,
@@ -67,8 +77,8 @@ shinyServer(function(input, output, session) {
 
   onRestore(function(state) {
     restoreVals$subset <- state$values$subset
-    restoreVals$inputs <- state$input$dea.input
-    restoreVals$outputs <- state$input$dea.output
+    restoreVals$inputs <- state$input$dea_input
+    restoreVals$outputs <- state$input$dea_output
     reactives$file <- state$values$file
     reactives$data <- state$values$data
     reactives$filename <- state$values$filename
@@ -95,10 +105,13 @@ shinyServer(function(input, output, session) {
 
   preview <- reactive({
 
+    req(data())
+
     d <- data()$file
-    cols <- list(input$dea.idvar, input$dea.input, input$dea.output, input$dea.year)
-    if (!is.null(cols) && length(unlist(cols)) > 1) {
-      d <- d[, unlist(cols)]
+    cols <- unique(c(params()$id, params()$inputs, params()$outputs, params()$year))
+    cols <- cols[cols %in% colnames(d)]
+    if (!is.null(cols) && length(c(params()$inputs, params()$outputs)) > 0) {
+      d <- d[, cols]
       # Perform list wise deletion if there are incomplete cases
       d <- d[complete.cases(d),]
     }
@@ -128,15 +141,15 @@ shinyServer(function(input, output, session) {
     req(preview())
 
     df <- preview()
-
     selected <- if (!is.null(restoreVals$subset)) restoreVals$subset else NULL
-    id <- input$dea.idvar
+    id <- params()$id
 
     coldefs <- list()
     if (!is.null(id)) coldefs[[id]] <- colDef(sticky = 'left')
 
     reactable(
       df, selection = 'multiple', selectionId = NULL, onClick = 'select',
+      class = 'small',
       columns = coldefs,
       theme = reactableTheme(
         rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset .2em 0 0 0 #0d6efd")
@@ -200,16 +213,16 @@ shinyServer(function(input, output, session) {
 
   dea.in <- reactive({
 
-    req(input$dea.input)
+  req(params()$inputs)
 
     df <- selection()
-    ci <- input$dea.input
-    cx <- length(input$dea.input)
+    ci <- params()$inputs
+    cx <- length(ci)
     x <- matrix(sapply(ci, function(i) df[[i]]), ncol = cx, dimnames = list(df[,1], paste0('x', 1:cx)))
 
     if (input$dea.norm) {
       v <- colSums(x) / nrow(x)
-      for (i in 1:ncol(x)) {
+      for (i in seq_len(ncol(x))) {
         x[,i] <- x[,i] / v[i]
       }
     }
@@ -220,16 +233,16 @@ shinyServer(function(input, output, session) {
 
   dea.out <- reactive({
 
-    req(input$dea.output)
+    req(params()$outputs)
 
     df <- selection()
-    ci <- input$dea.output
-    cy <- length(input$dea.output)
+    ci <- params()$outputs
+    cy <- length(ci)
     y <- matrix(sapply(ci, function(i) df[[i]]), ncol = cy, dimnames = list(df[,1], paste0('y', 1:cy)))
 
     if (input$dea.norm) {
       v <- colSums(y) / nrow(y)
-      for (i in 1:ncol(y)) {
+      for (i in seq_len(ncol(y))) {
         y[,i] <- y[,i] / v[i]
       }
     }
@@ -240,12 +253,13 @@ shinyServer(function(input, output, session) {
 
   dea.prod <- reactive({
 
-    req(input$dea.idvar, input$dea.input, input$dea.output)
+    req(data(), dea.in(), dea.out())
 
-    d <- Benchmarking::dea(dea.in(), dea.out(), RTS = input$plot.rts,
-                           ORIENTATION = input$plot.orientation)
+    d <- Benchmarking::dea(
+      dea.in(), dea.out(), RTS = input$plot.rts,
+      ORIENTATION = input$plot.orientation)
 
-    return(d)
+    d
 
   })
 
@@ -262,15 +276,18 @@ shinyServer(function(input, output, session) {
 
   sdea.prod <- reactive({
 
-    d <- Benchmarking::sdea(dea.in(), dea.out(), RTS = input$plot.rts,
-                            ORIENTATION = input$plot.orientation)
+    req(data(), dea.in(), dea.out())
 
-    return(d)
+    d <- Benchmarking::sdea(
+      dea.in(), dea.out(), RTS = input$plot.rts,
+      ORIENTATION = input$plot.orientation)
+
+    d
 
   })
 
   dea_plot_df <- reactive({
-    req(data(), input$dea.input, input$dea.output)
+    req(data(), params()$inputs, params()$outputs)
 
     x <- dea.in()
     y <- dea.out()
@@ -284,14 +301,14 @@ shinyServer(function(input, output, session) {
   })
 
   dea_plot <- reactive({
-    req(data(), input$dea.input, input$dea.output)
+    req(data(), params()$inputs, params()$outputs)
 
     d <- dea_plot_df()
 
     p <- ggplot(d, aes(x = x, y = y)) +
       geom_point(color = '#084887') +
-      xlab(paste('Inputs:\n', paste(input$dea.input, collapse = ', '))) +
-      ylab(paste('Outputs:\n', paste(input$dea.output, collapse = ', '))) +
+      xlab(paste('Inputs:\n', paste(params()$inputs, collapse = ', '))) +
+      ylab(paste('Outputs:\n', paste(params()$outputs, collapse = ', '))) +
       scale_y_continuous(labels = label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
       scale_x_continuous(labels = label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
       theme_pioneer()
@@ -392,9 +409,9 @@ shinyServer(function(input, output, session) {
   salter_plot_df <- reactive({
 
     d <- data.frame(
-      dmu = selection()[[input$dea.idvar]],
-      inputs = sapply(1:nrow(dea.in()), function(i) sum(dea.in()[i,])),
-      outputs = sapply(1:nrow(dea.out()), function(i) sum(dea.out()[i,])),
+      dmu = selection()[[params()$id]],
+      inputs = sapply(seq_len(nrow(dea.in())), function(i) sum(dea.in()[i,])),
+      outputs = sapply(seq_len(nrow(dea.out())), function(i) sum(dea.out()[i,])),
       eff = dea.prod()$eff,
       stringsAsFactors = FALSE
     )
@@ -482,14 +499,14 @@ shinyServer(function(input, output, session) {
       minE <- floor(10 * min(eff))/10
       dec <- seq(from = minE, to = 1, by = 0.1)
 
-      estr <- sapply(1:length(dec), function(i) {
+      estr <- sapply(seq_len(length(dec)), function(i) {
         if (i < length(dec))
           paste(dec[i], '<= E <', dec[i + 1])
         else if (i == length(dec))
           "E == 1"
       })
 
-      num <- sapply(1:length(dec), function(i) {
+      num <- sapply(seq_len(length(dec)), function(i) {
         if (i < length(dec))
           sum(dec[i] - eps <= eff & eff < dec[i + 1] - eps)
         else if (i == length(dec))
@@ -505,7 +522,7 @@ shinyServer(function(input, output, session) {
         dec <- dec_[1:(max(which(dec_ < maxF)) + 1)]
       }
 
-      estr <- sapply(1:length(dec), function(i) {
+      estr <- sapply(seq_len(length(dec)), function(i) {
         if (i == 1)
           "F == 1"
         else if (i > 1)
@@ -861,9 +878,9 @@ shinyServer(function(input, output, session) {
 
   output$malm.dt <- renderUI({
 
-    req(data()$file, input$dea.year)
+    req(data(), params()$year)
 
-    df <- checkBalance(selection(), input$dea.idvar, input$dea.year)
+    df <- checkBalance(selection(), params()$id, params()$year)
     if (nrow(df$data) == 0) {
       out <- alert(
         color = 'danger', icon = 'danger',
@@ -887,19 +904,18 @@ shinyServer(function(input, output, session) {
 
     req(selection())
 
-    df <- checkBalance(selection(), input$dea.idvar, input$dea.year)
+    df <- checkBalance(selection(), params()$id, params()$year)
 
     malmquist <- malm(
-      data = df$data, id.var = input$dea.idvar, time.var = input$dea.year,
-      x.vars = input$dea.input, y.vars = input$dea.output,
+      data = df$data, id.var = params()$id, time.var = params()$year,
+      x.vars = params()$inputs, y.vars = params()$outputs,
       rts = input$malm.rts, orientation = input$malm.orient, scaled = TRUE)
 
     d <- malmquist$Changes[, c(1:6)]
 
-    colnames(d) <- c(input$dea.idvar, 'Year', 'Ref. year', 'Malmquist',
-                     'Efficiency change', 'Tech. change')
+    colnames(d) <- c(params()$id, 'Year', 'Ref. year', 'Malmquist', 'Eff. change', 'Tech. change')
 
-    return(d)
+    d
 
   })
 
@@ -912,7 +928,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$malm.render <- renderReactable({
-    req(input$dea.year)
+    req(params()$year)
 
     d <- malm.calc()
     withProgress(reactable(
@@ -955,9 +971,9 @@ shinyServer(function(input, output, session) {
 
       params <- list(
         data = selection(),
-        idvar = input$dea.idvar,
-        inputvars = input$dea.input,
-        outputvars = input$dea.output,
+        idvar = params()$id,
+        inputvars = params()$inputs,
+        outputvars = params()$outputs,
         normdata = input$dea.norm,
         dearts = input$plot.rts,
         deaorient = input$plot.orientation,
