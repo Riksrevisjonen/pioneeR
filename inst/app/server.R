@@ -938,6 +938,20 @@ shinyServer(function(input, output, session) {
     res
   })
 
+  output$boot_rts_warn <- renderUI({
+    req(model_params$rts)
+    if (!model_params$rts %in% c('crs', 'vrs')) {
+      session$sendCustomMessage('disable_run_bootstrap', TRUE)
+      return(p(
+        class = 'small text-danger',
+        'Bootstrap is only supported with constant or variable returns to scale.'
+      ))
+    } else {
+      session$sendCustomMessage('disable_run_bootstrap', FALSE)
+      return()
+    }
+  })
+
   output$boot_tbl <- renderUI({
 
     rts <- model_params$rts

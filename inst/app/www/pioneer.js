@@ -50,6 +50,15 @@ $(document).ready(function() {
     el.style.display = msg === true ? 'block' : 'none';
   });
 
+  Shiny.addCustomMessageHandler('disable_run_bootstrap', function(msg) {
+    let el = document.getElementById('run_boot');
+    if (msg === true) {
+      el.setAttribute('disabled', '');
+    } else {
+      el.removeAttribute('disabled');
+    }
+  });
+
   $(document).on('click', '[data-app-delete-id]', function(e) {
     let id = e.target.getAttribute('data-app-delete-id');
     let parent = e.target.closest('div.row');
