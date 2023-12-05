@@ -73,7 +73,7 @@ ui <- function(request) { page_navbar(
         actionButton('delete_all_models', 'Delete all models'),
         uiOutput('saved_models_info'),
         hr(),
-        numericInput('out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
+        numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
         radioButtons(
           'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
           selected = 'none', inline = TRUE),
@@ -216,7 +216,7 @@ ui <- function(request) { page_navbar(
     )
   ),
 
-  footer = div( class = 'small text-center', tagList(
+  footer = div(class = 'small text-center', tagList(
     hr(),
     p('Developed by the Data Science team at the Office of the Auditor General of Norway.'),
     p(HTML(sprintf('&copy; %s Riksrevisjonen. Version %s', format(Sys.Date(), '%Y'), ver)))

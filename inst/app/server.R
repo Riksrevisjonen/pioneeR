@@ -355,7 +355,7 @@ shinyServer(function(input, output, session) {
         Input: %s<br />
         Output: %s<br />
         Efficiency score: %s</p>',
-        x$dmu[1], x$x[1], x$y[1], round(x$eff[1], input$out.decimals)
+        x$dmu[1], x$x[1], x$y[1], round(x$eff[1], input$dea_round)
       )
       tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
     } else {
@@ -381,24 +381,28 @@ shinyServer(function(input, output, session) {
 
     crs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'crs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
     vrs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'vrs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
     nirs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'drs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
-    out_mod <- data.frame(
-      DMU = rownames(dea.in()),
-      crs = round(crs_mod$eff, input$out.decimals),
-      vrs = round(vrs_mod$eff, input$out.decimals),
-      nirs = round(nirs_mod$eff, input$out.decimals))
+    out_mod <- round(data.frame(
+      crs = crs_mod$eff,
+      vrs = vrs_mod$eff,
+      nirs = nirs_mod$eff,
+      scale_eff = crs_mod$eff / vrs_mod$eff,
+      vrs_nirs = vrs_mod$eff / nirs_mod$eff
+    ), input$dea_round)
 
-    out_mod$scale_eff <- round(out_mod$crs / out_mod$vrs, input$out.decimals)
-    out_mod$vrs_nirs <- round(out_mod$vrs / out_mod$nirs, input$out.decimals)
+    out_mod <- cbind(
+      data.frame(DMU = rownames(dea.in())),
+      out_mod
+    )
 
     return(out_mod)
 
@@ -570,29 +574,29 @@ shinyServer(function(input, output, session) {
     list(
       p(class = 'h5', 'Summary of DEA analysis'),
       p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
-      p(paste('Mean efficiency:', round(mean(eff), input$out.decimals))),
-      p(paste('Weighted efficiency:',round(sum.eff, input$out.decimals))),
+      p(paste('Mean efficiency:', round(mean(eff), input$dea_round))),
+      p(paste('Weighted efficiency:',round(sum.eff, input$dea_round))),
       layout_column_wrap(
         width = 1/5,
         card(
           card_header('Min'),
-          card_body(round(min(eff), input$out.decimals))
+          card_body(round(min(eff), input$dea_round))
         ),
         card(
           card_header('1st Qu'),
-          card_body(round(quantile(eff)[[2]], input$out.decimals))
+          card_body(round(quantile(eff)[[2]], input$dea_round))
         ),
         card(
           card_header('Median'),
-          card_body(round(median(eff), input$out.decimals))
+          card_body(round(median(eff), input$dea_round))
         ),
         card(
           card_header('3rd Qu.'),
-          card_body(round(quantile(eff)[[4]], input$out.decimals))
+          card_body(round(quantile(eff)[[4]], input$dea_round))
         ),
         card(
           card_header('Max'),
-          card_body(round(max(eff), input$out.decimals))
+          card_body(round(max(eff), input$dea_round))
         )
       ),
       hr(),
@@ -642,7 +646,7 @@ shinyServer(function(input, output, session) {
 
     df <- data.frame(
       DMU = names(dea.prod()$eff),
-      round(cbind(ins, outs, deff, sl, seff), input$out.decimals),
+      round(cbind(ins, outs, deff, sl, seff), input$dea_round),
       stringsAsFactors = FALSE, row.names = NULL
     )
 
@@ -728,7 +732,7 @@ shinyServer(function(input, output, session) {
       data = data.frame(
         idx = seq_len(length(mod$eff)),
         dmu = names(mod$eff),
-        eff = round(unname(mod$eff), input$out.decimals)
+        eff = round(unname(mod$eff), input$dea_round)
       ),
       params = list(
         rts = mod$RTS,
