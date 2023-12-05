@@ -92,13 +92,23 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$dea_rts, {
     model_params$rts <- input$dea_rts
+    updateSelectizeInput(session, 'boot_rts', selected = input$dea_rts)
   })
 
+  observeEvent(input$boot_rts, {
+    model_params$rts <- input$boot_rts
+    updateSelectizeInput(session, 'dea_rts', selected = input$boot_rts)
+  })
 
   observeEvent(input$dea_orientation, {
     model_params$orientation <- input$dea_orientation
+    updateSelectizeInput(session, 'boot_orientation', selected = input$dea_orientation)
   })
 
+  observeEvent(input$boot_orientation, {
+    model_params$orientation <- input$boot_orientation
+    updateSelectizeInput(session, 'dea_orientation', selected = input$boot_orientation)
+  })
 
   # ---- Data ----
 
@@ -295,8 +305,8 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- Benchmarking::sdea(
-      dea.in(), dea.out(), RTS = input$plot.rts,
-      ORIENTATION = input$plot.orientation)
+      dea.in(), dea.out(), RTS = model_params$rts,
+      ORIENTATION = model_params$orientation)
 
     d
 
@@ -890,6 +900,72 @@ shinyServer(function(input, output, session) {
       sprintf(
         '%s models saved (10 maximum)',
         n_mods
+      )
+    )
+  })
+
+  # ---- Bootstrap ----
+
+  dea_boostrap <- reactive({
+    if (input$run_boot == 0)
+      return()
+    rts <- isolate(model_params$rts)
+    orientation <- isolate(model_params$orientation)
+    # Set up bootstrap params
+    b <- isolate(input$boot_b)
+    bw_rule <- isolate(input$boot_bw)
+    alpha <- isolate(as.numeric(input$boot_alpha))
+
+    x <- isolate(dea.in())
+    y <- isolate(dea.out())
+
+    withProgress(message = 'Running', value = 0, {
+      theta <- isolate(as.vector(dea.prod()$eff))
+      # theta >= 1 if 'out', <= if 'in'
+      h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule, adjust = TRUE)
+      boot <- matrix(NA, nrow = nrow(x), ncol = b)
+      for (i in seq_len(b)) {
+        incProgress(1/b, detail = sprintf('Iteration %s', i))
+        boot <- perform_boot(
+          x, y, rts, orientation, h = h, i = i, theta = theta, boot = boot
+        )
+      }
+    })
+    res <- process_boot(
+      rts, orientation, h = h, alpha = alpha, theta = theta,
+      boot = boot
+    )
+    res
+  })
+
+  output$boot_tbl <- renderUI({
+
+    rts <- model_params$rts
+
+    if (!rts %in% c('vrs', 'crs')) {
+      p('Returns to scale must be vrs or crs')
+    }
+
+    res <- dea_boostrap()
+
+    if (is.null(res))
+      return()
+
+    # Add DMU names and round inputs
+    df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+
+    reactable(
+      df,
+      class = 'small',
+      striped = TRUE,
+      defaultPageSize = 30,
+      pageSizeOptions = c(10, 30, 50, 100),
+      columns = list(
+        eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
+        bias = colDef(show = input$boot_show_bias, name = 'Bias'),
+        eff_bc = colDef(name = 'Bias corr. score'),
+        lower = colDef(name = 'Lower'),
+        upper = colDef(name = 'Upper')
       )
     )
   })

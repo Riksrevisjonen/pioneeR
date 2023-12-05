@@ -1,8 +1,11 @@
 # Load required packages
 require(data.table)
 require(reactable)
+require(bslib)
 
 ver <- utils::packageVersion('pioneeR')
+
+sidebar_width <- 400
 
 vals <- list(
   'rts' = c(
@@ -167,6 +170,59 @@ ui <- function(request) { page_navbar(
           )
         )
       )
+    )
+  ),
+
+  tabPanel(
+    title = 'Bootstrap',
+    value = 'bootstrap',
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width,
+        accordion(
+          open = NULL, multiple = TRUE, class = 'mb-2',
+          accordion_panel(
+            'Bootstrap options',
+            selectizeInput(
+              'boot_rts', 'Returns to scale', choices = vals$rts, selected = 'crs'
+            ),
+            uiOutput('boot_rts_warn'),
+            selectInput(
+              'boot_orientation', 'Orientation', choices = vals$orient,
+              selected = 'in'
+            ),
+            selectizeInput(
+              'boot_alpha',
+              'Alpha',
+              choices = c('1 %' = 0.01, '5 %' = 0.05, '10 %' = 0.1),
+              selected = 0.05
+            ),
+            numericInput('boot_b', 'Iterations', min = 20, max = 5000, step = 1, value = 200)
+          ),
+          accordion_panel(
+            'Advanced options',
+            selectizeInput(
+              'boot_bw',
+              'Bandwidth selection',
+              choices = c(
+                'Silverman\'s rule of thumb' = 'silverman',
+                'Robust normal rule (Scott)' = 'scott',
+                'Unbiased cross validation' = 'ucv',
+                'sw98'),
+              selected = 'ucv'
+            )
+          ),
+          accordion_panel(
+            'Table options',
+            numericInput('boot_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('boot_show_eff', 'Show original efficiency score', value = TRUE),
+            checkboxInput('boot_show_bias', 'Show bias', value = FALSE)
+          )
+        ),
+        actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')
+      ),
+      div(class = 'alert alert-info', role = 'alert', 'Bootstrap functionality is currently in preview'),
+      uiOutput('boot_tbl')
     )
   ),
 
