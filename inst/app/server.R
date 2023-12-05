@@ -60,6 +60,10 @@ shinyServer(function(input, output, session) {
       year = input$dea_year
     )
   ) |> debounce(100)
+  model_params <- reactiveValues(
+    rts = NULL,
+    orientation = NULL
+  )
   restoreVals <- reactiveValues(
     subset = NULL,
     inputs = NULL,
@@ -83,6 +87,18 @@ shinyServer(function(input, output, session) {
     reactives$data <- state$values$data
     reactives$filename <- state$values$filename
   })
+
+  # ---- Observers for model parameters ----
+
+  observeEvent(input$dea_rts, {
+    model_params$rts <- input$dea_rts
+  })
+
+
+  observeEvent(input$dea_orientation, {
+    model_params$orientation <- input$dea_orientation
+  })
+
 
   # ---- Data ----
 
@@ -256,8 +272,8 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = input$plot.rts,
-      ORIENTATION = input$plot.orientation)
+      dea.in(), dea.out(), RTS = model_params$rts,
+      ORIENTATION = model_params$orientation)
 
     d
 
@@ -314,17 +330,17 @@ shinyServer(function(input, output, session) {
       theme_pioneer()
 
     # Add frontier line
-    if (input$plot.rts %in% c('crs', 'vrs', 'drs')) {
-      if (input$plot.rts == 'crs') {
+    if (model_params$rts %in% c('crs', 'vrs', 'drs')) {
+      if (model_params$rts == 'crs') {
         p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55', linewidth = 1)
       } else {
-        if (input$plot.rts == 'vrs') {
+        if (model_params$rts == 'vrs') {
           # Use chull to find the points which lie on the convex hull
           hpts <- chull(d$x, d$y)
           hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(min(d$x), d$x[hpts], max(d$x))
-        } else if (input$plot.rts == 'drs') {
+        } else if (model_params$rts == 'drs') {
           # If we have NIRS, the front starts at origo, so we add origo to our coordinates
           hpts <- chull(c(0, d$x), c(0, d$y))
           hpts <- hpts[hpts != 1]-1
@@ -552,9 +568,9 @@ shinyServer(function(input, output, session) {
     )
     colnames(sum.tbl) <- c('Min.', '1st Qu.', 'Median', 'Mean', '3rd. Qu.', 'Max')
 
-    if (input$plot.orientation == 'in')
+    if (model_params$orientation == 'in')
       sum.eff <- sum(dea.in() * eff) / sum(dea.in())
-    else if (input$plot.orientation == 'out')
+    else if (model_params$orientation == 'out')
       sum.eff <- sum(dea.out() * eff) / sum(dea.out())
 
     rts <- switch(dea.prod()$RTS,
@@ -979,8 +995,8 @@ shinyServer(function(input, output, session) {
         inputvars = params()$inputs,
         outputvars = params()$outputs,
         normdata = input$dea.norm,
-        dearts = input$plot.rts,
-        deaorient = input$plot.orientation,
+        dearts = model_params$rts,
+        deaorient = model_params$orientation,
         deain = dea.in(),
         deaout = dea.out(),
         deanorm = input$dea.norm,

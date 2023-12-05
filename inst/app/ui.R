@@ -63,8 +63,8 @@ ui <- function(request) { page_navbar(
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        selectInput('plot.rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
-        selectInput('plot.orientation', 'Orientation', choices = vals$orient, selected = 'in'),
+        selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
+        selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
         checkboxInput('dea.norm', 'Normalize input/output', value = FALSE),
         p(strong('Output options')),
         checkboxInput('out.slack', 'Show slack', value = TRUE),
