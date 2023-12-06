@@ -922,7 +922,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'Running', value = 0, {
       theta <- isolate(as.vector(dea.prod()$eff))
       # theta >= 1 if 'out', <= if 'in'
-      h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule, adjust = TRUE)
+      h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
       boot <- matrix(NA, nrow = nrow(x), ncol = b)
       for (i in seq_len(b)) {
         incProgress(1/b, detail = sprintf('Iteration %s', i))
@@ -978,8 +978,8 @@ shinyServer(function(input, output, session) {
         eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
         bias = colDef(show = input$boot_show_bias, name = 'Bias'),
         eff_bc = colDef(name = 'Bias corr. score'),
-        lower = colDef(name = 'Lower'),
-        upper = colDef(name = 'Upper')
+        lower = colDef(name = 'Lower bound'),
+        upper = colDef(name = 'Upper bound')
       )
     )
   })

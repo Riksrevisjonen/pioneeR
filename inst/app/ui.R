@@ -207,8 +207,7 @@ ui <- function(request) { page_navbar(
               choices = c(
                 'Silverman\'s rule of thumb' = 'silverman',
                 'Robust normal rule (Scott)' = 'scott',
-                'Unbiased cross validation' = 'ucv',
-                'sw98'),
+                'Unbiased cross validation' = 'ucv'),
               selected = 'ucv'
             )
           ),
