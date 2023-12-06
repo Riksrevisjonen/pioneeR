@@ -10,6 +10,12 @@ pioneeR can be installed using the `remotes` package:
 remotes::install_github('riksrevisjonen/pioneeR')
 ```
 
+This will give you the lastest version of pioneeR, and is the recommended way for installing pioneeR at the moment. If you want to install the latest stable release, you can run the following command instead:
+
+```r
+remotes::install_github('riksrevisjonen/pioneeR@stable')
+```
+
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r

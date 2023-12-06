@@ -2,9 +2,11 @@
 
 $(document).ready(function() {
 
-  document.querySelector('[data-value="malmquist"]').closest('li').style.display = 'none';
-  document.querySelector('[data-value="pioneeranalysis"]').closest('li').style.display = 'none';
-  document.querySelector('[data-value="pioneer_compare"]').closest('li').style.display = 'none';
+  let hiddenTabs = ['pioneeranalysis', 'bootstrap', 'malmquist', 'pioneer_compare'];
+  for (let i = 0; i < hiddenTabs.length; i++) {
+    console.log(`[data-value="${hiddenTabs[i]}"]`);
+    document.querySelector(`[data-value="${hiddenTabs[i]}"]`).closest('li').style.display = 'none';
+  }
 
   document.addEventListener('click', function(e) {
     if (e.target.id === 'uopts_menu') {
@@ -48,6 +50,15 @@ $(document).ready(function() {
     el.style.display = msg === true ? 'block' : 'none';
   });
 
+  Shiny.addCustomMessageHandler('disable_run_bootstrap', function(msg) {
+    let el = document.getElementById('run_boot');
+    if (msg === true) {
+      el.setAttribute('disabled', '');
+    } else {
+      el.removeAttribute('disabled');
+    }
+  });
+
   $(document).on('click', '[data-app-delete-id]', function(e) {
     let id = e.target.getAttribute('data-app-delete-id');
     let parent = e.target.closest('div.row');
@@ -59,12 +70,15 @@ $(document).ready(function() {
     if (e.name === 'hasyear') {
       let el_m = document.querySelector('[data-value="malmquist"]').closest('li');
       let el_a = document.querySelector('[data-value="pioneeranalysis"]').closest('li');
+      let el_b = document.querySelector('[data-value="bootstrap"]').closest('li');
       if (e.value === true) {
         el_m.style.display = 'block';
         el_a.style.display = 'none';
+        el_b.style.display = 'none';
       } else if (e.value === false) {
         el_m.style.display = 'none';
         el_a.style.display = 'block';
+        el_b.style.display = 'block';
       }
     }
   });
