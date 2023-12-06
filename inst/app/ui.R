@@ -1,8 +1,11 @@
 # Load required packages
 require(data.table)
 require(reactable)
+require(bslib)
 
 ver <- utils::packageVersion('pioneeR')
+
+sidebar_width <- 400
 
 vals <- list(
   'rts' = c(
@@ -63,8 +66,8 @@ ui <- function(request) { page_navbar(
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        selectInput('plot.rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
-        selectInput('plot.orientation', 'Orientation', choices = vals$orient, selected = 'in'),
+        selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
+        selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
         checkboxInput('dea.norm', 'Normalize input/output', value = FALSE),
         p(strong('Output options')),
         checkboxInput('out.slack', 'Show slack', value = TRUE),
@@ -73,7 +76,7 @@ ui <- function(request) { page_navbar(
         actionButton('delete_all_models', 'Delete all models'),
         uiOutput('saved_models_info'),
         hr(),
-        numericInput('out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
+        numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
         radioButtons(
           'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
           selected = 'none', inline = TRUE),
@@ -171,6 +174,58 @@ ui <- function(request) { page_navbar(
   ),
 
   tabPanel(
+    title = 'Bootstrap',
+    value = 'bootstrap',
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width,
+        accordion(
+          open = NULL, multiple = TRUE, class = 'mb-2',
+          accordion_panel(
+            'Bootstrap options',
+            selectizeInput(
+              'boot_rts', 'Returns to scale', choices = vals$rts, selected = 'crs'
+            ),
+            uiOutput('boot_rts_warn'),
+            selectInput(
+              'boot_orientation', 'Orientation', choices = vals$orient,
+              selected = 'in'
+            ),
+            selectizeInput(
+              'boot_alpha',
+              'Alpha',
+              choices = c('1 %' = 0.01, '5 %' = 0.05, '10 %' = 0.1),
+              selected = 0.05
+            ),
+            numericInput('boot_b', 'Iterations', min = 20, max = 5000, step = 1, value = 200)
+          ),
+          accordion_panel(
+            'Advanced options',
+            selectizeInput(
+              'boot_bw',
+              'Bandwidth selection',
+              choices = c(
+                'Silverman\'s rule of thumb' = 'silverman',
+                'Robust normal rule (Scott)' = 'scott',
+                'Unbiased cross validation' = 'ucv'),
+              selected = 'ucv'
+            )
+          ),
+          accordion_panel(
+            'Table options',
+            numericInput('boot_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('boot_show_eff', 'Show original efficiency score', value = TRUE),
+            checkboxInput('boot_show_bias', 'Show bias', value = FALSE)
+          )
+        ),
+        actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')
+      ),
+      div(class = 'alert alert-info', role = 'alert', 'Bootstrap functionality is currently in preview'),
+      uiOutput('boot_tbl')
+    )
+  ),
+
+  tabPanel(
 
     # TODO: Print back results from analysis
 
@@ -216,7 +271,7 @@ ui <- function(request) { page_navbar(
     )
   ),
 
-  footer = div( class = 'small text-center', tagList(
+  footer = div(class = 'small text-center', tagList(
     hr(),
     p('Developed by the Data Science team at the Office of the Auditor General of Norway.'),
     p(HTML(sprintf('&copy; %s Riksrevisjonen. Version %s', format(Sys.Date(), '%Y'), ver)))

@@ -60,6 +60,10 @@ shinyServer(function(input, output, session) {
       year = input$dea_year
     )
   ) |> debounce(100)
+  model_params <- reactiveValues(
+    rts = NULL,
+    orientation = NULL
+  )
   restoreVals <- reactiveValues(
     subset = NULL,
     inputs = NULL,
@@ -82,6 +86,28 @@ shinyServer(function(input, output, session) {
     reactives$file <- state$values$file
     reactives$data <- state$values$data
     reactives$filename <- state$values$filename
+  })
+
+  # ---- Observers for model parameters ----
+
+  observeEvent(input$dea_rts, {
+    model_params$rts <- input$dea_rts
+    updateSelectizeInput(session, 'boot_rts', selected = input$dea_rts)
+  })
+
+  observeEvent(input$boot_rts, {
+    model_params$rts <- input$boot_rts
+    updateSelectizeInput(session, 'dea_rts', selected = input$boot_rts)
+  })
+
+  observeEvent(input$dea_orientation, {
+    model_params$orientation <- input$dea_orientation
+    updateSelectizeInput(session, 'boot_orientation', selected = input$dea_orientation)
+  })
+
+  observeEvent(input$boot_orientation, {
+    model_params$orientation <- input$boot_orientation
+    updateSelectizeInput(session, 'dea_orientation', selected = input$boot_orientation)
   })
 
   # ---- Data ----
@@ -256,8 +282,8 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = input$plot.rts,
-      ORIENTATION = input$plot.orientation)
+      dea.in(), dea.out(), RTS = model_params$rts,
+      ORIENTATION = model_params$orientation)
 
     d
 
@@ -279,8 +305,8 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- Benchmarking::sdea(
-      dea.in(), dea.out(), RTS = input$plot.rts,
-      ORIENTATION = input$plot.orientation)
+      dea.in(), dea.out(), RTS = model_params$rts,
+      ORIENTATION = model_params$orientation)
 
     d
 
@@ -314,17 +340,17 @@ shinyServer(function(input, output, session) {
       theme_pioneer()
 
     # Add frontier line
-    if (input$plot.rts %in% c('crs', 'vrs', 'drs')) {
-      if (input$plot.rts == 'crs') {
+    if (model_params$rts %in% c('crs', 'vrs', 'drs')) {
+      if (model_params$rts == 'crs') {
         p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55', linewidth = 1)
       } else {
-        if (input$plot.rts == 'vrs') {
+        if (model_params$rts == 'vrs') {
           # Use chull to find the points which lie on the convex hull
           hpts <- chull(d$x, d$y)
           hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(min(d$x), d$x[hpts], max(d$x))
-        } else if (input$plot.rts == 'drs') {
+        } else if (model_params$rts == 'drs') {
           # If we have NIRS, the front starts at origo, so we add origo to our coordinates
           hpts <- chull(c(0, d$x), c(0, d$y))
           hpts <- hpts[hpts != 1]-1
@@ -355,7 +381,7 @@ shinyServer(function(input, output, session) {
         Input: %s<br />
         Output: %s<br />
         Efficiency score: %s</p>',
-        x$dmu[1], x$x[1], x$y[1], round(x$eff[1], input$out.decimals)
+        x$dmu[1], x$x[1], x$y[1], round(x$eff[1], input$dea_round)
       )
       tags$div(class = 'alert alert-dark p-0 m-0', HTML(msg))
     } else {
@@ -381,24 +407,28 @@ shinyServer(function(input, output, session) {
 
     crs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'crs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
     vrs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'vrs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
     nirs_mod <- Benchmarking::dea(
       dea.in(), dea.out(), RTS = 'drs',
-      ORIENTATION = input$plot.orientation)
+      ORIENTATION = model_params$orientation)
 
-    out_mod <- data.frame(
-      DMU = rownames(dea.in()),
-      crs = round(crs_mod$eff, input$out.decimals),
-      vrs = round(vrs_mod$eff, input$out.decimals),
-      nirs = round(nirs_mod$eff, input$out.decimals))
+    out_mod <- round(data.frame(
+      crs = crs_mod$eff,
+      vrs = vrs_mod$eff,
+      nirs = nirs_mod$eff,
+      scale_eff = crs_mod$eff / vrs_mod$eff,
+      vrs_nirs = vrs_mod$eff / nirs_mod$eff
+    ), input$dea_round)
 
-    out_mod$scale_eff <- round(out_mod$crs / out_mod$vrs, input$out.decimals)
-    out_mod$vrs_nirs <- round(out_mod$vrs / out_mod$nirs, input$out.decimals)
+    out_mod <- cbind(
+      data.frame(DMU = rownames(dea.in())),
+      out_mod
+    )
 
     return(out_mod)
 
@@ -548,9 +578,9 @@ shinyServer(function(input, output, session) {
     )
     colnames(sum.tbl) <- c('Min.', '1st Qu.', 'Median', 'Mean', '3rd. Qu.', 'Max')
 
-    if (input$plot.orientation == 'in')
+    if (model_params$orientation == 'in')
       sum.eff <- sum(dea.in() * eff) / sum(dea.in())
-    else if (input$plot.orientation == 'out')
+    else if (model_params$orientation == 'out')
       sum.eff <- sum(dea.out() * eff) / sum(dea.out())
 
     rts <- switch(dea.prod()$RTS,
@@ -570,29 +600,29 @@ shinyServer(function(input, output, session) {
     list(
       p(class = 'h5', 'Summary of DEA analysis'),
       p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
-      p(paste('Mean efficiency:', round(mean(eff), input$out.decimals))),
-      p(paste('Weighted efficiency:',round(sum.eff, input$out.decimals))),
+      p(paste('Mean efficiency:', round(mean(eff), input$dea_round))),
+      p(paste('Weighted efficiency:',round(sum.eff, input$dea_round))),
       layout_column_wrap(
         width = 1/5,
         card(
           card_header('Min'),
-          card_body(round(min(eff), input$out.decimals))
+          card_body(round(min(eff), input$dea_round))
         ),
         card(
           card_header('1st Qu'),
-          card_body(round(quantile(eff)[[2]], input$out.decimals))
+          card_body(round(quantile(eff)[[2]], input$dea_round))
         ),
         card(
           card_header('Median'),
-          card_body(round(median(eff), input$out.decimals))
+          card_body(round(median(eff), input$dea_round))
         ),
         card(
           card_header('3rd Qu.'),
-          card_body(round(quantile(eff)[[4]], input$out.decimals))
+          card_body(round(quantile(eff)[[4]], input$dea_round))
         ),
         card(
           card_header('Max'),
-          card_body(round(max(eff), input$out.decimals))
+          card_body(round(max(eff), input$dea_round))
         )
       ),
       hr(),
@@ -642,7 +672,7 @@ shinyServer(function(input, output, session) {
 
     df <- data.frame(
       DMU = names(dea.prod()$eff),
-      round(cbind(ins, outs, deff, sl, seff), input$out.decimals),
+      round(cbind(ins, outs, deff, sl, seff), input$dea_round),
       stringsAsFactors = FALSE, row.names = NULL
     )
 
@@ -728,7 +758,7 @@ shinyServer(function(input, output, session) {
       data = data.frame(
         idx = seq_len(length(mod$eff)),
         dmu = names(mod$eff),
-        eff = round(unname(mod$eff), input$out.decimals)
+        eff = round(unname(mod$eff), input$dea_round)
       ),
       params = list(
         rts = mod$RTS,
@@ -874,6 +904,86 @@ shinyServer(function(input, output, session) {
     )
   })
 
+  # ---- Bootstrap ----
+
+  dea_boostrap <- reactive({
+    if (input$run_boot == 0)
+      return()
+    rts <- isolate(model_params$rts)
+    orientation <- isolate(model_params$orientation)
+    # Set up bootstrap params
+    b <- isolate(input$boot_b)
+    bw_rule <- isolate(input$boot_bw)
+    alpha <- isolate(as.numeric(input$boot_alpha))
+
+    x <- isolate(dea.in())
+    y <- isolate(dea.out())
+
+    withProgress(message = 'Running', value = 0, {
+      theta <- isolate(as.vector(dea.prod()$eff))
+      # theta >= 1 if 'out', <= if 'in'
+      h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
+      boot <- matrix(NA, nrow = nrow(x), ncol = b)
+      for (i in seq_len(b)) {
+        incProgress(1/b, detail = sprintf('Iteration %s', i))
+        boot <- perform_boot(
+          x, y, rts, orientation, h = h, i = i, theta = theta, boot = boot
+        )
+      }
+    })
+    res <- process_boot(
+      rts, orientation, h = h, alpha = alpha, theta = theta,
+      boot = boot
+    )
+    res
+  })
+
+  output$boot_rts_warn <- renderUI({
+    req(model_params$rts)
+    if (!model_params$rts %in% c('crs', 'vrs')) {
+      session$sendCustomMessage('disable_run_bootstrap', TRUE)
+      return(p(
+        class = 'small text-danger',
+        'Bootstrap is only supported with constant or variable returns to scale.'
+      ))
+    } else {
+      session$sendCustomMessage('disable_run_bootstrap', FALSE)
+      return()
+    }
+  })
+
+  output$boot_tbl <- renderUI({
+
+    rts <- model_params$rts
+
+    if (!rts %in% c('vrs', 'crs')) {
+      p('Returns to scale must be vrs or crs')
+    }
+
+    res <- dea_boostrap()
+
+    if (is.null(res))
+      return()
+
+    # Add DMU names and round inputs
+    df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+
+    reactable(
+      df,
+      class = 'small',
+      striped = TRUE,
+      defaultPageSize = 30,
+      pageSizeOptions = c(10, 30, 50, 100),
+      columns = list(
+        eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
+        bias = colDef(show = input$boot_show_bias, name = 'Bias'),
+        eff_bc = colDef(name = 'Bias corr. score'),
+        lower = colDef(name = 'Lower bound'),
+        upper = colDef(name = 'Upper bound')
+      )
+    )
+  })
+
   # ---- Malmquist ----
 
   output$malm.dt <- renderUI({
@@ -975,8 +1085,8 @@ shinyServer(function(input, output, session) {
         inputvars = params()$inputs,
         outputvars = params()$outputs,
         normdata = input$dea.norm,
-        dearts = input$plot.rts,
-        deaorient = input$plot.orientation,
+        dearts = model_params$rts,
+        deaorient = model_params$orientation,
         deain = dea.in(),
         deaout = dea.out(),
         deanorm = input$dea.norm,
