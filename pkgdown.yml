@@ -2,7 +2,7 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles: {}
-last_built: 2023-12-01T08:46Z
+last_built: 2023-12-06T11:17Z
 urls:
   reference: https://riksrevisjonen.github.io/pioneeR/reference
   article: https://riksrevisjonen.github.io/pioneeR/articles

@@ -40,11 +40,13 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0.9000" id="version-0209000">Version 0.2.0.9000<a class="anchor" aria-label="anchor" href="#version-0209000"></a></h2>
-<ul><li>Added new function <code><a href="../reference/unset_env_vars.html">unset_env_vars()</a></code> that will clear environment variables set by pioneeR if the app exits unexpectedly and the variables are not unset automatically</li>
+<ul><li>Added new boostrap functionality for models with constant or variable returns to scale based on Simar and Wilson (1998) (#6)</li>
+<li>Added new function <code><a href="../reference/unset_env_vars.html">unset_env_vars()</a></code> that will clear environment variables set by pioneeR if the app exits unexpectedly and the variables are not unset automatically</li>
 <li>
 <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> has been renamed <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>. <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> will still work, but will be deprecated in a later version</li>
-<li>If the user selects a port number that is considered unsafe, a random port number is selected instead</li>
-<li>Fixed a bug where an error occurred if any of the model parameters were not found in the column names</li>
+<li>If the user selects a port number that is considered unsafe, a random port number is selected instead (#40)</li>
+<li>Fixed a bug where an error occurred if any of the model parameters were not found in the column names (#39)</li>
+<li>Fixed a bug in the scale efficiency tab where numbers where rounded twice (#47)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="version-020">Version 0.2.0<a class="anchor" aria-label="anchor" href="#version-020"></a></h2>

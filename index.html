@@ -63,18 +63,21 @@
 <p>pioneeR can be installed using the <code>remotes</code> package:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR'</span><span class="op">)</span></span></code></pre></div>
-<p>If you want to install a specific version of pioneeR, you can add the release version:</p>
+<p>This will give you the lastest version of pioneeR, and is the recommended way for installing pioneeR at the moment. If you want to install the latest stable release, you can run the following command instead:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@stable'</span><span class="op">)</span></span></code></pre></div>
+<p>If you want to install a specific version of pioneeR, you can add the release version:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@v0.2.0'</span><span class="op">)</span></span></code></pre></div>
 <p>Note that pioneeR will install the <code>productivity</code> package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency <code>GLPK</code> first. On Ubuntu this can be done by typing the following command:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install libglpk-dev</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install libglpk-dev</span></code></pre></div>
 <p>On macOS, we recommend that you install <code>glpk</code> with <a href="https://brew.sh" class="external-link">Homebrew</a>. Open the terminal and type:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install glpk</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install glpk</span></code></pre></div>
 <div class="section level3">
 <h3 id="exporting-reports-as-pdf">Exporting reports as PDF<a class="anchor" aria-label="anchor" href="#exporting-reports-as-pdf"></a>
 </h3>
 <p>pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the <a href="https://yihui.name/tinytex/" class="external-link"><code>tinytex</code>-package</a> by Yihui Xie. Install LaTeX on your system by typing:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'tinytex'</span><span class="op">)</span></span>
 <span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/install_tinytex.html" class="external-link">install_tinytex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -83,25 +86,25 @@
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
 <p>To start up the pioneeR app, simply type the following into your R console:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">pioneeR</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/run_pioneer.html">run_pioneer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The app should start automatically in a new browser window. By default, Shiny will start with a random port number. If you want to start the app with a specific port number, you can set the <code>port</code> argument. Valid port numbers are in the range 3000 through 65535:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/run_pioneer.html">run_pioneer</a></span><span class="op">(</span>port <span class="op">=</span> <span class="fl">3939</span><span class="op">)</span></span></code></pre></div>
 <p>Note that Shiny will not run with port numbers that Google Chrome considers unsafe. If you select an unsafe port number, the port number will be overridden and a random port number selected instead. See <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">?shiny::runApp</a></code> for details.</p>
 <div class="section level3">
 <h3 id="use-a-data-set-from-the-current-session">Use a data set from the current session<a class="anchor" aria-label="anchor" href="#use-a-data-set-from-the-current-session"></a>
 </h3>
 <p>If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument <code>x</code> in the <code>runPioneeR</code>-function. The argument supports an object of type <code>data.frame</code>, <code>tbl_df</code>, <code>data.table</code> or <code>matrix</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/run_pioneer.html">runPioneeR</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">my_data_frame</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="save-results-to-the-current-session">Save results to the current session<a class="anchor" aria-label="anchor" href="#save-results-to-the-current-session"></a>
 </h3>
 <p>You can write back results from the analysis to the current R session. In the “Analyse”-tab, there is a button to quit the app and return the results. When the button is clicked, the app will close and the current data set along with any saved models and the current model, will be returned to the active R session. If you want to capture the results to an object, you can initiate the app by assigning it to a new object:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_pioneer.html">run_pioneer</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
