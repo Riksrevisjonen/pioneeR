@@ -11,11 +11,11 @@ vals <- list(
   'rts' = c(
     'Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
     'Non-decreasing RTS' = 'irs'),
-  'malm.rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
+  'malm_rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
 
-if (utils::packageVersion('bslib') > '0.5.0') {
+if (utils::packageVersion('bslib') > '0.5.1') {
   theme_args = list(version = bs_ver, preset = 'bootstrap')
 } else {
   theme_args = list(version = bs_ver)
@@ -37,9 +37,9 @@ ui <- function(request) { page_navbar(
 
   tabPanel(
     'Data', value = 'pioneer_upload',
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
         file_upload_ui('file_upload', wrap = TRUE, class = 'mb-2'),
         p(class = 'small', helpText(HTML(
           'Upload a file for analysis. If you are uploading <strong>time series data</strong>,
@@ -61,35 +61,41 @@ ui <- function(request) { page_navbar(
           'and that states might be deleted by the server administrator.'
         )))
       ),
-      mainPanel(
-        width = 9,
         uiOutput('data_preview')
       )
-    )
   ),
+
   tabPanel(
     'Analyse', value = 'pioneeranalysis',
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
+        accordion(
+          accordion_panel(
+            title = 'Model',
         selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
         selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
-        checkboxInput('dea.norm', 'Normalize input/output', value = FALSE),
-        p(strong('Output options')),
+            checkboxInput('dea_norm', 'Normalize input/output', value = FALSE),
+            div(
+              actionButton('save_model', 'Save model', class = 'btn-sm btn-primary'),
+              actionButton('delete_all_models', 'Delete all models', class = 'btn-sm btn-danger')
+            ),
+            uiOutput('saved_models_info')
+          ),
+          accordion_panel(
+            title = 'Table options',
+            numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
         checkboxInput('out.slack', 'Show slack', value = TRUE),
         checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
-        actionButton('save_model', 'Save model'),
-        actionButton('delete_all_models', 'Delete all models'),
-        uiOutput('saved_models_info'),
-        hr(),
-        numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
         radioButtons(
           'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
           selected = 'none', inline = TRUE),
         radioButtons(
           'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-          selected = 'none', inline = TRUE),
-        hr(),
+              selected = 'none', inline = TRUE)
+          ),
+          accordion_panel(
+            title = 'Export',
         downloadButton('exporttable', 'Export results', class = 'btn-dark'),
         p(class = 'small', helpText(
           'Download the analysis results as shown in the table to the right.'
@@ -97,7 +103,6 @@ ui <- function(request) { page_navbar(
         selectizeInput(
           'exportfileformat', 'Choose file format',
           choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
-        hr(),
         downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
         p(class = 'small mt-1', helpText(
           'Create a PDF-report with the results of the analysis and the code used to generate it.'
@@ -107,12 +112,11 @@ ui <- function(request) { page_navbar(
           paste('Download the data used for the analysis in RDS format for use in R.',
                 'The file can be used in conjunction with the code supplied in the',
                 'analysis report.')
-        )),
-        hr(),
+            ))
+          )
+        ),
         actionButton('save_and_close_dea', 'Quit app and return results')
       ),
-      mainPanel(
-        width = 9,
         tabsetPanel(
           tabPanel(
             'Efficiency',
@@ -176,7 +180,6 @@ ui <- function(request) { page_navbar(
           )
         )
       )
-    )
   ),
 
   tabPanel(
@@ -184,7 +187,7 @@ ui <- function(request) { page_navbar(
     value = 'bootstrap',
     layout_sidebar(
       sidebar = sidebar(
-        width = sidebar_width,
+        width = sidebar_width, gap = 0,
         accordion(
           open = NULL, multiple = TRUE, class = 'mb-2',
           accordion_panel(
@@ -234,18 +237,24 @@ ui <- function(request) { page_navbar(
   tabPanel(
 
     # TODO: Print back results from analysis
-
     title = 'Malmquist',
     value = 'malmquist',
 
-    sidebarLayout(
-      sidebarPanel(width = 3,
-                   selectInput('malm.rts', 'Returns to scale', choices = vals$malm.rts, selected = 'crs'),
-                   selectInput('malm.orient', 'Orientation', choices = vals$orient, selected = 'in'),
-                   hr(),
-                   p(strong('Output options')),
-                   numericInput('malm.out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
-                   hr(),
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
+        accordion(
+          accordion_panel(
+            title = 'Model',
+            selectInput('malm_rts', 'Returns to scale', choices = vals$malm_rts, selected = 'crs'),
+            selectInput('malm_orientation', 'Orientation', choices = vals$orient, selected = 'in')
+          ),
+          accordion_panel(
+            title = 'Table options',
+            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L)
+          ),
+          accordion_panel(
+            title = 'Export',
                    downloadButton('malm.export', 'Export results', class = 'btn-dark'),
                    p(class = 'small', helpText(
                      'Download the analysis results as shown in the table to the right.'
@@ -253,13 +262,11 @@ ui <- function(request) { page_navbar(
                    selectizeInput(
                      'malm.fileformat', 'Choose file format',
                      choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
+          )
+        )
       ),
-      mainPanel(width = 9,
-                # Output malmquist$Changes as DT (with pretty lables)
-                # Viz of malmquist score?
                 uiOutput('malm.dt')
       )
-    )
 
   ),
 
