@@ -1,23 +1,32 @@
 # Load required packages
 require(data.table)
 require(reactable)
+require(bslib)
 
 ver <- utils::packageVersion('pioneeR')
+
+sidebar_width <- 400
 
 vals <- list(
   'rts' = c(
     'Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
     'Non-decreasing RTS' = 'irs'),
-  'malm.rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
+  'malm_rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
+
+if (utils::packageVersion('bslib') > '0.5.1') {
+  theme_args = list(version = bs_ver, preset = 'bootstrap')
+} else {
+  theme_args = list(version = bs_ver)
+}
 
 # Define UI for application that draws a histogram
 ui <- function(request) { page_navbar(
 
   title = 'pioneeR',
   id = 'pioneer',
-  theme = bslib::bs_theme(version = bs_ver),
+  theme = do.call(bslib::bs_theme, theme_args),
   fluid = TRUE,
 
   # Add custom CSS
@@ -28,9 +37,9 @@ ui <- function(request) { page_navbar(
 
   tabPanel(
     'Data', value = 'pioneer_upload',
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
         file_upload_ui('file_upload', wrap = TRUE, class = 'mb-2'),
         p(class = 'small', helpText(HTML(
           'Upload a file for analysis. If you are uploading <strong>time series data</strong>,
@@ -52,152 +61,211 @@ ui <- function(request) { page_navbar(
           'and that states might be deleted by the server administrator.'
         )))
       ),
-      mainPanel(
-        width = 9,
-        uiOutput('data_preview')
-      )
+      uiOutput('data_preview')
     )
   ),
+
   tabPanel(
     'Analyse', value = 'pioneeranalysis',
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
-        selectInput('plot.rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
-        selectInput('plot.orientation', 'Orientation', choices = vals$orient, selected = 'in'),
-        checkboxInput('dea.norm', 'Normalize input/output', value = FALSE),
-        p(strong('Output options')),
-        checkboxInput('out.slack', 'Show slack', value = TRUE),
-        checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
-        actionButton('save_model', 'Save model'),
-        actionButton('delete_all_models', 'Delete all models'),
-        uiOutput('saved_models_info'),
-        hr(),
-        numericInput('out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
-        radioButtons(
-          'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-          selected = 'none', inline = TRUE),
-        radioButtons(
-          'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-          selected = 'none', inline = TRUE),
-        hr(),
-        downloadButton('exporttable', 'Export results', class = 'btn-dark'),
-        p(class = 'small', helpText(
-          'Download the analysis results as shown in the table to the right.'
-        )),
-        selectizeInput(
-          'exportfileformat', 'Choose file format',
-          choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
-        hr(),
-        downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
-        p(class = 'small mt-1', helpText(
-          'Create a PDF-report with the results of the analysis and the code used to generate it.'
-        )),
-        downloadButton('export-dea-rds', 'Download data for analysis', color = 'dark'),
-        p(class = 'small mt-1', helpText(
-          paste('Download the data used for the analysis in RDS format for use in R.',
-                'The file can be used in conjunction with the code supplied in the',
-                'analysis report.')
-        )),
-        hr(),
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
+        accordion(
+          accordion_panel(
+            title = 'Model',
+            selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
+            selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
+            checkboxInput('dea_norm', 'Normalize input/output', value = FALSE),
+            div(
+              actionButton('save_model', 'Save model', class = 'btn-sm btn-primary'),
+              actionButton('delete_all_models', 'Delete all models', class = 'btn-sm btn-danger')
+            ),
+            uiOutput('saved_models_info')
+          ),
+          accordion_panel(
+            title = 'Table options',
+            numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('out.slack', 'Show slack', value = TRUE),
+            checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
+            radioButtons(
+              'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
+              selected = 'none', inline = TRUE),
+            radioButtons(
+              'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
+              selected = 'none', inline = TRUE)
+          ),
+          accordion_panel(
+            title = 'Export',
+            downloadButton('exporttable', 'Export results', class = 'btn-dark'),
+            p(class = 'small', helpText(
+              'Download the analysis results as shown in the table to the right.'
+            )),
+            selectizeInput(
+              'exportfileformat', 'Choose file format',
+              choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
+            downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
+            p(class = 'small mt-1', helpText(
+              'Create a PDF-report with the results of the analysis and the code used to generate it.'
+            )),
+            downloadButton('export-dea-rds', 'Download data for analysis', color = 'dark'),
+            p(class = 'small mt-1', helpText(
+              paste('Download the data used for the analysis in RDS format for use in R.',
+                    'The file can be used in conjunction with the code supplied in the',
+                    'analysis report.')
+            ))
+          )
+        ),
         actionButton('save_and_close_dea', 'Quit app and return results')
       ),
-      mainPanel(
-        width = 9,
-        tabsetPanel(
-          tabPanel(
-            'Efficiency',
-            reactableOutput('dea.table')
-          ),
-          tabPanel(
-            'Slack',
-            reactableOutput('dea.slack')
-          ),
-          tabPanel('Plot',
-                   plotOutput('plot_dea', height = 600, hover = hoverOpts(
-                     id = 'dea_hover', delay = 100, delayType = 'throttle')
+      tabsetPanel(
+        tabPanel(
+          'Efficiency',
+          reactableOutput('dea.table')
+        ),
+        tabPanel(
+          'Slack',
+          reactableOutput('dea.slack')
+        ),
+        tabPanel('Plot',
+                 plotOutput('plot_dea', height = 600, hover = hoverOpts(
+                   id = 'dea_hover', delay = 100, delayType = 'throttle')
+                 ),
+                 uiOutput('plot_dea_tooltip'),
+                 div(
+                   dropdown_button(
+                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                     textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
+                     textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
+                     selectizeInput('dea_dl_size', 'Image size', choices = c(
+                       'A5', 'A4', 'A3'
+                     )),
+                     selectizeInput('dea_dl_format', 'Image format', choices = c(
+                       'PNG' = 'png', 'PDF' = 'pdf'
+                     ))
                    ),
-                   uiOutput('plot_dea_tooltip'),
-                   div(
-                     dropdown_button(
-                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                       textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
-                       textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
-                       selectizeInput('dea_dl_size', 'Image size', choices = c(
-                         'A5', 'A4', 'A3'
-                       )),
-                       selectizeInput('dea_dl_format', 'Image format', choices = c(
-                         'PNG' = 'png', 'PDF' = 'pdf'
-                       ))
-                     ),
-                     downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                   downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                 ),
+                 hr(),
+                 plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
+                   id = 'salter_hover', delay = 100, delayType = 'throttle')
+                 ),
+                 uiOutput('plot_salter_tooltip'),
+                 div(
+                   dropdown_button(
+                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                     textInput('salter.color', 'Color', value = '85c9f7'),
+                     textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
+                     textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
+                     selectizeInput('salter_dl_size', 'Image size', choices = c(
+                       'A5', 'A4', 'A3'
+                     )),
+                     selectizeInput('salter_dl_format', 'Image format', choices = c(
+                       'PNG' = 'png', 'PDF' = 'pdf'
+                     ))
                    ),
-                   hr(),
-                   plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
-                     id = 'salter_hover', delay = 100, delayType = 'throttle')
-                   ),
-                   uiOutput('plot_salter_tooltip'),
-                   div(
-                     dropdown_button(
-                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                       textInput('salter.color', 'Color', value = '85c9f7'),
-                       textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
-                       textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
-                       selectizeInput('salter_dl_size', 'Image size', choices = c(
-                         'A5', 'A4', 'A3'
-                       )),
-                       selectizeInput('salter_dl_format', 'Image format', choices = c(
-                         'PNG' = 'png', 'PDF' = 'pdf'
-                       ))
-                     ),
-                     downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
-                   )
-          ),
-          tabPanel(
-            'Peers',
-            reactableOutput('peers.table')
-          ),
-          tabPanel(
-            'Summary',
-            uiOutput('summary.dea')
-          ),
-          tabPanel(
-            'Scale efficiency',
-            reactableOutput('scaleeff.tbl')
-          )
+                   downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
+                 )
+        ),
+        tabPanel(
+          'Peers',
+          reactableOutput('peers.table')
+        ),
+        tabPanel(
+          'Summary',
+          uiOutput('summary.dea')
+        ),
+        tabPanel(
+          'Scale efficiency',
+          reactableOutput('scaleeff.tbl')
         )
       )
     )
   ),
 
   tabPanel(
+    title = 'Bootstrap',
+    value = 'bootstrap',
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
+        accordion(
+          open = NULL, multiple = TRUE, class = 'mb-2',
+          accordion_panel(
+            'Bootstrap options',
+            selectizeInput(
+              'boot_rts', 'Returns to scale', choices = vals$rts, selected = 'crs'
+            ),
+            uiOutput('boot_rts_warn'),
+            selectInput(
+              'boot_orientation', 'Orientation', choices = vals$orient,
+              selected = 'in'
+            ),
+            selectizeInput(
+              'boot_alpha',
+              'Alpha',
+              choices = c('1 %' = 0.01, '5 %' = 0.05, '10 %' = 0.1),
+              selected = 0.05
+            ),
+            numericInput('boot_b', 'Iterations', min = 20, max = 5000, step = 1, value = 200)
+          ),
+          accordion_panel(
+            'Advanced options',
+            selectizeInput(
+              'boot_bw',
+              'Bandwidth selection',
+              choices = c(
+                'Silverman\'s rule of thumb' = 'silverman',
+                'Robust normal rule (Scott)' = 'scott',
+                'Unbiased cross validation' = 'ucv'),
+              selected = 'ucv'
+            )
+          ),
+          accordion_panel(
+            'Table options',
+            numericInput('boot_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('boot_show_eff', 'Show original efficiency score', value = TRUE),
+            checkboxInput('boot_show_bias', 'Show bias', value = FALSE)
+          )
+        ),
+        actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')
+      ),
+      div(class = 'alert alert-info', role = 'alert', 'Bootstrap functionality is currently in preview'),
+      uiOutput('boot_tbl')
+    )
+  ),
+
+  tabPanel(
 
     # TODO: Print back results from analysis
-
     title = 'Malmquist',
     value = 'malmquist',
 
-    sidebarLayout(
-      sidebarPanel(width = 3,
-                   selectInput('malm.rts', 'Returns to scale', choices = vals$malm.rts, selected = 'crs'),
-                   selectInput('malm.orient', 'Orientation', choices = vals$orient, selected = 'in'),
-                   hr(),
-                   p(strong('Output options')),
-                   numericInput('malm.out.decimals', 'Number of decimals', min = 2, max = 10, step = 1, value = 5),
-                   hr(),
-                   downloadButton('malm.export', 'Export results', class = 'btn-dark'),
-                   p(class = 'small', helpText(
-                     'Download the analysis results as shown in the table to the right.'
-                   )),
-                   selectizeInput(
-                     'malm.fileformat', 'Choose file format',
-                     choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
+    layout_sidebar(
+      sidebar = sidebar(
+        width = sidebar_width, gap = 0,
+        accordion(
+          accordion_panel(
+            title = 'Model',
+            selectInput('malm_rts', 'Returns to scale', choices = vals$malm_rts, selected = 'crs'),
+            selectInput('malm_orientation', 'Orientation', choices = vals$orient, selected = 'in')
+          ),
+          accordion_panel(
+            title = 'Table options',
+            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L)
+          ),
+          accordion_panel(
+            title = 'Export',
+            downloadButton('malm.export', 'Export results', class = 'btn-dark'),
+            p(class = 'small', helpText(
+              'Download the analysis results as shown in the table to the right.'
+            )),
+            selectizeInput(
+              'malm.fileformat', 'Choose file format',
+              choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
+          )
+        )
       ),
-      mainPanel(width = 9,
-                # Output malmquist$Changes as DT (with pretty lables)
-                # Viz of malmquist score?
-                uiOutput('malm.dt')
-      )
+      uiOutput('malm.dt')
     )
 
   ),
@@ -216,10 +284,14 @@ ui <- function(request) { page_navbar(
     )
   ),
 
-  footer = div( class = 'small text-center', tagList(
-    hr(),
-    p('Developed by the Data Science team at the Office of the Auditor General of Norway.'),
-    p(HTML(sprintf('&copy; %s Riksrevisjonen. Version %s', format(Sys.Date(), '%Y'), ver)))
-  ))
+  footer = div(class = 'small text-center text-muted', markdown(
+    sprintf(
+      'Developed by the Data Science team at the **[Office of the Auditor General of
+      Norway](https://www.riksrevisjonen.no/en)**.
+
+      &copy; %s Office of the Auditor General of Norway &#8212; Version %s with bslib %s',
+      format(Sys.Date(), '%Y'), ver, packageVersion('bslib')
+    ))
+  )
 
 )}
