@@ -67,14 +67,7 @@ observeEvent(input$dea_output, {
 
 output$ui_timeseries <- renderUI({
 
-  req(data()$file, params()$id)
-
-  if (!(params()$id %in% colnames(data()$file))) return(NULL)
-
-  # If the ID variable is not unique, we assume time series
-  value <- any(duplicated(data()$file[, params()$id]))
-
-  checkboxInput('hasyear', 'Time series data', value = value)
+  checkboxInput('hasyear', 'Time series data', value = FALSE)
 
 })
 
@@ -102,9 +95,10 @@ output$ui_year <- renderUI({
     min = lapply(data()$file, min),
     max = lapply(data()$file, max))
 
-  choices <- data()$cols[which(year_vars)] #names(chk_min > 1900 & chk_max < 2100)
-  selected <- ifelse(length(choices) == 1, choices[[1]], NULL)
-  selectInput('dea_year', 'Year variable', choices = choices, selected = selected, multiple = TRUE)
+  choices <- data()$cols
+  year_variable <- data()$cols[which(year_vars)]
+  selected <- ifelse(length(year_variable) == 1, year_variable[[1]], choices[[1]])
+  selectInput('dea_year', 'Time series variable', choices = choices, selected = selected, multiple = FALSE)
 
 })
 
