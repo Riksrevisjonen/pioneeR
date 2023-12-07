@@ -39,24 +39,32 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0.9000" id="version-0209000">Version 0.2.0.9000<a class="anchor" aria-label="anchor" href="#version-0209000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0.9000" id="pioneer-0209000">pioneeR 0.2.0.9000<a class="anchor" aria-label="anchor" href="#pioneer-0209000"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-2-0-9000">Breaking changes:<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-0-9000"></a></h3>
+<ul><li>pioneeR now depends on bslib 0.5.1 or higher. Version 0.6.0 or higher is recommended, and support for version 0.5.1 will be deprecated in the next release</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-2-0-9000">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0-9000"></a></h3>
 <ul><li>Added new boostrap functionality for models with constant or variable returns to scale based on Simar and Wilson (1998) (#6)</li>
 <li>Added new function <code><a href="../reference/unset_env_vars.html">unset_env_vars()</a></code> that will clear environment variables set by pioneeR if the app exits unexpectedly and the variables are not unset automatically</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-0-2-0-9000">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0-9000"></a></h3>
+<ul><li>Layout changed to <code>layout_sidebar</code> from the bslib package to improve UI and fix compatability with bslib &gt;= 0.6.0 and Boostrap 5.3 (#44)</li>
 <li>
 <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> has been renamed <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>. <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> will still work, but will be deprecated in a later version</li>
-<li>If the user selects a port number that is considered unsafe, a random port number is selected instead (#40)</li>
-<li>Fixed a bug where an error occurred if any of the model parameters were not found in the column names (#39)</li>
-<li>Fixed a bug in the scale efficiency tab where numbers where rounded twice (#47)</li>
 </ul></div>
+</div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.0" id="version-020">Version 0.2.0<a class="anchor" aria-label="anchor" href="#version-020"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="pioneer-020">pioneeR 0.2.0<a class="anchor" aria-label="anchor" href="#pioneer-020"></a></h2>
 <ul><li>Added ability to provide data to the app with <code>runPioneer()</code>
 </li>
 <li>Added the ability to return data when the app closes</li>
-<li>Fixed a bug where the Malmquist tab would not show the results of the analysis</li>
+<li>Fixed a bug where the Malmquist tab would not show the results of the analysis (#36)</li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="version-010">Version 0.1.0<a class="anchor" aria-label="anchor" href="#version-010"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="pioneer-010">pioneeR 0.1.0<a class="anchor" aria-label="anchor" href="#pioneer-010"></a></h2>
 <ul><li>First public release</li>
 </ul></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
