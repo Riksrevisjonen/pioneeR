@@ -61,8 +61,8 @@ ui <- function(request) { page_navbar(
           'and that states might be deleted by the server administrator.'
         )))
       ),
-        uiOutput('data_preview')
-      )
+      uiOutput('data_preview')
+    )
   ),
 
   tabPanel(
@@ -73,8 +73,8 @@ ui <- function(request) { page_navbar(
         accordion(
           accordion_panel(
             title = 'Model',
-        selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
-        selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
+            selectInput('dea_rts', 'Returns to Scale', choices = vals$rts, selected = 'crs'),
+            selectInput('dea_orientation', 'Orientation', choices = vals$orient, selected = 'in'),
             checkboxInput('dea_norm', 'Normalize input/output', value = FALSE),
             div(
               actionButton('save_model', 'Save model', class = 'btn-sm btn-primary'),
@@ -85,101 +85,101 @@ ui <- function(request) { page_navbar(
           accordion_panel(
             title = 'Table options',
             numericInput('dea_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
-        checkboxInput('out.slack', 'Show slack', value = TRUE),
-        checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
-        radioButtons(
-          'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-          selected = 'none', inline = TRUE),
-        radioButtons(
-          'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
+            checkboxInput('out.slack', 'Show slack', value = TRUE),
+            checkboxInput('out.sdea', 'Show super efficiency score', value = FALSE),
+            radioButtons(
+              'show.in', 'Show inputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
+              selected = 'none', inline = TRUE),
+            radioButtons(
+              'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
               selected = 'none', inline = TRUE)
           ),
           accordion_panel(
             title = 'Export',
-        downloadButton('exporttable', 'Export results', class = 'btn-dark'),
-        p(class = 'small', helpText(
-          'Download the analysis results as shown in the table to the right.'
-        )),
-        selectizeInput(
-          'exportfileformat', 'Choose file format',
-          choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
-        downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
-        p(class = 'small mt-1', helpText(
-          'Create a PDF-report with the results of the analysis and the code used to generate it.'
-        )),
-        downloadButton('export-dea-rds', 'Download data for analysis', color = 'dark'),
-        p(class = 'small mt-1', helpText(
-          paste('Download the data used for the analysis in RDS format for use in R.',
-                'The file can be used in conjunction with the code supplied in the',
-                'analysis report.')
+            downloadButton('exporttable', 'Export results', class = 'btn-dark'),
+            p(class = 'small', helpText(
+              'Download the analysis results as shown in the table to the right.'
+            )),
+            selectizeInput(
+              'exportfileformat', 'Choose file format',
+              choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
+            downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
+            p(class = 'small mt-1', helpText(
+              'Create a PDF-report with the results of the analysis and the code used to generate it.'
+            )),
+            downloadButton('export-dea-rds', 'Download data for analysis', color = 'dark'),
+            p(class = 'small mt-1', helpText(
+              paste('Download the data used for the analysis in RDS format for use in R.',
+                    'The file can be used in conjunction with the code supplied in the',
+                    'analysis report.')
             ))
           )
         ),
         actionButton('save_and_close_dea', 'Quit app and return results')
       ),
-        tabsetPanel(
-          tabPanel(
-            'Efficiency',
-            reactableOutput('dea.table')
-          ),
-          tabPanel(
-            'Slack',
-            reactableOutput('dea.slack')
-          ),
-          tabPanel('Plot',
-                   plotOutput('plot_dea', height = 600, hover = hoverOpts(
-                     id = 'dea_hover', delay = 100, delayType = 'throttle')
+      tabsetPanel(
+        tabPanel(
+          'Efficiency',
+          reactableOutput('dea.table')
+        ),
+        tabPanel(
+          'Slack',
+          reactableOutput('dea.slack')
+        ),
+        tabPanel('Plot',
+                 plotOutput('plot_dea', height = 600, hover = hoverOpts(
+                   id = 'dea_hover', delay = 100, delayType = 'throttle')
+                 ),
+                 uiOutput('plot_dea_tooltip'),
+                 div(
+                   dropdown_button(
+                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                     textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
+                     textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
+                     selectizeInput('dea_dl_size', 'Image size', choices = c(
+                       'A5', 'A4', 'A3'
+                     )),
+                     selectizeInput('dea_dl_format', 'Image format', choices = c(
+                       'PNG' = 'png', 'PDF' = 'pdf'
+                     ))
                    ),
-                   uiOutput('plot_dea_tooltip'),
-                   div(
-                     dropdown_button(
-                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                       textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
-                       textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
-                       selectizeInput('dea_dl_size', 'Image size', choices = c(
-                         'A5', 'A4', 'A3'
-                       )),
-                       selectizeInput('dea_dl_format', 'Image format', choices = c(
-                         'PNG' = 'png', 'PDF' = 'pdf'
-                       ))
-                     ),
-                     downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                   downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                 ),
+                 hr(),
+                 plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
+                   id = 'salter_hover', delay = 100, delayType = 'throttle')
+                 ),
+                 uiOutput('plot_salter_tooltip'),
+                 div(
+                   dropdown_button(
+                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                     textInput('salter.color', 'Color', value = '85c9f7'),
+                     textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
+                     textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
+                     selectizeInput('salter_dl_size', 'Image size', choices = c(
+                       'A5', 'A4', 'A3'
+                     )),
+                     selectizeInput('salter_dl_format', 'Image format', choices = c(
+                       'PNG' = 'png', 'PDF' = 'pdf'
+                     ))
                    ),
-                   hr(),
-                   plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
-                     id = 'salter_hover', delay = 100, delayType = 'throttle')
-                   ),
-                   uiOutput('plot_salter_tooltip'),
-                   div(
-                     dropdown_button(
-                       'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                       textInput('salter.color', 'Color', value = '85c9f7'),
-                       textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
-                       textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
-                       selectizeInput('salter_dl_size', 'Image size', choices = c(
-                         'A5', 'A4', 'A3'
-                       )),
-                       selectizeInput('salter_dl_format', 'Image format', choices = c(
-                         'PNG' = 'png', 'PDF' = 'pdf'
-                       ))
-                     ),
-                     downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
-                   )
-          ),
-          tabPanel(
-            'Peers',
-            reactableOutput('peers.table')
-          ),
-          tabPanel(
-            'Summary',
-            uiOutput('summary.dea')
-          ),
-          tabPanel(
-            'Scale efficiency',
-            reactableOutput('scaleeff.tbl')
-          )
+                   downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
+                 )
+        ),
+        tabPanel(
+          'Peers',
+          reactableOutput('peers.table')
+        ),
+        tabPanel(
+          'Summary',
+          uiOutput('summary.dea')
+        ),
+        tabPanel(
+          'Scale efficiency',
+          reactableOutput('scaleeff.tbl')
         )
       )
+    )
   ),
 
   tabPanel(
@@ -255,18 +255,18 @@ ui <- function(request) { page_navbar(
           ),
           accordion_panel(
             title = 'Export',
-                   downloadButton('malm.export', 'Export results', class = 'btn-dark'),
-                   p(class = 'small', helpText(
-                     'Download the analysis results as shown in the table to the right.'
-                   )),
-                   selectizeInput(
-                     'malm.fileformat', 'Choose file format',
-                     choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
+            downloadButton('malm.export', 'Export results', class = 'btn-dark'),
+            p(class = 'small', helpText(
+              'Download the analysis results as shown in the table to the right.'
+            )),
+            selectizeInput(
+              'malm.fileformat', 'Choose file format',
+              choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         )
       ),
-                uiOutput('malm.dt')
-      )
+      uiOutput('malm.dt')
+    )
 
   ),
 
@@ -284,10 +284,14 @@ ui <- function(request) { page_navbar(
     )
   ),
 
-  footer = div(class = 'small text-center', tagList(
-    hr(),
-    p('Developed by the Data Science team at the Office of the Auditor General of Norway.'),
-    p(HTML(sprintf('&copy; %s Riksrevisjonen. Version %s', format(Sys.Date(), '%Y'), ver)))
-  ))
+  footer = div(class = 'small text-center text-muted', markdown(
+    sprintf(
+      'Developed by the Data Science team at the **[Office of the Auditor General of
+      Norway](https://www.riksrevisjonen.no/en)**.
+
+      &copy; %s Office of the Auditor General of Norway &#8212; Version %s with bslib %s',
+      format(Sys.Date(), '%Y'), ver, packageVersion('bslib')
+    ))
+  )
 
 )}
