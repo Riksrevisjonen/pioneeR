@@ -23,7 +23,7 @@ Imports:
     productivity (>= 1.1.0),
     readxl,
     writexl,
-    bslib (>= 0.4.2),
+    bslib (>= 0.5.1),
     ggplot2 (>= 3.3.0),
     reactable (>= 0.4.0)
 Suggests:

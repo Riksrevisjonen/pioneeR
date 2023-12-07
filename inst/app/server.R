@@ -246,7 +246,7 @@ shinyServer(function(input, output, session) {
     cx <- length(ci)
     x <- matrix(sapply(ci, function(i) df[[i]]), ncol = cx, dimnames = list(df[,1], paste0('x', 1:cx)))
 
-    if (input$dea.norm) {
+    if (input$dea_norm) {
       v <- colSums(x) / nrow(x)
       for (i in seq_len(ncol(x))) {
         x[,i] <- x[,i] / v[i]
@@ -266,7 +266,7 @@ shinyServer(function(input, output, session) {
     cy <- length(ci)
     y <- matrix(sapply(ci, function(i) df[[i]]), ncol = cy, dimnames = list(df[,1], paste0('y', 1:cy)))
 
-    if (input$dea.norm) {
+    if (input$dea_norm) {
       v <- colSums(y) / nrow(y)
       for (i in seq_len(ncol(y))) {
         y[,i] <- y[,i] / v[i]
@@ -1019,7 +1019,7 @@ shinyServer(function(input, output, session) {
     malmquist <- malm(
       data = df$data, id.var = params()$id, time.var = params()$year,
       x.vars = params()$inputs, y.vars = params()$outputs,
-      rts = input$malm.rts, orientation = input$malm.orient, scaled = TRUE)
+      rts = input$malm_rts, orientation = input$malm_orientation, scaled = TRUE)
 
     d <- malmquist$Changes[, c(1:6)]
 
@@ -1032,7 +1032,7 @@ shinyServer(function(input, output, session) {
   malm.calc <- reactive({
 
     d <- malm.mod()
-    d[, 3:6] <- sapply(d[,3:6], function(c) round(c, input$malm.out.decimals))
+    d[, 3:6] <- sapply(d[,3:6], function(c) round(c, input$malm_round))
     return(d)
 
   })
@@ -1084,12 +1084,12 @@ shinyServer(function(input, output, session) {
         idvar = params()$id,
         inputvars = params()$inputs,
         outputvars = params()$outputs,
-        normdata = input$dea.norm,
+        normdata = input$dea_norm,
         dearts = model_params$rts,
         deaorient = model_params$orientation,
         deain = dea.in(),
         deaout = dea.out(),
-        deanorm = input$dea.norm,
+        deanorm = input$dea_norm,
         modelout = dea.prod()
       )
 
