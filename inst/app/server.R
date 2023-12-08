@@ -706,7 +706,7 @@ shinyServer(function(input, output, session) {
     pr <- dea.prod()
     pe <- Benchmarking::peers(pr, NAMES = TRUE)
     df <- data.frame(
-      cbind(selection()[, input$dea.idvar], pe),
+      cbind(selection()[, input$dea_id], pe),
       stringsAsFactors = FALSE)
     colnames(df)[1] <- 'DMU'
 
