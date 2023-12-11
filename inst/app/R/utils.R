@@ -40,8 +40,8 @@ dropdown_button <- function(
 }
 
 find_scale <- function(x) {
-  m <- max(x)
-  i <- c(1e0, 1e3, 1e6, 1e9, 1e12)
+  m <- abs(max(x))
+  i <- c(0, 1e3, 1e6, 1e9, 1e12)
   x <- c(1e-0, 1e-3, 1e-6, 1e-9, 1e-12)
   names(i) <- c('', 'K', 'M', 'B', 'T')
   return(list(names(i)[findInterval(m, i)], x[findInterval(m, i)]))
