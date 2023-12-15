@@ -2,6 +2,7 @@
 
 S3method(summary_tbl_dea,Farrell)
 S3method(summary_tbl_dea,numeric)
+export(create_matrix)
 export(runPioneeR)
 export(run_pioneer)
 export(summary_tbl_dea)
