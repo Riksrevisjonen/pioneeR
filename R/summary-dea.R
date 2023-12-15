@@ -27,10 +27,10 @@ summary_tbl_dea.Farrell <- function(x) {
 
 #' @method summary_tbl_dea numeric
 #' @export
-summary_tbl_dea.numeric <- function(eff) {
-  eff <- eff[!is.na(eff)]
+summary_tbl_dea.numeric <- function(x) {
+  x <- x[!is.na(x)]
   # Check if efficiency scores are in range [0, 1]
-  range0 <- min(eff) < 1
+  range0 <- min(x) < 1
   bins <- if (range0) seq(0, 1.1, .1) else round(1/rev(seq(0, 1.1, .1)), 3L)
   # Values equal to 1 be in last bin for input and first bin for output orientation
   # Create new labels to use with the cut function
@@ -40,7 +40,7 @@ summary_tbl_dea.numeric <- function(eff) {
     c('F == 1', sprintf('%.3f < F <= %.3f', bins[2:11], bins[3:12]))
   }
   # If efficiency scores are in range [0, 1] bins must be closed on the left
-  eff_bin <- cut(eff, breaks =  bins, labels = labs, right = !range0)
+  eff_bin <- cut(x, breaks =  bins, labels = labs, right = !range0)
   eff_df <- table(eff_bin) |> as.data.frame()
   colnames(eff_df) <- c('Range', 'Frequency')
   eff_df
