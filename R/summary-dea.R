@@ -30,7 +30,7 @@ summary_tbl_dea.Farrell <- function(x) {
 summary_tbl_dea.numeric <- function(x) {
   x <- x[!is.na(x)]
   # Check if efficiency scores are in range [0, 1]
-  range0 <- min(x) < 1
+  range0 <- min(x) < 1L
   bins <- if (range0) seq(0, 1.1, .1) else round(1/rev(seq(0, 1.1, .1)), 3L)
   # Values equal to 1 be in last bin for input and first bin for output orientation
   # Create new labels to use with the cut function

@@ -31,49 +31,48 @@ create_matrix <- function(df, columns, id, normalize = FALSE) {
 #' Calculate scale efficiency from a set of inputs and outputs and return a
 #' data.frame
 #'
-#' @param inputs A matrix of inputs, created with `create_matrix`
-#' @param outputs A matrix of outputs, created with `create_matrix`
+#' @param x A matrix of inputs, created with `create_matrix`
+#' @param y A matrix of outputs, created with `create_matrix`
 #' @param orientation `in` for input oriented models or `out` for output oriented
 #' @param digits An integer with the number of digits to round to. If `NULL` the
 #'   values are kept unrounded.
 #'
 #' @export
-calculate_scale_eff <- function(
-    inputs,
-    outputs,
+compute_scale_efficiency <- function(
+    x,
+    y,
     orientation = c('in', 'out'),
     digits = NULL)
 {
 
-  if (!is.matrix(inputs)) {
+  if (!is.matrix(x)) {
     cli::cli_abort('inputs must be a matrix of input values')
   }
-  if (!is.matrix(outputs)) {
+  if (!is.matrix(y)) {
     cli::cli_abort('outputs must be a matrix of output values')
   }
-  if (nrow(inputs) != nrow(outputs)) {
-    len_i <- nrow(inputs)
-    len_o <- nrow(outputs)
+  if (nrow(x) != nrow(y)) {
+    len_x <- nrow(x)
+    len_y <- nrow(y)
     cli::cli_abort(c(
       'The number of DMUs for inputs and outputs does not match',
-      'i' = 'There {?is/are} {len_i} DMU{?s} in the input matrix, and {len_o} in the output matrix',
+      'i' = 'There {?is/are} {len_x} DMU{?s} in the input matrix, and {len_y} in the output matrix',
       'x' = 'The number of DMUs must match for the input and output matrices'
+    ))
+  }
+  if (!is.null(digits) && !is.numeric(digits)) {
+    cli::cli_warn(c(
+      'The digits argument must be a numeric value or NULL. The argument will be ignored.',
+      'i' = 'Expected NULL or numeric, got {digit} of type {typeof(digit)}',
+      'x' = 'Argument digits must be a numeric or NULL'
     ))
   }
   orientation <- match.arg(orientation)
 
   # Run DEA models
-  crs_mod <- Benchmarking::dea(
-    inputs, outputs, RTS = 'crs',
-    ORIENTATION = orientation)
-
-  vrs_mod <- Benchmarking::dea(
-    inputs, outputs, RTS = 'vrs',
-    ORIENTATION = orientation)
-
-  nirs_mod <- Benchmarking::dea(
-    inputs, outputs, RTS = 'drs',
-    ORIENTATION = orientation)
+  crs_mod <- Benchmarking::dea(x, y, RTS = 'crs', ORIENTATION = orientation)
+  vrs_mod <- Benchmarking::dea(x, y, RTS = 'vrs', ORIENTATION = orientation)
+  nirs_mod <- Benchmarking::dea(x, y, RTS = 'drs', ORIENTATION = orientation)
 
   # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
   # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When
@@ -96,7 +95,7 @@ calculate_scale_eff <- function(
   if (!is.null(digits) || is.numeric(digits)) {
     out_mod <- round(out_mod, digits)
   }
-  dmu_names <- if (is.null(rownames(inputs))) nrow(inputs) else rownames(inputs)
+  dmu_names <- if (is.null(rownames(x))) seq_len(nrow(x)) else rownames(x)
   out_mod <- cbind(
     data.frame('DMU' = dmu_names),
     out_mod,
