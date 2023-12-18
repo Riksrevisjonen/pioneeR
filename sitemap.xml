@@ -19,10 +19,19 @@
     <loc>https://riksrevisjonen.github.io/pioneeR/news/index.html</loc>
   </url>
   <url>
+    <loc>https://riksrevisjonen.github.io/pioneeR/reference/compute_scale_efficiency.html</loc>
+  </url>
+  <url>
+    <loc>https://riksrevisjonen.github.io/pioneeR/reference/create_matrix.html</loc>
+  </url>
+  <url>
     <loc>https://riksrevisjonen.github.io/pioneeR/reference/index.html</loc>
   </url>
   <url>
     <loc>https://riksrevisjonen.github.io/pioneeR/reference/run_pioneer.html</loc>
+  </url>
+  <url>
+    <loc>https://riksrevisjonen.github.io/pioneeR/reference/summary_tbl_dea.html</loc>
   </url>
   <url>
     <loc>https://riksrevisjonen.github.io/pioneeR/reference/unset_env_vars.html</loc>
