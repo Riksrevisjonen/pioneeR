@@ -57,7 +57,8 @@ shinyServer(function(input, output, session) {
       id = input$dea_id,
       inputs = input$dea_input,
       outputs = input$dea_output,
-      year = input$dea_year
+      year = input$dea_year,
+      normalize = input$dea_norm
     )
   ) |> debounce(100)
   model_params <- reactiveValues(
@@ -238,43 +239,15 @@ shinyServer(function(input, output, session) {
   # ---- DEA analysis ----
 
   dea.in <- reactive({
-
-  req(params()$inputs)
-
-    df <- selection()
-    ci <- params()$inputs
-    cx <- length(ci)
-    x <- matrix(sapply(ci, function(i) df[[i]]), ncol = cx, dimnames = list(df[,1], paste0('x', 1:cx)))
-
-    if (input$dea_norm) {
-      v <- colSums(x) / nrow(x)
-      for (i in seq_len(ncol(x))) {
-        x[,i] <- x[,i] / v[i]
-      }
-    }
-
-    return(x)
-
+    req(params()$inputs)
+    x <- create_matrix(selection(), params()$inputs, params()$id, normalize = input$dea_norm)
+    x
   })
 
   dea.out <- reactive({
-
     req(params()$outputs)
-
-    df <- selection()
-    ci <- params()$outputs
-    cy <- length(ci)
-    y <- matrix(sapply(ci, function(i) df[[i]]), ncol = cy, dimnames = list(df[,1], paste0('y', 1:cy)))
-
-    if (input$dea_norm) {
-      v <- colSums(y) / nrow(y)
-      for (i in seq_len(ncol(y))) {
-        y[,i] <- y[,i] / v[i]
-      }
-    }
-
-    return(y)
-
+    y <- create_matrix(selection(), params()$outputs, params()$id, normalize = input$dea_norm)
+    y
   })
 
   dea.prod <- reactive({
@@ -403,34 +376,10 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  dea.scaleeff <- reactive({
+  dea_scaleeff <- reactive({
 
-    crs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'crs',
-      ORIENTATION = model_params$orientation)
-
-    vrs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'vrs',
-      ORIENTATION = model_params$orientation)
-
-    nirs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'drs',
-      ORIENTATION = model_params$orientation)
-
-    out_mod <- round(data.frame(
-      crs = crs_mod$eff,
-      vrs = vrs_mod$eff,
-      nirs = nirs_mod$eff,
-      scale_eff = crs_mod$eff / vrs_mod$eff,
-      vrs_nirs = vrs_mod$eff / nirs_mod$eff
-    ), input$dea_round)
-
-    out_mod <- cbind(
-      data.frame(DMU = rownames(dea.in())),
-      out_mod
-    )
-
-    return(out_mod)
+    out <- compute_scale_efficiency(dea.in(), dea.out(), model_params$orientation, 4L)
+    out
 
   })
 
@@ -521,62 +470,8 @@ shinyServer(function(input, output, session) {
 
     req(dea.prod())
 
-    eps <- 1e-06
+    eff_tbl <- summary_tbl_dea(dea.prod())
     eff <- dea.prod()$eff
-
-    if (dea.prod()$ORIENTATION != 'out' && is.null(dea.prod()$direct)) {
-
-      minE <- floor(10 * min(eff))/10
-      dec <- seq(from = minE, to = 1, by = 0.1)
-
-      estr <- sapply(seq_len(length(dec)), function(i) {
-        if (i < length(dec))
-          paste(dec[i], '<= E <', dec[i + 1])
-        else if (i == length(dec))
-          "E == 1"
-      })
-
-      num <- sapply(seq_len(length(dec)), function(i) {
-        if (i < length(dec))
-          sum(dec[i] - eps <= eff & eff < dec[i + 1] - eps)
-        else if (i == length(dec))
-          sum(abs(eff - 1) < eps)
-      })
-
-    } else if (is.null(dea.prod()$direct)) {
-
-      maxF <- ceiling(10 * max(eff))/10
-      dec <- seq(from = 1, to = maxF, by = 0.1)
-      if (length(dec) > 10) {
-        dec_ <- c(1, 1.1, 1.2, 1.3, 1.5, 2, 5, 10, 100, Inf)
-        dec <- dec_[1:(max(which(dec_ < maxF)) + 1)]
-      }
-
-      estr <- sapply(seq_len(length(dec)), function(i) {
-        if (i == 1)
-          "F == 1"
-        else if (i > 1)
-          paste(dec[i - 1], '< F =<', dec[i])
-      })
-
-      num <- hist(eff, breaks = dec, plot = FALSE)$counts
-      num[1] <- num[1] - sum(abs(eff - 1) < eps)
-      num <- c(sum(abs(eff - 1) < eps), num)
-
-    } else {
-
-      return(NULL)
-
-    }
-
-    eff.tbl <- data.frame(eff = estr, n = num, stringsAsFactors = FALSE)
-    colnames(eff.tbl) <- c('Efficiency range', 'Number of observations')
-
-    sum.tbl <- data.frame(
-      min = min(eff), p25 = quantile(eff)[[2]], p50 = median(eff),
-      m = mean(eff), p75 = quantile(eff)[[4]], max = max(eff)
-    )
-    colnames(sum.tbl) <- c('Min.', '1st Qu.', 'Median', 'Mean', '3rd. Qu.', 'Max')
 
     if (model_params$orientation == 'in')
       sum.eff <- sum(dea.in() * eff) / sum(dea.in())
@@ -598,7 +493,6 @@ shinyServer(function(input, output, session) {
     )
 
     list(
-      p(class = 'h5', 'Summary of DEA analysis'),
       p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
       p(paste('Mean efficiency:', round(mean(eff), input$dea_round))),
       p(paste('Weighted efficiency:',round(sum.eff, input$dea_round))),
@@ -626,7 +520,7 @@ shinyServer(function(input, output, session) {
         )
       ),
       hr(),
-      renderTable({ eff.tbl }),
+      renderTable({ eff_tbl }),
       renderPlot({
         hist(eff, col = 'red', xlab = 'Efficiency',
              main = 'Distribution of efficiency scores')
@@ -735,13 +629,18 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  output$scaleeff.tbl <- renderReactable({
-    df <- dea.scaleeff()
+  output$tbl_scaleeff <- renderReactable({
+    df <- dea_scaleeff()
+    num_cols <- which(sapply(df, is.numeric, USE.NAMES = FALSE))
+    df[, num_cols] <- round(df[, num_cols], input$dea_round)
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left'),
-      scale_eff = colDef(name = 'crs/vrs'),
-      vrs_nirs = colDef(name = 'vrs/nirs')
+      Scale.eff. = colDef(name = 'Scale eff.'),
+      VRS.NIRS.ratio = colDef(
+        name = 'VRS/NIRS', show = input$tbl_se_show_vrs_nirs
+      ),
+      Optimal.scale.size = colDef(name = 'Optimal scale size')
     ))
     do.call(reactable, opts)
   })
@@ -1074,23 +973,27 @@ shinyServer(function(input, output, session) {
   )
 
   output$exportmd <- downloadHandler(
-    filename = 'dea_analysis.pdf',
+    filename = function() {
+      sprintf('dea-model-%s-%s.pdf', model_params$rts, model_params$orientation)
+    },
     content = function(file) {
       tempReport <- file.path(tempdir(), 'dea_analysis.Rmd')
       file.copy('dea_analysis.Rmd', tempReport, overwrite = TRUE)
 
       params <- list(
         data = selection(),
-        idvar = params()$id,
-        inputvars = params()$inputs,
-        outputvars = params()$outputs,
-        normdata = input$dea_norm,
-        dearts = model_params$rts,
-        deaorient = model_params$orientation,
-        deain = dea.in(),
-        deaout = dea.out(),
-        deanorm = input$dea_norm,
-        modelout = dea.prod()
+        org_data = data()$file,
+        inputs = dea.in(),
+        outputs = dea.out(),
+        model = dea.prod(),
+        model_params = model_params,
+        params = params(),
+        plots = list(
+          salter_plot = salterPlot()
+        ),
+        settings = list(
+          digits = input$dea_round
+        )
       )
 
       rmarkdown::render(

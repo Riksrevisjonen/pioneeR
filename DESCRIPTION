@@ -16,8 +16,6 @@ Depends:
 Imports:
     Benchmarking (>= 0.30),
     haven (>= 2.5.0),
-    lpSolve,
-    lpSolveAPI,
     magrittr,
     markdown,
     productivity (>= 1.1.0),
@@ -29,6 +27,8 @@ Imports:
 Suggests:
     cli,
     data.table,
+    lpSolve,
+    lpSolveAPI,
     rmarkdown,
     knitr,
     scales,
@@ -38,6 +38,7 @@ Suggests:
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Config/testthat/edition: 3

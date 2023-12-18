@@ -92,7 +92,9 @@ ui <- function(request) { page_navbar(
               selected = 'none', inline = TRUE),
             radioButtons(
               'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-              selected = 'none', inline = TRUE)
+              selected = 'none', inline = TRUE),
+            p(tags$strong('Scale efficiency table')),
+            checkboxInput('tbl_se_show_vrs_nirs', 'Show VRS/NIRS ratio', value = FALSE)
           ),
           accordion_panel(
             title = 'Export',
@@ -105,13 +107,14 @@ ui <- function(request) { page_navbar(
               choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv')),
             downloadButton('exportmd', 'Generate analysis report', color = 'dark'),
             p(class = 'small mt-1', helpText(
-              'Create a PDF-report with the results of the analysis and the code used to generate it.'
+              'Create a PDF-report with the results of the current analysis and the code needed
+              to reproduce the results.'
             )),
             downloadButton('export-dea-rds', 'Download data for analysis', color = 'dark'),
             p(class = 'small mt-1', helpText(
-              paste('Download the data used for the analysis in RDS format for use in R.',
-                    'The file can be used in conjunction with the code supplied in the',
-                    'analysis report.')
+              'Download the data set for the current model in RDS format. This file can be used
+              in conjunction with the code from the analysis report to reproduce the results
+              of the current analysis.'
             ))
           )
         ),
@@ -176,7 +179,7 @@ ui <- function(request) { page_navbar(
         ),
         tabPanel(
           'Scale efficiency',
-          reactableOutput('scaleeff.tbl')
+          reactableOutput('tbl_scaleeff')
         )
       )
     )
