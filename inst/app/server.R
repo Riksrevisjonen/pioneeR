@@ -982,6 +982,7 @@ shinyServer(function(input, output, session) {
 
       params <- list(
         data = selection(),
+        org_data = data()$file,
         inputs = dea.in(),
         outputs = dea.out(),
         model = dea.prod(),

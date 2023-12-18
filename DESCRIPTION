@@ -16,8 +16,6 @@ Depends:
 Imports:
     Benchmarking (>= 0.30),
     haven (>= 2.5.0),
-    lpSolve,
-    lpSolveAPI,
     magrittr,
     markdown,
     productivity (>= 1.1.0),
@@ -29,6 +27,8 @@ Imports:
 Suggests:
     cli,
     data.table,
+    lpSolve,
+    lpSolveAPI,
     rmarkdown,
     knitr,
     scales,

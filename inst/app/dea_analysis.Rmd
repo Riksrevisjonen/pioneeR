@@ -3,6 +3,7 @@ title: "Data Envelopment Analysis"
 output: pdf_document
 params:
   data: NA
+  org_data: NA
   inputs: NA
   outputs: NA
   model: NA
@@ -27,9 +28,20 @@ mod <- list(
 )
 ```
 
-## Dataset
+## Data set
 
-The data set consists of `r nrow(params$data)` observations and `r ncol(params$data)` variables.
+```{r, echo=FALSE}
+txt <- ''
+if (nrow(params$data) != nrow(params$org_data)) {
+  txt <- sprintf(
+    'The data set has been subsetted in the analysis. The original dataset included
+    %s rows, compared to %s rows in the data set used in the analysis.',
+    nrow(params$org_data), nrow(params$data)
+  )
+}
+```
+
+The data set consists of `r nrow(params$data)` observations and `r ncol(params$data)` variables. `r txt`
 
 ## Variables
 
