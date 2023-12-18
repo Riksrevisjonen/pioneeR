@@ -49,15 +49,19 @@ perform_boot <- function(x, y, rts, orientation, i, h, theta, boot) {
 
 process_boot <- function(rts, orientation, h, alpha, theta, boot) {
   # Correcting for bias and constructing CI based on SW98, eq. 2.17 and 2.18
-  bias <- as.vector(rowMeans(boot) - theta)
+  bias <- as.vector(rowMeans(boot, na.rm = TRUE) - theta)
   theta_tilde <- theta - bias
-  theta_ci <- t(apply(boot, 1, quantile, probs = c(alpha / 2, 1 - alpha / 2))) - (2 * bias)
+  theta_ci <- t(apply(boot, 1, quantile, probs = c(alpha / 2, 1 - alpha / 2), na.rm = TRUE)) - (2 * bias)
+  # Check for missingness
+  is_missing <- apply(boot, 1, \(x) any(is.na(x)))
+
   # Return data
   out <- list(
     eff = theta,
     bias = bias,
     eff_bc = theta_tilde,
     ci = theta_ci,
+    missing = if (all(!is_missing)) NULL else which(is_missing),
     tbl = data.frame(
       eff = theta,
       bias = bias,
