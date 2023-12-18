@@ -375,34 +375,10 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  dea.scaleeff <- reactive({
+  dea_scaleeff <- reactive({
 
-    crs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'crs',
-      ORIENTATION = model_params$orientation)
-
-    vrs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'vrs',
-      ORIENTATION = model_params$orientation)
-
-    nirs_mod <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = 'drs',
-      ORIENTATION = model_params$orientation)
-
-    out_mod <- round(data.frame(
-      crs = crs_mod$eff,
-      vrs = vrs_mod$eff,
-      nirs = nirs_mod$eff,
-      scale_eff = crs_mod$eff / vrs_mod$eff,
-      vrs_nirs = vrs_mod$eff / nirs_mod$eff
-    ), input$dea_round)
-
-    out_mod <- cbind(
-      data.frame(DMU = rownames(dea.in())),
-      out_mod
-    )
-
-    return(out_mod)
+    out <- calculate_scale_eff(dea.in(), dea.out(), model_params$orientation, 4L)
+    out
 
   })
 
@@ -652,13 +628,18 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  output$scaleeff.tbl <- renderReactable({
-    df <- dea.scaleeff()
+  output$tbl_scaleeff <- renderReactable({
+    df <- dea_scaleeff()
+    num_cols <- which(sapply(df, is.numeric, USE.NAMES = FALSE))
+    df[, num_cols] <- round(df[, num_cols], input$dea_round)
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left'),
-      scale_eff = colDef(name = 'crs/vrs'),
-      vrs_nirs = colDef(name = 'vrs/nirs')
+      Scale.eff. = colDef(name = 'Scale eff.'),
+      VRS.NIRS.ratio = colDef(
+        name = 'VRS/NIRS', show = input$tbl_se_show_vrs_nirs
+      ),
+      Optimal.scale.size = colDef(name = 'Optimal scale size')
     ))
     do.call(reactable, opts)
   })

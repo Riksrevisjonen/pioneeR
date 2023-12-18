@@ -92,7 +92,9 @@ ui <- function(request) { page_navbar(
               selected = 'none', inline = TRUE),
             radioButtons(
               'show.out', 'Show outputs', choices = c('None' = 'none', 'All' = 'all', 'Combined' = 'comb'),
-              selected = 'none', inline = TRUE)
+              selected = 'none', inline = TRUE),
+            p(tags$strong('Scale efficiency table')),
+            checkboxInput('tbl_se_show_vrs_nirs', 'Show VRS/NIRS ratio', value = FALSE)
           ),
           accordion_panel(
             title = 'Export',
@@ -176,7 +178,7 @@ ui <- function(request) { page_navbar(
         ),
         tabPanel(
           'Scale efficiency',
-          reactableOutput('scaleeff.tbl')
+          reactableOutput('tbl_scaleeff')
         )
       )
     )
