@@ -2,7 +2,7 @@
 
 S3method(summary_tbl_dea,Farrell)
 S3method(summary_tbl_dea,numeric)
-export(calculate_scale_eff)
+export(compute_scale_efficiency)
 export(create_matrix)
 export(runPioneeR)
 export(run_pioneer)
