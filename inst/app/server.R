@@ -238,43 +238,15 @@ shinyServer(function(input, output, session) {
   # ---- DEA analysis ----
 
   dea.in <- reactive({
-
   req(params()$inputs)
-
-    df <- selection()
-    ci <- params()$inputs
-    cx <- length(ci)
-    x <- matrix(sapply(ci, function(i) df[[i]]), ncol = cx, dimnames = list(df[,1], paste0('x', 1:cx)))
-
-    if (input$dea_norm) {
-      v <- colSums(x) / nrow(x)
-      for (i in seq_len(ncol(x))) {
-        x[,i] <- x[,i] / v[i]
-      }
-    }
-
-    return(x)
-
+    x <- create_matrix(selection(), params()$inputs, params()$id, normalize = input$dea_norm)
+    x
   })
 
   dea.out <- reactive({
-
     req(params()$outputs)
-
-    df <- selection()
-    ci <- params()$outputs
-    cy <- length(ci)
-    y <- matrix(sapply(ci, function(i) df[[i]]), ncol = cy, dimnames = list(df[,1], paste0('y', 1:cy)))
-
-    if (input$dea_norm) {
-      v <- colSums(y) / nrow(y)
-      for (i in seq_len(ncol(y))) {
-        y[,i] <- y[,i] / v[i]
-      }
-    }
-
-    return(y)
-
+    y <- create_matrix(selection(), params()$outputs, params()$id, normalize = input$dea_norm)
+    y
   })
 
   dea.prod <- reactive({
@@ -521,62 +493,8 @@ shinyServer(function(input, output, session) {
 
     req(dea.prod())
 
-    eps <- 1e-06
+    eff_tbl <- summary_tbl_dea(dea.prod())
     eff <- dea.prod()$eff
-
-    if (dea.prod()$ORIENTATION != 'out' && is.null(dea.prod()$direct)) {
-
-      minE <- floor(10 * min(eff))/10
-      dec <- seq(from = minE, to = 1, by = 0.1)
-
-      estr <- sapply(seq_len(length(dec)), function(i) {
-        if (i < length(dec))
-          paste(dec[i], '<= E <', dec[i + 1])
-        else if (i == length(dec))
-          "E == 1"
-      })
-
-      num <- sapply(seq_len(length(dec)), function(i) {
-        if (i < length(dec))
-          sum(dec[i] - eps <= eff & eff < dec[i + 1] - eps)
-        else if (i == length(dec))
-          sum(abs(eff - 1) < eps)
-      })
-
-    } else if (is.null(dea.prod()$direct)) {
-
-      maxF <- ceiling(10 * max(eff))/10
-      dec <- seq(from = 1, to = maxF, by = 0.1)
-      if (length(dec) > 10) {
-        dec_ <- c(1, 1.1, 1.2, 1.3, 1.5, 2, 5, 10, 100, Inf)
-        dec <- dec_[1:(max(which(dec_ < maxF)) + 1)]
-      }
-
-      estr <- sapply(seq_len(length(dec)), function(i) {
-        if (i == 1)
-          "F == 1"
-        else if (i > 1)
-          paste(dec[i - 1], '< F =<', dec[i])
-      })
-
-      num <- hist(eff, breaks = dec, plot = FALSE)$counts
-      num[1] <- num[1] - sum(abs(eff - 1) < eps)
-      num <- c(sum(abs(eff - 1) < eps), num)
-
-    } else {
-
-      return(NULL)
-
-    }
-
-    eff.tbl <- data.frame(eff = estr, n = num, stringsAsFactors = FALSE)
-    colnames(eff.tbl) <- c('Efficiency range', 'Number of observations')
-
-    sum.tbl <- data.frame(
-      min = min(eff), p25 = quantile(eff)[[2]], p50 = median(eff),
-      m = mean(eff), p75 = quantile(eff)[[4]], max = max(eff)
-    )
-    colnames(sum.tbl) <- c('Min.', '1st Qu.', 'Median', 'Mean', '3rd. Qu.', 'Max')
 
     if (model_params$orientation == 'in')
       sum.eff <- sum(dea.in() * eff) / sum(dea.in())
@@ -598,7 +516,6 @@ shinyServer(function(input, output, session) {
     )
 
     list(
-      p(class = 'h5', 'Summary of DEA analysis'),
       p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
       p(paste('Mean efficiency:', round(mean(eff), input$dea_round))),
       p(paste('Weighted efficiency:',round(sum.eff, input$dea_round))),
@@ -626,7 +543,7 @@ shinyServer(function(input, output, session) {
         )
       ),
       hr(),
-      renderTable({ eff.tbl }),
+      renderTable({ eff_tbl }),
       renderPlot({
         hist(eff, col = 'red', xlab = 'Efficiency',
              main = 'Distribution of efficiency scores')
