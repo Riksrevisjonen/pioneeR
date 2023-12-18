@@ -57,7 +57,8 @@ shinyServer(function(input, output, session) {
       id = input$dea_id,
       inputs = input$dea_input,
       outputs = input$dea_output,
-      year = input$dea_year
+      year = input$dea_year,
+      normalize = input$dea_norm
     )
   ) |> debounce(100)
   model_params <- reactiveValues(
@@ -238,7 +239,7 @@ shinyServer(function(input, output, session) {
   # ---- DEA analysis ----
 
   dea.in <- reactive({
-  req(params()$inputs)
+    req(params()$inputs)
     x <- create_matrix(selection(), params()$inputs, params()$id, normalize = input$dea_norm)
     x
   })
@@ -972,23 +973,26 @@ shinyServer(function(input, output, session) {
   )
 
   output$exportmd <- downloadHandler(
-    filename = 'dea_analysis.pdf',
+    filename = function() {
+      sprintf('dea-model-%s-%s.pdf', model_params$rts, model_params$orientation)
+    },
     content = function(file) {
       tempReport <- file.path(tempdir(), 'dea_analysis.Rmd')
       file.copy('dea_analysis.Rmd', tempReport, overwrite = TRUE)
 
       params <- list(
         data = selection(),
-        idvar = params()$id,
-        inputvars = params()$inputs,
-        outputvars = params()$outputs,
-        normdata = input$dea_norm,
-        dearts = model_params$rts,
-        deaorient = model_params$orientation,
-        deain = dea.in(),
-        deaout = dea.out(),
-        deanorm = input$dea_norm,
-        modelout = dea.prod()
+        inputs = dea.in(),
+        outputs = dea.out(),
+        model = dea.prod(),
+        model_params = model_params,
+        params = params(),
+        plots = list(
+          salter_plot = salterPlot()
+        ),
+        settings = list(
+          digits = input$dea_round
+        )
       )
 
       rmarkdown::render(
