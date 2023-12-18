@@ -80,24 +80,16 @@ output$ui_year <- renderUI({
 
   df <- data()$file
 
-  check_within <- function(min, max) {
-    if (!is.numeric(min) || !is.numeric(max)) {
-      return(NA)
+  identify_year_variable <- \(x) {
+    if (!is.atomic(x) || !is.numeric(x) || any(is.na(x))) {
+      return(FALSE)
     }
-    if (is.na(min) || is.na(max)) {
-      return(NA)
-    }
-    return(min > 1900 & max < 2100)
+    return(all(abs(2000 - range(x)) < 100))
   }
 
-  year_vars <- mapply(
-    check_within,
-    min = lapply(data()$file, min),
-    max = lapply(data()$file, max))
-
   choices <- data()$cols
-  year_variable <- data()$cols[which(year_vars)]
-  selected <- ifelse(length(year_variable) == 1, year_variable[[1]], choices[[1]])
+  year_variable <- df[names(df[(which(sapply(df, identify_year_variable)))])]
+  selected <- ifelse(length(year_variable) >= 1, names(year_variable[1]), choices[[1]])
   selectInput('dea_year', 'Time series variable', choices = choices, selected = selected, multiple = FALSE)
 
 })
