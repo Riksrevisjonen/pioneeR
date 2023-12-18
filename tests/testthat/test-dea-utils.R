@@ -23,3 +23,21 @@ test_that('create_matrix returns errors as expected', {
   expect_error(create_matrix(df, id = 'id', columns = 'x'))
   expect_error(create_matrix(df, id = 'x', columns = 'd'))
 })
+
+test_that('compute_scale_efficiency returns expected results', {
+  x <- create_matrix(df, id = 'id', columns = c('a', 'b', 'c'))
+  y <- create_matrix(df, id = 'id', columns = 'd')
+  res <- compute_scale_efficiency(x, y, orientation = 'in')
+  expect_true(is.data.frame(res))
+  res <- compute_scale_efficiency(x, y, orientation = 'in', digits = 4L)
+  expect_true(is.data.frame(res))
+})
+
+test_that('compute_scale_efficiency returns errors as expected', {
+  x <- create_matrix(df, id = 'id', columns = c('a', 'b', 'c'))
+  y <- create_matrix(df, id = 'id', columns = 'd')
+  expect_error(compute_scale_efficiency(x, 1:3))
+  expect_error(compute_scale_efficiency(1:3, x))
+  expect_error(compute_scale_efficiency(matrix(1:4, ncol = 2), matrix(1:6, ncol = 2)))
+  expect_warning(compute_scale_efficiency(x, y, digits = 'a'))
+})

@@ -63,9 +63,10 @@ compute_scale_efficiency <- function(
   if (!is.null(digits) && !is.numeric(digits)) {
     cli::cli_warn(c(
       'The digits argument must be a numeric value or NULL. The argument will be ignored.',
-      'i' = 'Expected NULL or numeric, got {digit} of type {typeof(digit)}',
+      'i' = 'Expected NULL or numeric, got {digits} of type {typeof(digits)}',
       'x' = 'Argument digits must be a numeric or NULL'
     ))
+    digits <- NULL
   }
   orientation <- match.arg(orientation)
 
