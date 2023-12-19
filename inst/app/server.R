@@ -867,7 +867,7 @@ shinyServer(function(input, output, session) {
     # Add DMU names and round inputs
     df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
 
-    reactable(
+    tbl <- reactable(
       df,
       class = 'small',
       striped = TRUE,
@@ -881,6 +881,23 @@ shinyServer(function(input, output, session) {
         upper = colDef(name = 'Upper bound')
       )
     )
+
+    # Add warning if there are any missing observations
+    if (!is.null(res$missing)) {
+      tagList(
+        div(
+          class = 'alert alert-warning', sprintf(
+            'Units with indices %s had one or more missing bootstrapped efficiency
+            scores. Bias and confidence intervals have been estimated on the available
+            values.',
+            paste(res$missing, collapse = ', ')
+          )
+        ),
+        tbl
+      )
+    } else {
+      tbl
+    }
   })
 
   # ---- Malmquist ----
