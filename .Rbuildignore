@@ -10,3 +10,4 @@ dev
 ^\.github$
 ^CONTRIBUTING.md$
 ^DOCKERFILE$
+^README.Rmd$

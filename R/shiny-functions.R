@@ -1,5 +1,12 @@
 #' @import shiny
 #' @import bslib
+#' @import ggplot2
+#' @import haven
+#' @import markdown
+#' @import productivity
+#' @import reactable
+#' @import readxl
+#' @import writexl
 NULL
 
 #' Run pioneeR

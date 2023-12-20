@@ -19,7 +19,6 @@ Depends:
 Imports:
     Benchmarking (>= 0.30),
     haven (>= 2.5.0),
-    magrittr,
     markdown,
     productivity (>= 1.1.0),
     readxl,

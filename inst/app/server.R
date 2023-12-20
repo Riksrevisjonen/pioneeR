@@ -1,6 +1,5 @@
 # Load required packages
 require(readxl)
-require(magrittr)
 require(ucminf)
 require(lpSolveAPI)
 require(lpSolve)
