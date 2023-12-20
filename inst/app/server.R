@@ -867,20 +867,16 @@ shinyServer(function(input, output, session) {
     # Add DMU names and round inputs
     df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
 
-    reactable(
-      df,
-      class = 'small',
-      striped = TRUE,
-      defaultPageSize = 30,
-      pageSizeOptions = c(10, 30, 50, 100),
-      columns = list(
+    opts <- list2(!!!reactable_opts, data = df, columns = list(
         eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
         bias = colDef(show = input$boot_show_bias, name = 'Bias'),
         eff_bc = colDef(name = 'Bias corr. score'),
         lower = colDef(name = 'Lower bound'),
-        upper = colDef(name = 'Upper bound')
-      )
-    )
+        upper = colDef(name = 'Upper bound'),
+        range = colDef(name = 'CI range')
+    ))
+    do.call(reactable, opts)
+
   })
 
   # ---- Malmquist ----
