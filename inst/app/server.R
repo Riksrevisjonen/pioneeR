@@ -1042,7 +1042,9 @@ shinyServer(function(input, output, session) {
   )
 
   output$`export-dea-rds` <- downloadHandler(
-    filename = sprintf('dea-%s-%s.rds', model_params$rts, model_params$orientation),
+    filename = function() {
+      sprintf('dea-%s-%s.rds', model_params$rts, model_params$orientation)
+    },
     content = function(file) {
       d <- selection()
       saveRDS(d, file = file)
