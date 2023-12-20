@@ -496,6 +496,7 @@ shinyServer(function(input, output, session) {
     list(
       p(class = 'lead', 'Summary'),
       layout_column_wrap(
+        width = 1/4,
         value_box(
           title = 'Technology',
           rts,
