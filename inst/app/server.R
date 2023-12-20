@@ -914,6 +914,28 @@ shinyServer(function(input, output, session) {
 
   })
 
+  output$boot_export <- downloadHandler(
+    filename = function() {
+      sprintf(
+        'bootstrap-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$boot_fileformat)
+    },
+    content = function(file) {
+      res <- dea_boostrap()
+      df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+      # Export based on chosen file format
+      if (input$boot_fileformat == 'dta') {
+        colnames(df) <- gsub('\\s', '_', colnames(df))
+        colnames(df) <- gsub('[^A-Za-z0-9_]', '', colnames(df))
+        haven::write_dta(df, file)
+      } else if (input$boot_fileformat == 'xlsx') {
+        writexl::write_xlsx(df, file)
+      } else if (input$boot_fileformat == 'csv') {
+        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+      }
+    }
+  )
+
   # ---- Malmquist ----
 
   output$malm.dt <- renderUI({
