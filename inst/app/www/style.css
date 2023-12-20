@@ -12,17 +12,13 @@ h2 {
     background-color: #edf389;
 }
 
+#ui_inputs .selectize-input, #ui_outputs .selectize-input  {
+  max-height: 4rem;
+  overflow-y: scroll;
+}
+
 .irs-grid-pol.small {
     display: none;
-}
-
-.dataTables_info, .dt-buttons {
-    width: 50%;
-    text-align: left;
-}
-
-.dataTables_length, .dataTables_paginate {
-    width: 50%;
 }
 
 .form-control {
