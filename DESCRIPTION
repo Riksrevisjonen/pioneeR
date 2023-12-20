@@ -11,6 +11,8 @@ Authors@R: c(
     person(family = "Riksrevisjonen", role = "cph"))
 Description: What the package does (one paragraph).
 License: GPL-3 | file LICENSE
+URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
+BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
 Depends:
     R (>= 4.1.0),
     shiny (>= 1.7.0)
