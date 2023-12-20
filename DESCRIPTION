@@ -1,12 +1,13 @@
 Package: pioneeR
 Title: Perform productivity analyses in a web browser
-Version: 0.2.0.9000
+Version: 0.3.0
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),
     person("Lars Skaage", "Engebretsen", role = "ctb", email = "lse@riksrevisjonen.no"),
     person("Jonas", "Månsson", role = "ctb", email = "jonas.mansson@riksrevisjonen.no"),
     person("Aleksander", "Eilertsen", role = "ctb", email = "ale@riksrevisjonen.no"),
+    person("Joachim", "Sandnes", role = "ctb", email = "jsn@riksrevisjonen.no"),
     person(family = "Riksrevisjonen", role = "cph"))
 Description: What the package does (one paragraph).
 License: GPL-3 | file LICENSE
