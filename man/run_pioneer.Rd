@@ -20,6 +20,9 @@ runPioneeR(x = NULL, port = NULL, ...)
 Run the pioneeR app on your local machine.
 }
 \details{
+Note that pioneeR must be loaded into the namespace with \code{library(pioneeR)}
+before you run the pioneeR app.
+
 You can load a data object in your current environment to the app. You can pass
 a data frame or a character string with the object name of the data frame you
 want to be loaded when the app launches. Note that you should only use data
