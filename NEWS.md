@@ -1,4 +1,4 @@
-# pioneeR 0.2.0.9000
+# pioneeR 0.3.0
 
 ## Breaking changes:
 
@@ -17,13 +17,15 @@
 - Layout changed to `layout_sidebar()` from the bslib package to improve UI and fix compatability with bslib >= 0.6.0 and Boostrap 5.3 (#44)
 - Analysis report has been updated and simplified to make the results from the app easier to reproduce (#35)
 - `runPioneeR()` has been renamed `run_pioneer()`. `runPioneeR()` will still work, but will be deprecated in a later version
-- Simplified logic in PDF report generated from the analysis tab
+- Improvements to the user interface and user experience (#57)
+- For time series data, all columns are now available to select as year/time variable. If a column with values within the range \[1900, 2100\] exists, this column will automatically be selected (#41)
 
 ## Bug fixes
 
 - If the user selects a port number that is considered unsafe, a random port number is selected instead (#40)
 - Fixed a bug where an error occurred if any of the model parameters were not found in the column names (#39)
 - Fixed a bug in the scale efficiency tab where numbers where rounded twice (#47)
+- Fixed a bug that would block Excel-files from properly uploading (#71)
 
 # pioneeR 0.2.0
 

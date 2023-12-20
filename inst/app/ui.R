@@ -228,6 +228,16 @@ ui <- function(request) { page_navbar(
             numericInput('boot_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
             checkboxInput('boot_show_eff', 'Show original efficiency score', value = TRUE),
             checkboxInput('boot_show_bias', 'Show bias', value = FALSE)
+          ),
+          accordion_panel(
+            title = 'Export',
+            downloadButton('boot_export', 'Export results', class = 'btn-dark'),
+            p(class = 'small', helpText(
+              'Download the bootstrap results as shown in the table to the right.'
+            )),
+            selectizeInput(
+              'boot_fileformat', 'Choose file format',
+              choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         ),
         actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')

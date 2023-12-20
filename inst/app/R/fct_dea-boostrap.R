@@ -67,7 +67,8 @@ process_boot <- function(rts, orientation, h, alpha, theta, boot) {
       bias = bias,
       eff_bc = theta_tilde,
       lower = as.vector(theta_ci[, 1]),
-      upper = as.vector(theta_ci[, 2])
+      upper = as.vector(theta_ci[, 2]),
+      range = apply(theta_ci, 1, diff)
     )
   )
   invisible(out)

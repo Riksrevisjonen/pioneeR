@@ -212,10 +212,11 @@ shinyServer(function(input, output, session) {
         card_header('Select data'),
         card_body(
           'Upload a file to get started by pressing the Upload file button in the vertical
-          menu to the left. Accepted file types are Excel, Stata, R data.frames stored as
-          RDS-files, comma-, semicolon- og tabseparated files (.tsv, .csv or .txt). When you
-          upload a file, you get a preview of the contents. You can adjust the file import
-          settings if needed. Remember to save the file to the current session.'
+          menu to the left. Accepted file types are Excel, Stata (version 14 or newer), R
+          data.frames stored as DS-files, comma-, semicolon- og tabseparated files (.tsv,
+          .csv or .txt). When you upload a file, you get a preview of the contents. You can
+          adjust the file import settings if needed. Remember to save the file to the current
+          session.'
         ))
     } else {
       # Check for list wise deletion and inform the user if observations have been removed
@@ -364,7 +365,9 @@ shinyServer(function(input, output, session) {
 
   output$dea.plot.save <- downloadHandler(
     filename = function() {
-      sprintf('dea-plot-%s.%s', Sys.Date(), input$dea_dl_format)
+      sprintf(
+        'dea-plot-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$dea_dl_format)
     },
     content = function(file) {
       p <- dea_plot() +
@@ -457,7 +460,9 @@ shinyServer(function(input, output, session) {
 
   output$salter.save <- downloadHandler(
     filename = function() {
-      sprintf('salterplot-%s.%s', Sys.Date(), input$salter_dl_format)
+      sprintf(
+        'salterplot-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$salter_dl_format)
     },
     content = function(file) {
       ggsave_(
@@ -474,28 +479,50 @@ shinyServer(function(input, output, session) {
     eff <- dea.prod()$eff
 
     if (model_params$orientation == 'in')
-      sum.eff <- sum(dea.in() * eff) / sum(dea.in())
+      sum_eff <- sum(dea.in() * eff) / sum(dea.in())
     else if (model_params$orientation == 'out')
-      sum.eff <- sum(dea.out() * eff) / sum(dea.out())
+      sum_eff <- sum(dea.out() * eff) / sum(dea.out())
 
-    rts <- switch(dea.prod()$RTS,
-      crs = 'constant returns to scale',
-      vrs = 'variable returns to scale',
-      drs = 'non-increasing returns to scale',
-      irs = 'non-decreasing returns to scale',
-      'UNKNOWN'
+    rts <- switch(
+      dea.prod()$RTS,
+      crs = 'Constant',
+      vrs = 'Variable',
+      drs = 'Non-increasing',
+      irs = 'Non-decreasing'
     )
 
-    orient <- switch(dea.prod()$ORIENTATION,
-      'in' = 'input oriented',
-      'out' = 'output oriented',
-      'UNKNOWN'
+    orient <- switch(
+      dea.prod()$ORIENTATION,
+      'in' = 'Input',
+      'out' = 'Output'
     )
 
     list(
-      p(list('Technology is ', tags$em(rts), ' and orientation is ', tags$em(orient))),
-      p(paste('Mean efficiency:', round(mean(eff), input$dea_round))),
-      p(paste('Weighted efficiency:',round(sum.eff, input$dea_round))),
+      p(class = 'lead', 'Summary'),
+      layout_column_wrap(
+        width = 1/4,
+        value_box(
+          title = 'Technology',
+          rts,
+          theme = 'secondary'
+        ),
+        value_box(
+          title = 'Orientation',
+          orient,
+          theme = 'secondary'
+        ),
+        value_box(
+          'Mean efficiency',
+          round(mean(eff), input$dea_round),
+          theme = 'primary'
+        ),
+        value_box(
+          'Weighted efficiency',
+          round(sum_eff, input$dea_round),
+          theme = 'primary'
+        )
+      ),
+      p(class = 'lead', 'Statistics on efficiency scores'),
       layout_column_wrap(
         width = 1/5,
         card(
@@ -519,12 +546,25 @@ shinyServer(function(input, output, session) {
           card_body(round(max(eff), input$dea_round))
         )
       ),
-      hr(),
-      renderTable({ eff_tbl }),
-      renderPlot({
-        hist(eff, col = 'red', xlab = 'Efficiency',
-             main = 'Distribution of efficiency scores')
-      })
+      p(class = 'lead', 'Distribution'),
+      layout_columns(
+        col_widths = c(4, 8),
+        renderTable({ eff_tbl }),
+        renderPlot({
+          # Find to optimal number of bins using Freedman-Diaconis rule if N is less
+          # than 200, and Sturge's rule if N is equal or greater than 200
+          n_bins <- if (length(eff) < 200) nclass.FD(eff) else nclass.Sturges(eff)
+          bins <- pretty(range(eff), n = n_bins, min.n = 1)
+          ggplot(data.frame(eff = eff), aes(x = eff)) +
+            stat_bin(fill = '#ee2255', color = '#eeeeee', breaks = bins) +
+            geom_rug() +
+            theme_pioneer() +
+            theme(
+              axis.title.x = element_blank(),
+              axis.title.y = element_blank()
+            )
+        })
+      )
     )
 
   })
@@ -612,7 +652,9 @@ shinyServer(function(input, output, session) {
 
   output$exporttable <- downloadHandler(
     filename = function() {
-      paste0('dea-model-', Sys.Date(), '.', input$exportfileformat)
+      sprintf(
+        'dea-model-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$exportfileformat)
     },
     content = function(file) {
       df <- dea.tbl()
@@ -867,20 +909,16 @@ shinyServer(function(input, output, session) {
     # Add DMU names and round inputs
     df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
 
-    tbl <- reactable(
-      df,
-      class = 'small',
-      striped = TRUE,
-      defaultPageSize = 30,
-      pageSizeOptions = c(10, 30, 50, 100),
-      columns = list(
+    opts <- list2(!!!reactable_opts, data = df, columns = list(
         eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
         bias = colDef(show = input$boot_show_bias, name = 'Bias'),
         eff_bc = colDef(name = 'Bias corr. score'),
         lower = colDef(name = 'Lower bound'),
-        upper = colDef(name = 'Upper bound')
+        upper = colDef(name = 'Upper bound'),
+        range = colDef(name = 'CI range')
       )
     )
+    tbl <- do.call(reactable, opts)
 
     # Add warning if there are any missing observations
     if (!is.null(res$missing)) {
@@ -899,6 +937,28 @@ shinyServer(function(input, output, session) {
       tbl
     }
   })
+
+  output$boot_export <- downloadHandler(
+    filename = function() {
+      sprintf(
+        'bootstrap-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$boot_fileformat)
+    },
+    content = function(file) {
+      res <- dea_boostrap()
+      df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+      # Export based on chosen file format
+      if (input$boot_fileformat == 'dta') {
+        colnames(df) <- gsub('\\s', '_', colnames(df))
+        colnames(df) <- gsub('[^A-Za-z0-9_]', '', colnames(df))
+        haven::write_dta(df, file)
+      } else if (input$boot_fileformat == 'xlsx') {
+        writexl::write_xlsx(df, file)
+      } else if (input$boot_fileformat == 'csv') {
+        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+      }
+    }
+  )
 
   # ---- Malmquist ----
 
@@ -982,7 +1042,9 @@ shinyServer(function(input, output, session) {
   )
 
   output$`export-dea-rds` <- downloadHandler(
-    filename = 'dea.rds',
+    filename = function() {
+      sprintf('dea-%s-%s.rds', model_params$rts, model_params$orientation)
+    },
     content = function(file) {
       d <- selection()
       saveRDS(d, file = file)

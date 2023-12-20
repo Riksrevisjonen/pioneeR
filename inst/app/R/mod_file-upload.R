@@ -31,8 +31,8 @@ file_upload_srv <- function(id) {
             easyClose = TRUE, size = 'xl',
             title = 'Upload file',
             footer = tagList(
-              actionButton(ns('file_save'), 'Save'),
-              bs_modal_button('Close')
+              actionButton(ns('file_save'), 'Save and close', class = 'btn-sm btn-primary', `data-bs-dismiss` = 'modal'),
+              bs_modal_button('Cancel', size = 'sm', color = 'secondary')
             ),
             div(
               class = 'input-group mb-3',

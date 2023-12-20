@@ -27,3 +27,10 @@ check_file <- function(file) {
   file
 
 }
+
+has_value <- function(x) {
+  if (length(x) > 1L) return(sapply(x, has_value, USE.NAMES = FALSE))
+  if (is.null(x) || is.na(x)) return(FALSE)
+  if (!is.character(x)) x <- as.character(x)
+  nzchar(x)
+}
