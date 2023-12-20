@@ -909,9 +909,26 @@ shinyServer(function(input, output, session) {
         lower = colDef(name = 'Lower bound'),
         upper = colDef(name = 'Upper bound'),
         range = colDef(name = 'CI range')
-    ))
-    do.call(reactable, opts)
+      )
+    )
+    tbl <- do.call(reactable, opts)
 
+    # Add warning if there are any missing observations
+    if (!is.null(res$missing)) {
+      tagList(
+        div(
+          class = 'alert alert-warning', sprintf(
+            'Units with indices %s had one or more missing bootstrapped efficiency
+            scores. Bias and confidence intervals have been estimated on the available
+            values.',
+            paste(res$missing, collapse = ', ')
+          )
+        ),
+        tbl
+      )
+    } else {
+      tbl
+    }
   })
 
   output$boot_export <- downloadHandler(
