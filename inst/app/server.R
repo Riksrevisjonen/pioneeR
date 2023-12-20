@@ -365,7 +365,9 @@ shinyServer(function(input, output, session) {
 
   output$dea.plot.save <- downloadHandler(
     filename = function() {
-      sprintf('dea-plot-%s.%s', Sys.Date(), input$dea_dl_format)
+      sprintf(
+        'dea-plot-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$dea_dl_format)
     },
     content = function(file) {
       p <- dea_plot() +
@@ -458,7 +460,9 @@ shinyServer(function(input, output, session) {
 
   output$salter.save <- downloadHandler(
     filename = function() {
-      sprintf('salterplot-%s.%s', Sys.Date(), input$salter_dl_format)
+      sprintf(
+        'salterplot-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$salter_dl_format)
     },
     content = function(file) {
       ggsave_(
@@ -648,7 +652,9 @@ shinyServer(function(input, output, session) {
 
   output$exporttable <- downloadHandler(
     filename = function() {
-      paste0('dea-model-', Sys.Date(), '.', input$exportfileformat)
+      sprintf(
+        'dea-model-%s-%s.%s', model_params$rts, model_params$orientation,
+        input$exportfileformat)
     },
     content = function(file) {
       df <- dea.tbl()
@@ -1036,7 +1042,7 @@ shinyServer(function(input, output, session) {
   )
 
   output$`export-dea-rds` <- downloadHandler(
-    filename = 'dea.rds',
+    filename = sprintf('dea-%s-%s.rds', model_params$rts, model_params$orientation),
     content = function(file) {
       d <- selection()
       saveRDS(d, file = file)
