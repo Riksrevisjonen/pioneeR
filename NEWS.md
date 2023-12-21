@@ -1,3 +1,8 @@
+# pioneeR 0.3.0.9000
+
+- Fixed bug where checkbox for timeseries would be available before any data is uploaded (#74)
+- Updated documentation for `run_pioneer()`
+
 # pioneeR 0.3.0
 
 ## Breaking changes:
