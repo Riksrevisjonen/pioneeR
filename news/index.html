@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/Riksrevisjonen/pioneeR/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -35,9 +41,15 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Changelog</h1>
-      
+      <small>Source: <a href="https://github.com/Riksrevisjonen/pioneeR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0.9000" id="pioneer-0309000">pioneeR 0.3.0.9000<a class="anchor" aria-label="anchor" href="#pioneer-0309000"></a></h2>
+<ul><li>Fixed bug where checkbox for timeseries would be available before any data is uploaded (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/74" class="external-link">#74</a>)</li>
+<li>Updated documentation for <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>
+</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="pioneer-030">pioneeR 0.3.0<a class="anchor" aria-label="anchor" href="#pioneer-030"></a></h2>
 <div class="section level3">
@@ -46,7 +58,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-0-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
-<ul><li>Added new boostrap functionality for models with constant or variable returns to scale based on Simar and Wilson (1998) (#6)</li>
+<ul><li>Added new boostrap functionality for models with constant or variable returns to scale based on Simar and Wilson (1998) (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/6" class="external-link">#6</a>)</li>
 <li>Added new function <code><a href="../reference/unset_env_vars.html">unset_env_vars()</a></code> that will clear environment variables set by pioneeR if the app exits unexpectedly and the variables are not unset automatically</li>
 <li>Added new function <code><a href="../reference/compute_scale_efficiency.html">compute_scale_efficiency()</a></code> to run CRS, VRS and NIRS models to compute scale efficiency and evaluate optimal scale size for each unit</li>
 <li>Added new function <code><a href="../reference/summary_tbl_dea.html">summary_tbl_dea()</a></code> to create a summary table of efficiency scores from a vector of efficiency scores or an object of type Farrell as returned from the <code>dea()</code> function in the Benchmarking package</li>
@@ -54,19 +66,19 @@
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-0-3-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-3-0"></a></h3>
-<ul><li>Layout changed to <code>layout_sidebar()</code> from the bslib package to improve UI and fix compatability with bslib &gt;= 0.6.0 and Boostrap 5.3 (#44)</li>
-<li>Analysis report has been updated and simplified to make the results from the app easier to reproduce (#35)</li>
+<ul><li>Layout changed to <code>layout_sidebar()</code> from the bslib package to improve UI and fix compatability with bslib &gt;= 0.6.0 and Boostrap 5.3 (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/44" class="external-link">#44</a>)</li>
+<li>Analysis report has been updated and simplified to make the results from the app easier to reproduce (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/35" class="external-link">#35</a>)</li>
 <li>
 <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> has been renamed <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>. <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> will still work, but will be deprecated in a later version</li>
-<li>Improvements to the user interface and user experience (#57)</li>
-<li>For time series data, all columns are now available to select as year/time variable. If a column with values within the range [1900, 2100] exists, this column will automatically be selected (#41)</li>
+<li>Improvements to the user interface and user experience (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/57" class="external-link">#57</a>)</li>
+<li>For time series data, all columns are now available to select as year/time variable. If a column with values within the range [1900, 2100] exists, this column will automatically be selected (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/41" class="external-link">#41</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0"></a></h3>
-<ul><li>If the user selects a port number that is considered unsafe, a random port number is selected instead (#40)</li>
-<li>Fixed a bug where an error occurred if any of the model parameters were not found in the column names (#39)</li>
-<li>Fixed a bug in the scale efficiency tab where numbers where rounded twice (#47)</li>
-<li>Fixed a bug that would block Excel-files from properly uploading (#71)</li>
+<ul><li>If the user selects a port number that is considered unsafe, a random port number is selected instead (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/40" class="external-link">#40</a>)</li>
+<li>Fixed a bug where an error occurred if any of the model parameters were not found in the column names (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/39" class="external-link">#39</a>)</li>
+<li>Fixed a bug in the scale efficiency tab where numbers where rounded twice (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/47" class="external-link">#47</a>)</li>
+<li>Fixed a bug that would block Excel-files from properly uploading (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/71" class="external-link">#71</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -74,7 +86,7 @@
 <ul><li>Added ability to provide data to the app with <code>runPioneer()</code>
 </li>
 <li>Added the ability to return data when the app closes</li>
-<li>Fixed a bug where the Malmquist tab would not show the results of the analysis (#36)</li>
+<li>Fixed a bug where the Malmquist tab would not show the results of the analysis (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/36" class="external-link">#36</a>)</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="pioneer-010">pioneeR 0.1.0<a class="anchor" aria-label="anchor" href="#pioneer-010"></a></h2>
