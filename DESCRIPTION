@@ -1,6 +1,6 @@
 Package: pioneeR
 Title: Perform productivity analyses in a web browser
-Version: 0.3.0
+Version: 0.3.0.9000
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),
@@ -11,13 +11,14 @@ Authors@R: c(
     person(family = "Riksrevisjonen", role = "cph"))
 Description: What the package does (one paragraph).
 License: GPL-3 | file LICENSE
+URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
+BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
 Depends:
     R (>= 4.1.0),
     shiny (>= 1.7.0)
 Imports:
     Benchmarking (>= 0.30),
     haven (>= 2.5.0),
-    magrittr,
     markdown,
     productivity (>= 1.1.0),
     readxl,

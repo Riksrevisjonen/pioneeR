@@ -8,4 +8,6 @@ docs
 dev
 ^pkgdown$
 ^\.github$
+^CONTRIBUTING.md$
 ^DOCKERFILE$
+^README.Rmd$

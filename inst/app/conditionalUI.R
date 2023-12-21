@@ -67,6 +67,8 @@ observeEvent(input$dea_output, {
 
 output$ui_timeseries <- renderUI({
 
+  req(data()$file)
+
   checkboxInput('hasyear', 'Time series data', value = FALSE)
 
 })
