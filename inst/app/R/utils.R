@@ -111,3 +111,10 @@ rand_id <- function() {
   hex_digits <- c(0:9, letters[1:6])
   paste(sample(hex_digits, 32, replace = TRUE), collapse = '')
 }
+
+set_tooltip <- function(title, text){
+  bslib::tooltip(span(title,                    # Tooltip title
+                      bsicons::bs_icon("question-circle"),   # Icon
+                      class = "text"),               # Class
+                 text)
+  }
