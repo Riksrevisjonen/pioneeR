@@ -1,4 +1,13 @@
-# pioneeR
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# pioneeR <a href="https://riksrevisjonen.github.io/pioneeR/"><img src="man/figures/logo.png" align="right" height="139" /></a>
 
 R package for running a Shiny app for DEA analysis. Full documentation is available on our [GitHub Pages](https://riksrevisjonen.github.io/pioneeR/).
 
