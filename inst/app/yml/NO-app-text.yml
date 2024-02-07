@@ -1,0 +1,5 @@
+tooltips:
+  time_series: "Huk av dersom du har tidsseriedata"
+  test_tooltip: "Dette er en test"
+in_app_messages:
+  error_simple: "Feil!"

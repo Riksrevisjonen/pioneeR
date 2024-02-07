@@ -16,8 +16,6 @@ require(yaml)
 # Define server logic
 shinyServer(function(input, output, session) {
 
-  tooltip_yaml <- yaml::read_yaml("inst/app/R/tooltips.yml")
-
   reactable_opts <- list(
     compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
     class = 'small', defaultPageSize = 100, rownames = FALSE

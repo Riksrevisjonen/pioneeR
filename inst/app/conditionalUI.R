@@ -21,9 +21,9 @@ output$ui_inputs <- renderUI({
   selected <- if (!is.null(restoreVals$inputs)) restoreVals$inputs else NULL
   choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
 
-  selectInput('dea_input', 'Inputs', set_tooltip(title = "Inputs",
-                                                 text = tooltip_yaml$tooltip_text_inputs),
-                                                 choices = choices, selected = selected, multiple = TRUE)
+  selectInput('dea_input',
+              set_tooltip("Input", get_tooltip(id = "test_tooltip")),
+              choices = choices, selected = selected, multiple = TRUE)
 
 })
 

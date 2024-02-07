@@ -39,6 +39,8 @@ dropdown_button <- function(
 
 }
 
+tooltip_texts <- get_yaml(path = "app/yml")
+
 find_scale <- function(x) {
   m <- abs(max(x))
   i <- c(0, 1e3, 1e6, 1e9, 1e12)
@@ -112,9 +114,32 @@ rand_id <- function() {
   paste(sample(hex_digits, 32, replace = TRUE), collapse = '')
 }
 
-set_tooltip <- function(title, text){
-  bslib::tooltip(span(title,                    # Tooltip title
-                      bsicons::bs_icon("question-circle"),   # Icon
-                      class = "text"),               # Class
-                 text)
+# Function to retrieve and combine yaml files with tooltips and app text for different languages
+get_yaml <- function(path) {
+  files <- list.files(system.file(path, package = 'pioneeR'), pattern = '.yml', full.names = TRUE)
+  texts <- lapply(files, yaml::read_yaml)
+  names(texts) <- tools::file_path_sans_ext(basename(files))
+  texts
+}
+
+# Function to determine the tooltip based on ID and language.
+# If language is null, english is chosen as a language. If the ID does not match an ID in the list, the tooltip says "Invalid tooltip"
+get_tooltip <- function(id, lang = NULL) {
+  # Determine the language.
+  lang_text = if (!is.null(lang) && lang == 'NO') 'NO-app-text' else if (is.null(lang) || lang == 'EN') 'EN-app-text'
+
+  # Check if the id exists in the tooltips for the determined language.
+  if (!is.null(tooltip_texts[[lang_text]][['tooltips']][[id]])) {
+    return(tooltip_texts[[lang_text]][['tooltips']][[id]])
+  } else {
+    return("Invalid tooltip")
   }
+}
+
+# Function to input the tooltip in a bslib wrapper.
+set_tooltip <- function(title, tooltiptext){
+  bslib::tooltip(
+    span(title,
+         bsicons::bs_icon("question-circle")),
+    tooltiptext)
+}
