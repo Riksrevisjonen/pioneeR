@@ -11,6 +11,7 @@ require(haven)
 require(writexl)
 require(reactable)
 require(rlang)
+require(yaml)
 
 # Define server logic
 shinyServer(function(input, output, session) {

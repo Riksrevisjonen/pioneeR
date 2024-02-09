@@ -1,7 +1,6 @@
 # Load packages
 library(shiny)
 library(bslib)
-source('R/utils.R')
 
 # Set Bootstrap version
 bs_ver <- 5

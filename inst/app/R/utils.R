@@ -111,3 +111,33 @@ rand_id <- function() {
   hex_digits <- c(0:9, letters[1:6])
   paste(sample(hex_digits, 32, replace = TRUE), collapse = '')
 }
+
+# Function to retrieve and combine yaml files with tooltips and app text for different languages
+get_yaml <- function(path) {
+  files <- list.files(system.file(path, package = 'pioneeR'), pattern = '.yml', full.names = TRUE)
+  texts <- lapply(files, yaml::read_yaml)
+  names(texts) <- tools::file_path_sans_ext(basename(files))
+  texts
+}
+
+tooltip_texts <- yaml::read_yaml("www/EN-app-text.yml")
+
+# Function to determine the tooltip based on ID and language.
+# If language is null, english is chosen as a language. If the ID does not match an ID in the list, the tooltip says "Invalid tooltip"
+get_tooltip <- function(id, lang = NULL) {
+
+  # Check if the id exists in the tooltips for the determined language.
+  if (!is.null(tooltip_texts[['tooltips']][[id]])) {
+    return(tooltip_texts[['tooltips']][[id]])
+  } else {
+    return("Invalid tooltip")
+  }
+}
+
+# Function to input the tooltip in a bslib wrapper.
+set_tooltip <- function(title, tooltiptext){
+  bslib::tooltip(
+    span(title,
+         bsicons::bs_icon("question-circle")),
+    tooltiptext)
+}
