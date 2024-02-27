@@ -35,3 +35,50 @@ h2 {
   z-index: 9999;
   padding: 0;
 }
+
+.nav-pills {
+  --bs-nav-pills-border-radius: var(--bs-border-radius);
+  --bs-nav-pills-link-active-color: #fff;
+  --bs-nav-pills-link-active-bg: #dc3545;
+  font-size: 34px;
+}
+
+.nav {
+  --bs-nav-link-padding-x: 1rem;
+  --bs-nav-link-padding-y: .5rem;
+  --bs-nav-link-font-weight: ;
+  --bs-nav-link-color: #838383;
+}
+
+p.subcategory {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 750;
+    font-size: 24px;
+}
+
+
+element.style {
+    ---bslib-value-box-showcase-w: 22%;
+}
+
+.bslib-value-box .value-box-title {
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.bslib-card .card-body p:last-child {
+    margin-bottom: 0;
+    font-weight: 650;
+    font-size: 38px;
+}
+
+.girafe, .girafe_container_std {
+    margin-left: 0%;
+    position: relative;
+    text-align: left;
+    margin-right: auto;
+}

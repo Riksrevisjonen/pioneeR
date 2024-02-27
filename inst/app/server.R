@@ -11,6 +11,8 @@ require(haven)
 require(writexl)
 require(reactable)
 require(rlang)
+require(ggiraph)
+require(ggdist)
 
 # Define server logic
 shinyServer(function(input, output, session) {
@@ -470,17 +472,9 @@ shinyServer(function(input, output, session) {
     }
   )
 
-  output$summary.dea <- renderUI({
+  output$model.summary <- renderUI({
 
     req(dea.prod())
-
-    eff_tbl <- summary_tbl_dea(dea.prod())
-    eff <- dea.prod()$eff
-
-    if (model_params$orientation == 'in')
-      sum_eff <- sum(dea.in() * eff) / sum(dea.in())
-    else if (model_params$orientation == 'out')
-      sum_eff <- sum(dea.out() * eff) / sum(dea.out())
 
     rts <- switch(
       dea.prod()$RTS,
@@ -497,74 +491,222 @@ shinyServer(function(input, output, session) {
     )
 
     list(
-      p(class = 'lead', 'Summary'),
+      br(),
+      p(class = 'subcategory', 'Model specifications'),
       layout_column_wrap(
-        width = 1/4,
+        width = 1/3,
+        fill = FALSE,
         value_box(
-          title = 'Technology',
-          rts,
-          theme = 'secondary'
+          title = HTML('<span style="font-size:26px; font-weight:500; color:#183271;">Model settings</span>'),
+          value = HTML(paste0('<span style="font-size:16px; font-weight:300; color:#183271;">Returns to scale: ', rts,
+                         "<br>",
+                         "Orientation: ", orient, "</span>"
+                         )),
+          showcase = bsicons::bs_icon("gear-fill", size = "50px"),
+          theme = value_box_theme(bg = "#e9f8ff", fg = "#183271")
         ),
         value_box(
-          title = 'Orientation',
-          orient,
-          theme = 'secondary'
-        ),
+          title = HTML('<span style="font-size:26px; font-weight:500; color:#183271;">Input variables</span>'),
+          value = HTML(paste0('<span style="font-size:16px; font-weight:300; color:#183271;">', paste(params()$inputs, collapse = ", "), '</span>')),
+          showcase = bsicons::bs_icon("box-arrow-in-right", size = "50px"),
+          theme = value_box_theme(bg = "#e9f8ff", fg = "#183271")
+          ),
         value_box(
-          'Mean efficiency',
-          round(mean(eff), input$dea_round),
-          theme = 'primary'
-        ),
-        value_box(
-          'Weighted efficiency',
-          round(sum_eff, input$dea_round),
-          theme = 'primary'
+          title = HTML('<span style="font-size:26px; font-weight:500; color:#183271;">Output variables</span>'),
+          value = HTML(paste0('<span style="font-size:16px; font-weight:300; color:#183271;">', paste(params()$outputs, collapse = ", "), '</span>')),
+          showcase = bsicons::bs_icon("box-arrow-right", size = "50px"),
+          theme = value_box_theme(bg = "#e9f8ff", fg = "#183271")
         )
-      ),
-      p(class = 'lead', 'Statistics on efficiency scores'),
-      layout_column_wrap(
-        width = 1/5,
-        card(
-          card_header('Min'),
-          card_body(round(min(eff), input$dea_round))
-        ),
-        card(
-          card_header('1st Qu'),
-          card_body(round(quantile(eff)[[2]], input$dea_round))
-        ),
-        card(
-          card_header('Median'),
-          card_body(round(median(eff), input$dea_round))
-        ),
-        card(
-          card_header('3rd Qu.'),
-          card_body(round(quantile(eff)[[4]], input$dea_round))
-        ),
-        card(
-          card_header('Max'),
-          card_body(round(max(eff), input$dea_round))
-        )
-      ),
-      p(class = 'lead', 'Distribution'),
-      layout_columns(
-        col_widths = c(4, 8),
-        renderTable({ eff_tbl }),
-        renderPlot({
-          # Find to optimal number of bins using Freedman-Diaconis rule if N is less
-          # than 200, and Sturge's rule if N is equal or greater than 200
-          n_bins <- if (length(eff) < 200) nclass.FD(eff) else nclass.Sturges(eff)
-          bins <- pretty(range(eff), n = n_bins, min.n = 1)
-          ggplot(data.frame(eff = eff), aes(x = eff)) +
-            stat_bin(fill = '#ee2255', color = '#eeeeee', breaks = bins) +
-            geom_rug() +
-            theme_pioneer() +
-            theme(
-              axis.title.x = element_blank(),
-              axis.title.y = element_blank()
-            )
-        })
       )
     )
+
+  })
+
+  output$key.metrics <- renderUI({
+
+    req(dea.prod())
+
+    eff_tbl <- summary_tbl_dea(dea.prod())
+    eff <- dea.prod()$eff
+    n_DMUs <- nrow(preview())
+
+    if (model_params$orientation == 'in')
+      sum_eff <- sum(dea.in() * eff) / sum(dea.in())
+    else if (model_params$orientation == 'out')
+      sum_eff <- sum(dea.out() * eff) / sum(dea.out())
+
+    list(
+      p(class = 'subcategory', 'Key metrics'),
+      layout_column_wrap(
+        width = 1/5,
+        value_box(
+          'Mean efficiency',
+          round(mean(eff), 3),
+          theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
+          ),
+        value_box(
+          'Weighted efficiency',
+          round(sum_eff, 3),
+          theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
+          ),
+        value_box(
+          'Efficiency potential',
+          paste0(n_DMUs, " %"),
+          theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
+          ),
+        value_box(
+          'Number of DMUs',
+          n_DMUs,
+          theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
+          ),
+        value_box(
+          'Number of DMUs',
+          n_DMUs,
+          theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
+          )
+        )
+      )
+
+  })
+
+  #### Distribution plot#####
+
+raincloud <- reactive({
+
+  req(data(), params()$inputs, params()$outputs)
+
+  d <- dea_plot_df()
+
+  p <- d |>
+    ggplot(aes(x = eff)) +
+    ggdist::stat_halfeye(
+      adjust = .5,
+      width = .2,
+      .width = 0,
+      height = 0.7,
+      justification = -.2,
+      point_colour = NA,
+      show.legend = FALSE,
+      fill = "#E20046",
+      color = "black"
+    ) +
+    geom_boxplot(
+      width = .12,
+      outlier.shape = NA,
+      show.legend = FALSE,
+      alpha = 0.9,
+      fill = "#4292c6",
+      color = "black"
+    ) +
+    stat_dots(side = "bottom",
+              justification = 1.3,
+              position = "dodgejust",
+              color = "black",
+              fill = "black",
+              height = 0.8,
+              scale = 0.8) +
+    theme_pioneer() +
+    scale_x_continuous(breaks = seq(0,1,0.1)) +
+    labs(x = "Efficiency score",
+         y = "Density") +
+    theme(panel.grid.major.x = element_line("#183271",
+                                            linetype = "dotted"),
+          panel.grid.major.y = element_blank(),
+          axis.text.y = element_blank(),
+          axis.text.x = element_text(color = "#182371",
+                                     size = 15),
+          axis.title = element_text(color = "#182371",
+                                    size = 20,
+                                    face= "bold"))
+
+  return(p)
+
+})
+
+output$raincloud_plot <- renderPlot({
+    g <- raincloud()
+    g
+  })
+
+
+  #### Salter diagram #####
+
+  output$salter_plot <-renderGirafe({
+
+    req(data(), params()$inputs, params()$outputs)
+
+    d <- dea_plot_df()
+
+    d$dmu <- gsub("'", "", d$dmu)
+
+    p <- d |>
+      ggplot(aes(x = reorder(dmu,
+                             eff),
+                 y = eff)) +
+      theme_pioneer() +
+      ggiraph::geom_bar_interactive(aes(tooltip = sprintf("%s: %.3f", dmu, eff),
+                               data_id = dmu),
+                           hover_nearest = TRUE,
+                           stat = "identity",
+                           color = "black",
+                           fill = "#85C9F7",
+                           size = 0.1
+      ) +
+      theme(axis.text.x = element_blank(),
+            legend.title = element_text(color = "#182371",
+                                        size = 11,
+                                        vjust = 0.8),
+            panel.grid.major.x = element_blank(),
+            axis.title = element_text(color = "#182371",
+                                      size = 13,
+                                      face= "bold"),
+            legend.position="bottom") +
+      labs(y = "Efficiency score",
+           x = "DMU") +
+      scale_y_continuous(expand = expansion(mult = c(0,0.1)))
+
+    x <- ggiraph::girafe(code = print(p),
+                         width_svg = 7.8125,
+                         height_svg = 5.729,
+                options = list(
+                  opts_hover(css = "fill:#FF3333;stroke:black;cursor:pointer;", reactive = TRUE),
+                  opts_selection(
+                    type = "multiple", css = "fill:#FF3333;stroke:black;")
+                ))
+
+    x
+  })
+
+histogram <- reactive({
+
+    eff <- dea.prod()$eff
+
+    # Histogram
+    # Find to optimal number of bins using Freedman-Diaconis rule if N is less
+    # than 200, and Sturge's rule if N is equal or greater than 200
+    n_bins <- if (length(eff) < 200) nclass.FD(eff) else nclass.Sturges(eff)
+    bins <- pretty(range(eff), n = n_bins, min.n = 1)
+    p <- ggplot(data.frame(eff = eff), aes(x = eff)) +
+      stat_bin(fill = '#E20046', color = '#eeeeee', breaks = bins) +
+      geom_rug() +
+      theme_pioneer() +
+      theme(
+        axis.text = element_text(color = "#182371",
+                                 size = 15)
+      ) + labs(x = "Efficiency score",
+               y = "Count")
+
+    return(p)
+
+  })
+
+output$eff_histogram <- renderPlot({
+
+    req(dea.prod())
+
+    # Histogram
+    g <- histogram()
+    g
 
   })
 
@@ -685,6 +827,8 @@ shinyServer(function(input, output, session) {
     ))
     do.call(reactable, opts)
   })
+
+
 
   # ---- Model comparison ----
 
