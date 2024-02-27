@@ -120,67 +120,97 @@ ui <- function(request) { page_navbar(
         ),
         actionButton('save_and_close_dea', 'Quit app and return results')
       ),
-      tabsetPanel(
-        tabPanel(
-          'Efficiency',
-          reactableOutput('dea.table')
-        ),
-        tabPanel(
-          'Slack',
-          reactableOutput('dea.slack')
-        ),
-        tabPanel('Plot',
-                 plotOutput('plot_dea', height = 600, hover = hoverOpts(
-                   id = 'dea_hover', delay = 100, delayType = 'throttle')
-                 ),
-                 uiOutput('plot_dea_tooltip'),
-                 div(
-                   dropdown_button(
-                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                     textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
-                     textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
-                     selectizeInput('dea_dl_size', 'Image size', choices = c(
-                       'A5', 'A4', 'A3'
-                     )),
-                     selectizeInput('dea_dl_format', 'Image format', choices = c(
-                       'PNG' = 'png', 'PDF' = 'pdf'
-                     ))
-                   ),
-                   downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
-                 ),
-                 hr(),
-                 plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
-                   id = 'salter_hover', delay = 100, delayType = 'throttle')
-                 ),
-                 uiOutput('plot_salter_tooltip'),
-                 div(
-                   dropdown_button(
-                     'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
-                     textInput('salter.color', 'Color', value = '85c9f7'),
-                     textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
-                     textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
-                     selectizeInput('salter_dl_size', 'Image size', choices = c(
-                       'A5', 'A4', 'A3'
-                     )),
-                     selectizeInput('salter_dl_format', 'Image format', choices = c(
-                       'PNG' = 'png', 'PDF' = 'pdf'
-                     ))
-                   ),
-                   downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
-                 )
-        ),
-        tabPanel(
-          'Peers',
-          reactableOutput('peers.table')
-        ),
-        tabPanel(
-          'Summary',
-          uiOutput('summary.dea')
-        ),
-        tabPanel(
-          'Scale efficiency',
-          reactableOutput('tbl_scaleeff')
-        )
+      tabsetPanel(type = "pills",
+                  tabPanel('View model summary',
+                           uiOutput('model.summary'),
+                           uiOutput('key.metrics'),
+                           p(class = 'subcategory', 'Data visualization'),
+                           tabsetPanel(
+                             tabPanel("Salter diagram",
+                                      br(),"In the Salter diagram, each DMU is represented by a bar,
+                                      sorted by efficiency score from low to high. The height of
+                                      each bar corresponds with the efficiency score of the DMU.
+                                      In the dropdown menu below, you can choose a variable to modify
+                                      the fill color and width of the bars.",
+                                      ggiraph::girafeOutput('salter_plot', height = "550px", width = "800px")
+                                      ),
+                             tabPanel("Distribution (raincloud)",
+                                      br(),
+                                      "This graph, a raincloud plot, shows three ways of viewing the distribution,
+                                      of the efficiency scores:",
+                                      br(), HTML("<p>- The <span style='color:#E20046; font-weight:bold;'>red graph</span> is a kernel density estimation.<br>
+                                                 - The <span style='color:#559DCC; font-weight:bold;'>blue box</span> in the middle is a boxplot showing the range of efficiency scores. The vertical line represents the median.<br>
+                                                 - The <span style='color:#000000; font-weight:bold;'>black dots</span> each represent a DMU sorted from low to high efficiency scores. DMUs with identical values are stacked.</p>"),
+                                      br(),
+                                      plotOutput('raincloud_plot', height = "550px", width = "800px")),
+                             tabPanel("Distribution (histogram)",
+                                      br(),
+                                      plotOutput('eff_histogram', height = "550px", width = "800px")
+                                      ),
+                             tabPanel("Scatterplot",
+                                      plotOutput('plot_dea', height = 600, hover = hoverOpts(
+                                        id = 'dea_hover', delay = 100, delayType = 'throttle')
+                                      ),
+                                      uiOutput('plot_dea_tooltip'),
+                                      div(
+                                        dropdown_button(
+                                          'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                                          textInput('dea_xtitle', 'X-axis title', 'Combined inputs'),
+                                          textInput('dea_ytitle', 'Y-axis title', 'Efficiency'),
+                                          selectizeInput('dea_dl_size', 'Image size', choices = c(
+                                            'A5', 'A4', 'A3'
+                                          )),
+                                          selectizeInput('dea_dl_format', 'Image format', choices = c(
+                                            'PNG' = 'png', 'PDF' = 'pdf'
+                                          ))
+                                        ),
+                                        downloadButton('dea.plot.save', 'Save plot', class = 'btn-sm btn-light')
+                                      ))
+                           )
+                           ),
+                  tabPanel("Explore the data",
+                           "Content for Subtab 2",
+                           tabsetPanel(
+                             tabPanel(
+                               'Efficiency',
+                               reactableOutput('dea.table')
+                             ),
+                             tabPanel(
+                               'Slack',
+                               reactableOutput('dea.slack')
+                             ),
+                             tabPanel(hr(),
+                                      plotOutput('dea_salter_plot', height = 600, hover = hoverOpts(
+                                        id = 'salter_hover', delay = 100, delayType = 'throttle')
+                                      ),
+                                      uiOutput('plot_salter_tooltip'),
+                                      div(
+                                        dropdown_button(
+                                          'Plot options', size = 'sm', color = 'light', autoclose = FALSE,
+                                          textInput('salter.color', 'Color', value = '85c9f7'),
+                                          textInput('salter.xtitle', 'X-axis title', 'Combined inputs'),
+                                          textInput('salter.ytitle', 'Y-axis title', 'Efficiency'),
+                                          selectizeInput('salter_dl_size', 'Image size', choices = c(
+                                            'A5', 'A4', 'A3'
+                                          )),
+                                          selectizeInput('salter_dl_format', 'Image format', choices = c(
+                                            'PNG' = 'png', 'PDF' = 'pdf'
+                                          ))
+                                        ),
+                                        downloadButton('salter.save', 'Save plot', class = 'btn-sm btn-light')
+                                      )
+                             ),
+                             tabPanel(
+                               'Peers',
+                               reactableOutput('peers.table')
+                             ),
+                             tabPanel(
+                               'Scale efficiency',
+                               reactableOutput('tbl_scaleeff')
+                             )
+                           )
+
+                           )
       )
     )
   ),

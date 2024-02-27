@@ -47,48 +47,111 @@ find_scale <- function(x) {
   return(list(names(i)[findInterval(m, i)], x[findInterval(m, i)]))
 }
 
+RR_dark_blue <- "#183271"
+RR_scarlet_red <- "#E20046"
+RR_teal <- "#169AFD"
+RR_green <- "#A6D96A"
+RR_purple <- "#8A3FFC"
+RR_orange <- "#FF9038"
+
+main_colors <- c(RR_dark_blue, RR_scarlet_red, RR_teal, RR_green, RR_purple, RR_orange)
+
 theme_pioneer <- function(){
   theme(
-    axis.text.x = element_text(
-      angle = 0, color = '#183271', vjust = 0.5,
-      size = 10
-    ),
-    axis.line.x = element_line('#183271', linetype = 'solid'),
-    axis.text.y = element_text(color = '#183271', size = 10),
-    legend.title = element_blank(),
-    legend.text = element_text(color = '#183271'),
-    plot.margin = unit(c(3,3,2,2), 'lines'),
-    plot.background = element_rect(fill = 'white', color = NA),
-    panel.background = element_rect(fill = 'white', color = NA),
-    panel.grid.major.x = element_line('#183271', linetype = 'dotted'),
-    panel.grid.major.y = element_line('#183271', linetype = 'dotted'),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.minor.y = element_blank(),
-    plot.title = element_text(
-      color = "#183271", face = "bold", size = 15,
-      margin = unit(c(0,0,1,0), "lines")
-    ),
-    axis.ticks.y = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title.y =  element_text(
-      size = 12, face = "bold", color = '#183271',
-      margin = unit(c(0,1.5,0,0), "lines")
-    ),
-    axis.title.x =  element_text(
-      size = 12, face = "bold", color = '#183271',
-      margin = unit(c(1.5,0,0,0), "lines")
-    ),
-    legend.background = element_blank(),
-    legend.key = element_rect(fill = "transparent", color = "transparent"),
-    legend.box.background = element_blank(),
+    line = ggplot2::element_line(color = "#183271"),
+    rect = ggplot2::element_rect(fill = main_colors, color = NA,
+                                 linetype = 1),
+    text = ggplot2::element_text(color = "#183271"),
+
+    # Axis lines
+    axis.line = ggplot2::element_line("#183271",
+                                      linewidth = ggplot2::rel(0.8)),
+
+    # Axis titles
+    axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 12+8,
+                                                                  l = 12),
+                                         angle = 90,
+                                         size = ggplot2::rel(1.15)),
+    axis.title.x = ggplot2::element_text(margin = ggplot2::margin(t = 12+8,
+                                                                  b = 12),
+                                         size = ggplot2::rel(1.15)),
+
+    # Axis text
+    axis.text = ggplot2::element_text(size = ggplot2::rel(1)),
+    axis.text.x = ggplot2::element_text(vjust = 0,
+                                        margin = ggplot2::margin(t = 12-5,
+                                                                 unit = "pt"),
+                                        size = ggplot2::rel(1)),
+    axis.text.y = ggplot2::element_text(hjust = 0,
+                                        margin = ggplot2::margin(r = 12-5,
+                                                                 unit = "pt"),
+                                        size = ggplot2::rel(1)),
+
+    # Axis ticks
+    axis.ticks = ggplot2::element_blank(),
+    axis.ticks.length = grid::unit(-0.25, "cm"),
+
+    # Legend
+    legend.background = ggplot2::element_rect(fill = "#e9f8ff",
+                                              color = "#e9f8ff",
+                                              linetype = 0),
+    legend.box.background = ggplot2::element_rect(fill = "#e9f8ff",
+                                                  color = "#e9f8ff",
+                                                  linetype = 0),
+    #legend.spacing = ggplot2::margin(c(0,0,0,0), "points"),
+    legend.key = ggplot2::element_rect(fill = "#e9f8ff",
+                                       color = "#e9f8ff",
+                                       linetype = 0),
+    legend.key.size = grid::unit(1.2, "lines"),
+    legend.key.height = NULL,
+    legend.key.width = NULL,
+    legend.text = ggplot2::element_text(size = ggplot2::rel(1.1)),
+    legend.text.align = NULL,
+    legend.title = ggplot2::element_text(size = ggplot2::rel(1.2),  hjust = 0,
+                                         margin = ggplot2::margin(t = 12,
+                                                                  r = 0,
+                                                                  b = 0,
+                                                                  l = 0,
+                                                                  unit = "pt")),
+    legend.title.align = NULL,
     legend.position = "right",
-    strip.background.x = element_rect(color = "transparent", fill = "transparent"),
-    strip.background.y = element_rect(color = "transparent", fill = "transparent"),
-    strip.text = element_text(
-      color = '#183271', face = "bold", size = 11,
-      margin = unit(c(0,0,1.5,0), "lines")
-    ),
-    panel.spacing = unit(2, "lines"))
+    legend.direction = NULL,
+    legend.justification = "center",
+
+    # Panel and plot backgrounds
+    panel.background = ggplot2::element_rect(fill = "white", linetype = 0),
+    panel.border = ggplot2::element_blank(),
+    panel.grid.major = ggplot2::element_line(color = scales::alpha("#183271", 0.5),
+                                             linetype = "dotted",
+                                             size = 0.6),
+    panel.grid.minor = ggplot2::element_blank(),
+    panel.spacing = grid::unit(0.25, "lines"),
+    plot.background = ggplot2::element_rect(fill = "#e9f8ff",
+                                            color = "#e9f8ff"),
+
+    # Facet wrap aesthetics
+    strip.background.x = ggplot2::element_rect(color = "transparent",
+                                               fill = "transparent"),
+    strip.background.y = ggplot2::element_rect(color = "transparent",
+                                               fill = "transparent"),
+    strip.text = ggplot2::element_text(color = "#183271",
+                                       family = "sans",
+                                       face = "bold",
+                                       size = ggplot2::rel(1),
+                                       margin = grid::unit(c(0.5,0,0.35,0), "lines")),
+
+    # Plot title
+    plot.title = ggplot2::element_text(size = ggplot2::rel(1.5),
+                                       hjust = 0, face = "bold",
+                                       margin = ggplot2::margin(t = 0,
+                                                                r = 0,
+                                                                b = 12,
+                                                                l = 0,
+                                                                unit = "points")),
+
+    # Spacing
+    plot.margin = grid::unit(c(1.3, 1.3, 0.6, 0.6), "cm"),
+    complete = TRUE)
 }
 
 ggsave_ <- function(filename, plot, format = 'png', size = c('A5', 'A4', 'A3')) {
