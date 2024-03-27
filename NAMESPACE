@@ -2,8 +2,12 @@
 
 S3method(summary_tbl_dea,Farrell)
 S3method(summary_tbl_dea,numeric)
+export(compute_efficiency)
 export(compute_scale_efficiency)
+export(compute_slack)
+export(compute_super_efficiency)
 export(create_matrix)
+export(get_peers)
 export(runPioneeR)
 export(run_pioneer)
 export(summary_tbl_dea)

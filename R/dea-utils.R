@@ -71,26 +71,26 @@ compute_scale_efficiency <- function(
   orientation <- match.arg(orientation)
 
   # Run DEA models
-  crs_mod <- Benchmarking::dea(x, y, RTS = 'crs', ORIENTATION = orientation)
-  vrs_mod <- Benchmarking::dea(x, y, RTS = 'vrs', ORIENTATION = orientation)
-  nirs_mod <- Benchmarking::dea(x, y, RTS = 'drs', ORIENTATION = orientation)
+  crs_mod <- compute_efficiency(x, y, type = 'crs', orientation = orientation)$values
+  vrs_mod <- compute_efficiency(x, y, type = 'vrs', orientation = orientation)$values
+  nirs_mod <- compute_efficiency(x, y, type = 'drs', orientation = orientation)$values
 
   # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
   # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When
   # the CRS and VRS models differ, and the ratio of the NIRS and VRS models is *not*
   # equal to 1, the unit should increase its size.
-  equal_crs_vrs <- round(crs_mod$eff, 6L) == round(vrs_mod$eff, 6L)
+  equal_crs_vrs <- round(crs_mod, 6L) == round(vrs_mod, 6L)
   optimal_scale <- ifelse(
     !equal_crs_vrs,
-    ifelse(vrs_mod$eff / nirs_mod$eff == 1, 'Decrease', 'Increase'),
+    ifelse(vrs_mod / nirs_mod == 1, 'Decrease', 'Increase'),
     '-'
   )
 
   out_mod <- data.frame(
-    'CRS' = crs_mod$eff,
-    'VRS' = vrs_mod$eff,
-    'Scale.eff.' = crs_mod$eff / vrs_mod$eff,
-    'VRS.NIRS.ratio' = vrs_mod$eff / nirs_mod$eff
+    'CRS' = crs_mod,
+    'VRS' = vrs_mod,
+    'Scale.eff.' = crs_mod / vrs_mod,
+    'VRS.NIRS.ratio' = vrs_mod / nirs_mod
   )
 
   if (!is.null(digits) || is.numeric(digits)) {
@@ -106,4 +106,53 @@ compute_scale_efficiency <- function(
 
   out_mod
 
+}
+
+#' check_data
+#' @noRd
+check_data <- function(x, y, xref = NULL, yref = NULL) {
+  check_numeric(x, y)
+  check_nunits(x, y)
+  if (!is.null(xref) || !is.null(yref)) {
+    if (ncol(xref) != ncol(x)) {
+      msg <- c('Inconsistent number of input variables:' ,
+               'x' = "You've supplied are {ncol(x)} column(s) for `x` and {ncol(xref)} column(s) for `xref`.")
+      cli::cli_abort(msg)
+    }
+    if (ncol(yref) != ncol(y)) {
+      msg <- c('Inconsistent number of output variables:' ,
+               'x' = "You've supplied are {ncol(y)} column(s) for `y` and {ncol(yref)} column(s) for `yref`.")
+      cli::cli_abort(msg)
+    }
+    check_numeric(xref, yref)
+    check_nunits(xref, yref)
+  }
+}
+
+#' check_data
+#' @noRd
+check_numeric <- function(x, y) {
+  check1 <- apply(x, 2, is.numeric)
+  check2 <- apply(y, 2, is.numeric)
+  if (!all(check1)) {
+    cli::cli_abort('All variables must be numeric.')
+  }
+  if (!all(check2)) {
+    cli::cli_abort('All variables must be numeric.')
+  }
+}
+
+#' check_data
+#' @noRd
+check_nunits <- function(x, y, ref = FALSE) {
+  nx <- nrow(x)
+  ny <- nrow(y)
+  if (nx != ny) {
+    if (ref) {
+      msg <- "You've supplied {nrows(x)} rows for `xref` and {nrow(y)} column(s) for `yref`."
+    } else {
+      msg <- "You've supplied {nrows(x)} rows for `x` and {nrow(y)} column(s) for `y`."
+    }
+    cli::cli_abort(c('Inconsistent number of units: ', 'x' = msg))
+  }
 }
