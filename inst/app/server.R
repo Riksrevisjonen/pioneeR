@@ -261,7 +261,8 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      compute_slack(dea.in(), dea.out(), dea.prod()$unadj_values)
+      compute_slack(dea.in(), dea.out(), dea.prod()$unadj_values,
+                    type = model_params$rts, orientation = model_params$orientation)
     }, warning = function(e) {
       NULL
     }, error = function(e) {
