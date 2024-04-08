@@ -543,87 +543,83 @@ shinyServer(function(input, output, session) {
           'Mean efficiency',
           round(mean(eff), 3),
           theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
-          ),
+        ),
         value_box(
           'Weighted efficiency',
           round(sum_eff, 3),
           theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
-          ),
+        ),
         value_box(
           'Efficiency potential',
           paste0(n_DMUs, " %"),
           theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
-          ),
+        ),
         value_box(
           'Number of DMUs',
           n_DMUs,
           theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
-          ),
+        ),
         value_box(
           'Number of DMUs',
           n_DMUs,
           theme = value_box_theme(bg = "#183271", fg = "#e9f8ff")
-          )
         )
       )
+    )
 
   })
 
   #### Distribution plot#####
 
-raincloud <- reactive({
+  raincloud <- reactive({
 
-  req(data(), params()$inputs, params()$outputs)
+    req(data(), params()$inputs, params()$outputs)
 
-  d <- dea_plot_df()
+    d <- dea_plot_df()
 
-  p <- d |>
-    ggplot(aes(x = eff)) +
-    ggdist::stat_halfeye(
-      adjust = .5,
-      width = .2,
-      .width = 0,
-      height = 0.7,
-      justification = -.2,
-      point_colour = NA,
-      show.legend = FALSE,
-      fill = "#E20046",
-      color = "black"
-    ) +
-    geom_boxplot(
-      width = .12,
-      outlier.shape = NA,
-      show.legend = FALSE,
-      alpha = 0.9,
-      fill = "#4292c6",
-      color = "black"
-    ) +
-    stat_dots(side = "bottom",
-              justification = 1.3,
-              position = "dodgejust",
-              color = "black",
-              fill = "black",
-              height = 0.8,
-              scale = 0.8) +
-    theme_pioneer() +
-    scale_x_continuous(breaks = seq(0,1,0.1)) +
-    labs(x = "Efficiency score",
-         y = "Density") +
-    theme(panel.grid.major.x = element_line("#183271",
-                                            linetype = "dotted"),
-          panel.grid.major.y = element_blank(),
-          axis.text.y = element_blank(),
-          axis.text.x = element_text(color = "#182371",
-                                     size = 15),
-          axis.title = element_text(color = "#182371",
-                                    size = 20,
-                                    face= "bold"))
+    p <- d |>
+      ggplot(aes(x = eff)) +
+      ggdist::stat_halfeye(
+        adjust = .5,
+        width = .2,
+        .width = 0,
+        height = 0.7,
+        justification = -.2,
+        point_colour = NA,
+        show.legend = FALSE,
+        fill = "#E20046",
+        color = "black"
+      ) +
+      geom_boxplot(
+        width = .12,
+        outlier.shape = NA,
+        show.legend = FALSE,
+        alpha = 0.9,
+        fill = "#4292c6",
+        color = "black"
+      ) +
+      stat_dots(side = "bottom",
+                justification = 1.3,
+                position = "dodgejust",
+                color = "black",
+                fill = "black",
+                height = 0.8,
+                scale = 0.8) +
+      theme_pioneer() +
+      scale_x_continuous(breaks = seq(0,1,0.1)) +
+      labs(x = "Efficiency score",
+           y = "Density") +
+      theme(panel.grid.major.x = element_line("#183271", linetype = "dotted"),
+            panel.grid.major.y = element_blank(),
+            axis.text.y = element_blank(),
+            axis.text.x = element_text(color = "#182371", size = 15),
+            axis.title = element_text(color = "#182371", size = 20, face= "bold"))
 
-  return(p)
+    return(p)
 
-})
+  })
 
-output$raincloud_plot <- renderPlot({
+  output$raincloud_plot <- renderPlot({
     g <- raincloud()
     g
   })
@@ -755,6 +751,11 @@ output$eff_histogram <- renderPlot({
       colnames(df)[which(colnames(df) == 'ins')] <- 'Inputs'
     if (input$show.out == 'comb')
       colnames(df)[which(colnames(df) == 'outs')] <- 'Outputs'
+
+    if (input$do_bootstrap && input$dea_rts %in% c('crs', 'vrs')) {
+      boot <- dea_boostrap()
+      df <- cbind(df, data.frame(round(boot$tbl, input$dea_round)))
+    }
 
     return(df)
 
@@ -991,17 +992,24 @@ output$eff_histogram <- renderPlot({
   # ---- Bootstrap ----
 
   dea_boostrap <- reactive({
-    if (input$run_boot == 0)
-      return()
-    rts <- isolate(model_params$rts)
-    orientation <- isolate(model_params$orientation)
+    # if (input$run_boot == 0)
+    #   return()
+    # rts <- isolate(model_params$rts)
+    # orientation <- isolate(model_params$orientation)
+    rts <- model_params$rts
+    orientation <- model_params$orientation
     # Set up bootstrap params
-    b <- isolate(input$boot_b)
-    bw_rule <- isolate(input$boot_bw)
-    alpha <- isolate(as.numeric(input$boot_alpha))
+    # b <- isolate(input$boot_b)
+    # bw_rule <- isolate(input$boot_bw)
+    # alpha <- isolate(as.numeric(input$boot_alpha))
+    b <- input$boot_b
+    bw_rule <- input$boot_bw
+    alpha <- as.numeric(input$boot_alpha)
 
-    x <- isolate(dea.in())
-    y <- isolate(dea.out())
+    # x <- isolate(dea.in())
+    # y <- isolate(dea.out())
+    x <- dea.in()
+    y <- dea.out()
 
     withProgress(message = 'Running', value = 0, {
       theta <- isolate(as.vector(dea.prod()$eff))
