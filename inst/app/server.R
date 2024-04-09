@@ -379,7 +379,7 @@ shinyServer(function(input, output, session) {
 
   dea_scaleeff <- reactive({
 
-    out <- compute_scale_efficiency(dea.in(), dea.out(), model_params$orientation, 4L)
+    out <- compute_scale_efficiency(dea.in(), dea.out(), model_params$orientation, input$dea_round)
     out
 
   })
