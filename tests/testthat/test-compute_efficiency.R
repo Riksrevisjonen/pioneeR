@@ -1,3 +1,6 @@
+# Benchmarking results
+benchmarking_results <- readRDS('../testdata/benchmarking-results.RDS')
+
 # Frontier 4.1
 frontier41 <- readRDS('../testdata/frontier41.RDS')
 f41_x <- as.matrix(frontier41[c('capital', 'labour')])
@@ -11,165 +14,330 @@ nc_y <- as.matrix(norCourts2018[c(
   'criminal_case_full_bench',
   'other_civil_cases')])
 
+# Electric Plants
+electricPlants <- readRDS('../testdata/electricPlants.RDS')
+ecp_x <- as.matrix(electricPlants[c('labor', 'fuel', 'capital')])
+ecp_y <- as.matrix(electricPlants[c('output')])
+
+# Hospitals
+hospitals <- readRDS('../testdata/hospitals.RDS')
+hp_x <- as.matrix(hospitals[c('labor', 'capital')])
+hp_y <- as.matrix(hospitals[c('inpatients', 'outpatients')])
+
+test_that('compute_efficiency() returns the correct structure', {
+
+  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'out')
+  # class
+  expect_identical(class(res), 'list')
+  # object names
+  expect_identical(names(res), c('values', 'unadj_values', 'lambda', 'info'))
+  expect_identical(names(res$info), c('type', 'orientation', 'dims'))
+  expect_identical(names(res$info$dims), c('n_inputs', 'n_outputs', 'n_units', 'n_constraints', 'n_vars', 'n_lambda'))
+  expect_identical(res$info$type, 'vrs')
+  expect_identical(res$info$orientation, 'out')
+  # dimensions (dim object)
+  expect_equal(res$info$dims$n_units, nrow(f41_x))
+  expect_equal(res$info$dims$n_inputs, ncol(f41_x))
+  expect_equal(res$info$dims$n_outputs, ncol(f41_y))
+  # dimensions (values)
+  expect_equal(length(res$values), nrow(f41_x))
+  expect_equal(length(res$unadj_values), nrow(f41_x))
+  expect_equal(nrow(res$lambda), nrow(f41_x))
+  expect_equal(ncol(res$lambda), nrow(f41_x))
+
+  # values_only = TRUE
+  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'out', values_only = TRUE)
+  expect_identical(class(res), 'list')
+  expect_identical(names(res), c('values'))
+
+})
+
 test_that('compute_efficiency() works for CRS', {
 
-  # orientation in
-  res <- compute_efficiency(f41_x, f41_y, type = 'crs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'crs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
-
-  # orientation out
-  res <- compute_efficiency(f41_x, f41_y, type = 'crs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'crs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  # --- Frontier 4.1 data --- #
 
   # orientation in
-  res <- compute_efficiency(nc_x, nc_y, type = 'crs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'crs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$in_crs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'crs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
   # orientation out
-  res <- compute_efficiency(nc_x, nc_y, type = 'crs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'crs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$out_crs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'crs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Norwegian District Courts --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$norCourts2018$in_crs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'crs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$norCourts2018$out_crs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'crs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Hospitals --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$hospitals$in_crs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'crs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$hospitals$out_crs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'crs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Electric Plants --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$electricPlants$in_crs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'crs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$electricPlants$out_crs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'crs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
 })
 
 test_that('compute_efficiency() works for VRS', {
 
-  # orientation in
-  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'vrs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
-
-  # orientation out
-  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'vrs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
-
-  # Real data
+  # --- Frontier 4.1 data --- #
 
   # orientation in
-  res <- compute_efficiency(nc_x, nc_y, type = 'vrs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'vrs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$in_vrs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
   # orientation out
-  res <- compute_efficiency(nc_x, nc_y, type = 'vrs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'vrs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$out_vrs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'vrs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Norwegian District Courts --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$norCourts2018$in_vrs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'vrs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$norCourts2018$out_vrs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'vrs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Hospitals --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$hospitals$in_vrs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'vrs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$hospitals$out_vrs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'vrs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Electric Plants --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$electricPlants$in_vrs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'vrs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$electricPlants$out_vrs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'vrs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
 
 })
 
 test_that('compute_efficiency() works for IRS', {
 
-  # orientation in
-  res <- compute_efficiency(f41_x, f41_y, type = 'irs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'irs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
-
-  # orientation out
-  res <- compute_efficiency(f41_x, f41_y, type = 'irs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'irs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  # --- Frontier 4.1 data --- #
 
   # orientation in
-  res <- compute_efficiency(nc_x, nc_y, type = 'irs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'irs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$in_irs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'irs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
   # orientation out
-  res <- compute_efficiency(nc_x, nc_y, type = 'irs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'irs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$out_irs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'irs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Norwegian District Courts --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$norCourts2018$in_irs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'irs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$norCourts2018$out_irs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'irs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Hospitals --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$hospitals$in_irs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'irs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$hospitals$out_irs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'irs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Electric Plants --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$electricPlants$in_irs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'irs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$electricPlants$out_irs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'irs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
 
 })
 
 test_that('compute_efficiency() works for DRS', {
 
-  # orientation in
-  res <- compute_efficiency(f41_x, f41_y, type = 'drs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'drs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
-
-  # orientation out
-  res <- compute_efficiency(f41_x, f41_y, type = 'drs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(f41_x, f41_y, RTS = 'drs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  # --- Frontier 4.1 data --- #
 
   # orientation in
-  res <- compute_efficiency(nc_x, nc_y, type = 'drs', orientation = 'in', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'drs', ORIENTATION = 'in')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$in_drs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'drs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
   # orientation out
-  res <- compute_efficiency(nc_x, nc_y, type = 'drs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(nc_x, nc_y, RTS = 'drs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$frontier41$out_drs$efficiency
+  res <- compute_efficiency(f41_x, f41_y, type = 'drs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Norwegian District Courts --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$norCourts2018$in_drs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'drs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$norCourts2018$out_drs$efficiency
+  res <- compute_efficiency(nc_x, nc_y, type = 'drs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Hospitals --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$hospitals$in_drs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'drs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$hospitals$out_drs$efficiency
+  res <- compute_efficiency(hp_x, hp_y, type = 'drs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # --- Electric Plants --- #
+
+  # orientation in
+  bench_res <- benchmarking_results$electricPlants$in_drs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'drs', orientation = 'in')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
+
+  # orientation out
+  bench_res <- benchmarking_results$electricPlants$out_drs$efficiency
+  res <- compute_efficiency(ecp_x, ecp_y, type = 'drs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
 })
 
 test_that('compute_efficiency() works when a reference techology set is used', {
 
   # Simple example (taken from https://pystoned.readthedocs.io/en/latest/examples/DEA/dea_ref.html)
-  x <- as.matrix(c(100,200,300,500,100,200,600,400,550,600))
-  y <- as.matrix(c(75,100,300,400,25,50,400,260,180,240))
-  xref <- as.matrix(c(100,300,500,100,600))
-  yref <- as.matrix(c(75,300,400,25,400))
+  x <- as.matrix(c(100, 200, 300, 500, 100, 200, 600, 400, 550, 600))
+  y <- as.matrix(c(75, 100, 300, 400, 25, 50, 400, 260, 180, 240))
+  xref <- as.matrix(c(100, 300, 500, 100, 600))
+  yref <- as.matrix(c(75, 300, 400, 25, 400))
 
-  res <- compute_efficiency(x, y, xref, yref, type = 'vrs', orientation = 'out', digits = NULL)
-  res2 <- Benchmarking::dea(x, y, XREF = xref, YREF = yref, RTS = 'vrs', ORIENTATION = 'out')
-  dimnames(res2$lambda) <- NULL
-  expect_equal(res$values, res2$eff) # efficiency
-  expect_equal(res$unadj_values, res2$objval) # unadjusted efficiency
-  expect_equal(res$lambda, res2$lambda) # lambda
+  bench_res <- benchmarking_results$simple$out_vrs$efficiency
+  res <- compute_efficiency(x, y, xref, yref, type = 'vrs', orientation = 'out')
+  expect_equal(res$values, bench_res$eff) # efficiency
+  expect_equal(res$unadj_values, bench_res$objval) # unadjusted efficiency
+  expect_equal(res$lambda, bench_res$lambda) # lambda
 
 })

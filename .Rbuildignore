@@ -11,3 +11,4 @@ dev
 ^CONTRIBUTING.md$
 ^DOCKERFILE$
 ^README.Rmd$
+^tests/script

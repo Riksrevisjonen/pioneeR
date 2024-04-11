@@ -25,6 +25,13 @@ summary_tbl_dea.Farrell <- function(x) {
   summary_tbl_dea(eff)
 }
 
+#' @method summary_tbl_dea pioneer_dea
+#' @export
+summary_tbl_dea.pioneer_dea <- function(x) {
+  eff <- x$results$efficiency
+  summary_tbl_dea(eff)
+}
+
 #' @method summary_tbl_dea numeric
 #' @export
 summary_tbl_dea.numeric <- function(x) {

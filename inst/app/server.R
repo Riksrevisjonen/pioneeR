@@ -261,8 +261,7 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      compute_slack(dea.in(), dea.out(), dea.prod()$unadj_values,
-                    type = model_params$rts, orientation = model_params$orientation)
+      compute_slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -903,13 +902,13 @@ shinyServer(function(input, output, session) {
     df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
-        eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
-        bias = colDef(show = input$boot_show_bias, name = 'Bias'),
-        eff_bc = colDef(name = 'Bias corr. score'),
-        lower = colDef(name = 'Lower bound'),
-        upper = colDef(name = 'Upper bound'),
-        range = colDef(name = 'CI range')
-      )
+      eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
+      bias = colDef(show = input$boot_show_bias, name = 'Bias'),
+      eff_bc = colDef(name = 'Bias corr. score'),
+      lower = colDef(name = 'Lower bound'),
+      upper = colDef(name = 'Upper bound'),
+      range = colDef(name = 'CI range')
+    )
     )
     tbl <- do.call(reactable, opts)
 

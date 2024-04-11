@@ -1,11 +1,20 @@
 # pioneeR 0.3.0.9000
 
-- Fixed bug where checkbox for timeseries would be available before any data is uploaded (#74)
+## Changes & improvements
+
 - Updated documentation for `run_pioneer()`
+- Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
+- `create_matrix()` has been deprecated. It will be removed in a future release. (#80)
+- The current version of `compute_scale_efficiency()` has been deprecated. It will receive breaking changes in a future release. (#80)
+
+## Bug fixes
+
+- Fixed bug where checkbox for timeseries would be available before any data is uploaded (#74)
+- Fixed a few bugs where the UI did not correctly reflect the user supplied input for rounding (#84)
 
 # pioneeR 0.3.0
 
-## Breaking changes:
+## Breaking changes
 
 - pioneeR now depends on bslib 0.5.1 or higher. Version 0.6.0 or higher is recommended, and support for version 0.5.1 will be deprecated in the next release
 

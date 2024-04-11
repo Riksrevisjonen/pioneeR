@@ -3,13 +3,13 @@ Title: Perform productivity analyses in a web browser
 Version: 0.3.0.9000
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
+    person("Aleksander", "Eilertsen", role = "aut", email = "ale@riksrevisjonen.no"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),
     person("Lars Skaage", "Engebretsen", role = "ctb", email = "lse@riksrevisjonen.no"),
     person("Jonas", "Månsson", role = "ctb", email = "jonas.mansson@riksrevisjonen.no"),
-    person("Aleksander", "Eilertsen", role = "ctb", email = "ale@riksrevisjonen.no"),
     person("Joachim", "Sandnes", role = "ctb", email = "jsn@riksrevisjonen.no"),
     person(family = "Riksrevisjonen", role = "cph"))
-Description: What the package does (one paragraph).
+Description: Application to conduct productivity and efficiency (DEA) analysis. 
 License: GPL-3 | file LICENSE
 URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
 BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
@@ -25,17 +25,19 @@ Imports:
     writexl,
     bslib (>= 0.5.1),
     ggplot2 (>= 3.3.0),
-    reactable (>= 0.4.0)
+    reactable (>= 0.4.0),
+    cli (>= 3.6.0),
+    lifecycle (>= 1.0.0)
 Suggests:
     Benchmarking (>= 0.30),
-    cli,
     data.table,
     rmarkdown,
     knitr,
     scales,
     rlang,
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    withr
 Language: en-GB
 Encoding: UTF-8
 LazyData: true

@@ -16,6 +16,9 @@ create_matrix(df, columns, id, normalize = FALSE)
 \item{normalize}{If \code{TRUE}, all columns will be normalized with a mean of 1}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
+}
+\details{
 Create a matrix for input or output variables that can be used in DEA models
 from a supplied data.frame
 }

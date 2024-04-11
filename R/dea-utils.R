@@ -8,8 +8,13 @@
 #' @param id The name of the column with the DMU IDs
 #' @param normalize If `TRUE`, all columns will be normalized with a mean of 1
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
 #' @export
 create_matrix <- function(df, columns, id, normalize = FALSE) {
+  lifecycle::deprecate_warn(
+    '0.4.0', 'create_matrix()',
+    details = 'create_matrix() is no longer needed and will be removed in the next release.')
   if (!inherits(df, 'data.frame')) {
     cli::cli_abort('You must provide a valid data.frame')
   }
@@ -42,8 +47,11 @@ compute_scale_efficiency <- function(
     x,
     y,
     orientation = c('in', 'out'),
-    digits = NULL)
-{
+    digits = NULL) {
+
+  lifecycle::deprecate_warn(
+    '0.4.0', 'compute_scale_efficiency()',
+    details = 'compute_scale_efficiency() will be re-structured and receive breaking changes in a future release.')
 
   if (!is.matrix(x)) {
     cli::cli_abort('inputs must be a matrix of input values')
@@ -71,9 +79,9 @@ compute_scale_efficiency <- function(
   orientation <- match.arg(orientation)
 
   # Run DEA models
-  crs_mod <- compute_efficiency(x, y, type = 'crs', orientation = orientation)$values
-  vrs_mod <- compute_efficiency(x, y, type = 'vrs', orientation = orientation)$values
-  nirs_mod <- compute_efficiency(x, y, type = 'drs', orientation = orientation)$values
+  crs_mod <- compute_efficiency(x, y, type = 'crs', orientation = orientation, values_only = TRUE)$values
+  vrs_mod <- compute_efficiency(x, y, type = 'vrs', orientation = orientation, values_only = TRUE)$values
+  nirs_mod <- compute_efficiency(x, y, type = 'drs', orientation = orientation, values_only = TRUE)$values
 
   # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
   # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When
@@ -132,12 +140,8 @@ check_data <- function(x, y, xref = NULL, yref = NULL) {
 #' check_data
 #' @noRd
 check_numeric <- function(x, y) {
-  check1 <- apply(x, 2, is.numeric)
-  check2 <- apply(y, 2, is.numeric)
-  if (!all(check1)) {
-    cli::cli_abort('All variables must be numeric.')
-  }
-  if (!all(check2)) {
+  chk <- apply(cbind(x, y), 2, is.numeric)
+  if (any(!chk)) {
     cli::cli_abort('All variables must be numeric.')
   }
 }
@@ -155,4 +159,40 @@ check_nunits <- function(x, y, ref = FALSE) {
     }
     cli::cli_abort(c('Inconsistent number of units: ', 'x' = msg))
   }
+}
+
+#' create_dea_output
+#' @noRd
+create_dea_output <- function(res, type, orientation, dims, values_only) {
+  if (values_only) {
+    res <- list(values = res$values)
+  } else {
+    res$info <- create_model_info(type, orientation, dims)
+  }
+  res
+}
+
+#' create_model_info
+#' @noRd
+create_model_info <- function(type, orientation, dims) {
+  list(
+    type = type,
+    orientation = orientation,
+    dims = dims
+  )
+}
+
+#' round_numeric
+#' @noRd
+round_numeric <- function(df, digits = 4L) {
+  df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, digits) else x)
+  df
+}
+
+#' pioneer_dea print method
+#' @noRd
+print.pioneer_dea <- function(x, ...) {
+  cat("DEA result:\n")
+  # x$results <- round_numeric(x$results, 4L)
+  utils::str(x)
 }

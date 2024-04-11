@@ -44,16 +44,14 @@ create_lp <- function(x, y,
       n_lambda = n_lambda,
       slack = slack)
   }
-  return(lp)
+  lp
 }
-
 
 #' Create linear program
 #' @inheritParams create_lp
 #' @noRd
 create_lp_ <- function(x, y, type, orientation, m, n, n_units, n_constraints,
                        n_vars, n_lambda, slack) {
-
   lp <- lpSolveAPI::make.lp(n_constraints, n_vars)
   if (slack) {
     lpSolveAPI::set.objfn(lp, rep(1, m + n), 1:(m + n))
@@ -66,9 +64,10 @@ create_lp_ <- function(x, y, type, orientation, m, n, n_units, n_constraints,
     if (orientation == 'out') lpSolveAPI::lp.control(lp, sense = 'max')
   }
   lpSolveAPI::lp.control(lp, scaling = c('range', 'equilibrate', 'integers'))
-  lp <- set_lp_constraints(lp, x, y, type, m = m, n = n, n_units = n_units,
-                           n_vars = n_vars, slack = slack)
-  return(lp)
+  lp <- set_lp_constraints(
+    lp, x, y, type, m = m, n = n, n_units = n_units,
+    n_vars = n_vars, slack = slack)
+  lp
 }
 
 #' set_lp_constraints
@@ -87,9 +86,10 @@ set_lp_constraints <- function(lp, x, y, type, m, n, n_units, n_vars, slack) {
     for (h in seq_len(m)) lpSolveAPI::set.row(lp, h, c(0, -x[,h])) # inputs
     for (h in seq_len(n)) lpSolveAPI::set.row(lp, m+h, c(0, y[,h])) # outputs
   }
-  lp <- set_lambda_constraints(lp, type = type, m = m, n = n,
-                               n_units = n_units, slack = slack)
-  return(lp)
+  lp <- set_lambda_constraints(
+    lp, type = type, m = m, n = n,
+    n_units = n_units, slack = slack)
+  lp
 }
 
 #' set_lambda_constraints
@@ -116,23 +116,20 @@ set_lambda_constraints <- function(lp, type, m, n, n_units, slack){
       if (slack) lpSolveAPI::set.constr.type(lp, '>=', l1)
     }
   }
-  return(lp)
+  lp
 }
 
 #' solve_lp
 #' @inheritParams create_lp
 #' @noRd
 solve_lp <- function(lp, x, y, orientation, m, n) {
-
   # Solve LP for each row
   dl <- mapply(\(x, y) {
     solve_lp_single(x, y, lp, orientation, m = m, n = n)
   }, x = asplit(x, 1), y = asplit(y, 1))
-
   values <- vapply(dl, \(x) x$value, FUN.VALUE = numeric(1))
   lambda <- do.call('rbind', lapply(dl, \(x) x$solution)) |> as.matrix()
   eps <- lpSolveAPI::lp.control(lp)$epsilon['epsint']
-
   list(
     values = values,
     lambda = lambda,
@@ -161,7 +158,6 @@ solve_lp_single <- function(x, y, lp, orientation, m, n){
 #' @inheritParams create_lp
 #' @noRd
 solve_lp_slack <- function(lp, x, y, values, orientation, m, n, n_units, n_vars) {
-
   if (orientation == 'in') {
     e_values <- values
     f_values <- rep(1, n_units)
@@ -176,7 +172,6 @@ solve_lp_slack <- function(lp, x, y, values, orientation, m, n, n_units, n_vars)
   sx <- matrix(NA_real_, n_units, m)
   sy <- matrix(NA_real_, n_units, n)
   lambda <- matrix(NA_real_, n_units, n_units)
-
   for (i in seq_len(n_units)) {
     lpSolveAPI::set.rhs(lp, rhs[i,], 1:mn)
     lpSolveAPI::set.basis(lp, default=TRUE)
@@ -201,10 +196,7 @@ solve_lp_slack <- function(lp, x, y, values, orientation, m, n, n_units, n_vars)
   }
   colnames(sx) <- paste('sx',1:m,sep='')
   colnames(sy) <- paste('sy',1:n,sep='')
-  #colnames(sx) <- sprintf('slack_x_%s', colnames(x))
-  #colnames(sy) <- sprintf('slack_y_%s', colnames(y))
-
-  out <- list(
+  list(
     lp = lp,
     values = values,
     sx = sx,
@@ -232,52 +224,31 @@ scale_vars <- function(x, y, m, n, n_units) {
 
 #' adjust_values
 #' @noRd
-adjust_values <- function(unadj_values, lambda, eps, digits = NULL) {
+adjust_values <- function(unadj_values, lambda, eps) {
   # efficiency scores close to 1 are converted to 1
   values <- adjust_efficiency(unadj_values, eps)
   # lambda values close to 0 and 1 are converted to 0 and 1 respectively
   lambda <- adjust_lambda(lambda, eps)
-  # round digits
-  if (!is.null(digits)) {
-    values <- round(values, digits)
-    unadj_values <- round(unadj_values, digits)
-    lambda <- round(lambda, digits)
-  }
-  out <- list(
+  list(
     values = values,
     unadj_values = unadj_values,
     lambda = lambda)
-  return(out)
 }
 
 #' adjust_slack
 #' @noRd
-adjust_slack <- function(lp, values, sx, sy, lambda, scaling, m, n, n_units, digits = NULL){
-  # For at undgaa at regneunoejagtigheder giver ikke-nul slack bliver
-  # slack sat til nul hvis de er mindre end den relative noejagitghed
-  # i input og output, noejagtighed der er i beregningerne.  Det
-  # betyder at sum af slacks bliver sum mens objval er sum plus
-  # regneunoejagtighed som giver en forskel hvis X er meget stoerre
-  # eller mindre end 1.
+adjust_slack <- function(lp, values, sx, sy, lambda, scaling, m, n, n_units){
   lpcontr <- lpSolveAPI::lp.control(lp)
   eps <- lpcontr$epsilon['epsint']
   lambda <- adjust_lambda(lambda, eps)
-  sx[abs(sx) < eps ] <- 0
-  sy[abs(sy) < eps ] <- 0
+  sx[abs(sx) < eps] <- 0
+  sy[abs(sy) < eps] <- 0
   if (scaling$scale) {
     sx <- sx * matrix(scaling$mmm, nrow=n_units, ncol=m, byrow=TRUE)
     sy <- sy * matrix(scaling$nnn, nrow=n_units, ncol=n, byrow=TRUE)
   }
   sum <- rowSums(sx) + rowSums(sy)
   is_slack <- sum > eps
-  # round digits
-  if (!is.null(digits)) {
-    sum <- round(sum, digits)
-    values <- round(values, digits)
-    lambda <- round(lambda, digits)
-    sx <- round(sx, digits)
-    sy <- round(sy, digits)
-  }
   list(values = sum,
        unadj_values = values,
        lambda = lambda,
@@ -289,7 +260,7 @@ adjust_slack <- function(lp, values, sx, sy, lambda, scaling, m, n, n_units, dig
 #' @noRd
 adjust_efficiency <- function(x, eps){
   x[abs(x-1) < eps] <- 1
-  return(x)
+  x
 }
 
 #' adjust_lambda
@@ -297,21 +268,19 @@ adjust_efficiency <- function(x, eps){
 adjust_lambda <- function(x, eps) {
   x[abs(x-1) < eps] <- 1   # 'lambda' close to 1 should be 1
   x[abs(x) < eps] <- 0     # 'lambda' close to 0 should be 0
-  return(x)
+  x
 }
 
 #' Get model dimensions
 #' @inheritParams create_lp
 #' @noRd
 get_dims <- function(x, y, xref = NULL, yref = NULL, type, slack = FALSE) {
-  # type <- match.arg(type)
   n_inputs <- ncol(x)
   n_outputs <- ncol(y)
-  #n_units <- nrow(x)
-  if (!is.null(xref)) n_units <- nrow(xref) else n_units <- nrow(x)
+  n_units <- if (!is.null(xref)) nrow(xref) else nrow(x)
   if (type == 'crs') {
     n_lambda <- 0
-  } else if (type %in% c('irs', 'drs', 'fdh')) {
+  } else if (type %in% c('irs', 'drs')) {
     n_lambda <- 1
   } else {
     n_lambda <- 2
@@ -331,19 +300,17 @@ get_dims <- function(x, y, xref = NULL, yref = NULL, type, slack = FALSE) {
   )
 }
 
-
 #' get_invalid_objective
 #' @noRd
-get_invalid_objective <- function(status, orientation){
+get_invalid_objective <- function(status, orientation) {
   if (status != 0) {
     if (status == 2 || status == 3) {
       # if the unit is not in the technology set the value to Inf
-      if (orientation == 'in') value <- Inf else value <- -Inf
+      if (orientation == 'in') return(Inf) else return(-Inf)
     } else {
-      value <- NA_real_
+      return(NA_real_)
     }
   }
-  return(value)
 }
 
 #' get_lp_objective
