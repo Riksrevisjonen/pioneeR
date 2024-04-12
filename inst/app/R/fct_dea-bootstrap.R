@@ -38,11 +38,11 @@ perform_boot <- function(x, y, rts, orientation, i, h, theta, boot) {
   beta <- bootstrap_sample(theta, h = h)
   if (orientation == 'in') {
     x_ref <- (theta / beta) * x
-    boot[, i] <- compute_efficiency(x, y, type = rts, orientation = orientation, xref = x_ref, yref = y, values_only = TRUE)$values
+    boot[, i] <- pioneeR:::compute_efficiency(x, y, type = rts, orientation = orientation, xref = x_ref, yref = y, values_only = TRUE)$values
   } else if (orientation == 'out') {
     beta <- 1 / beta
     y_ref <- (theta / beta) * y
-    boot[, i] <- compute_efficiency(x, y, type = rts, orientation = orientation, xref = x, yref = y_ref, values_only = TRUE)$values
+    boot[, i] <- pioneeR:::compute_efficiency(x, y, type = rts, orientation = orientation, xref = x, yref = y_ref, values_only = TRUE)$values
   }
   return(invisible(boot))
 }

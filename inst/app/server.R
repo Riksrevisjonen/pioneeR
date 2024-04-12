@@ -251,7 +251,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- compute_efficiency(
+    d <- pioneeR:::compute_efficiency(
       dea.in(), dea.out(), type = model_params$rts,
       orientation = model_params$orientation)
 
@@ -261,7 +261,7 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      compute_slack(dea.in(), dea.out(), dea.prod())
+      pioneeR:::compute_slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -274,7 +274,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- compute_super_efficiency(
+    d <- pioneeR:::compute_super_efficiency(
       dea.in(), dea.out(), type = model_params$rts,
       orientation = model_params$orientation
     )
@@ -632,7 +632,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    df <- get_peers(dea.prod()$lambda, ids = selection()[, input$dea_id], threshold = 0)
+    df <- pioneeR:::get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
