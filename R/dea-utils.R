@@ -49,10 +49,6 @@ compute_scale_efficiency <- function(
     orientation = c('in', 'out'),
     digits = NULL) {
 
-  lifecycle::deprecate_warn(
-    '0.4.0', 'compute_scale_efficiency()',
-    details = 'compute_scale_efficiency() will be re-structured and receive breaking changes in a future release.')
-
   if (!is.matrix(x)) {
     cli::cli_abort('inputs must be a matrix of input values')
   }
