@@ -15,7 +15,6 @@
 #' }
 #' @param orientation Model orientation.
 #' @param super If `TRUE` super efficiency scores are calculated.
-#' @param scale If `TRUE` scale efficiency scores are calculated.
 #' @param slack If `TRUE` slack values are calculated.
 #' @param peers If `TRUE` peers are added to the response.
 #' @return list
@@ -28,7 +27,6 @@ compute_dea <- function(
     rts = c('crs', 'vrs', 'drs', 'irs'),
     orientation = c('in', 'out'),
     super = FALSE,
-    scale = FALSE,
     slack = FALSE,
     peers = FALSE) {
 
@@ -47,7 +45,6 @@ compute_dea <- function(
     rts = rts,
     orientation = orientation,
     super = super,
-    scale = scale,
     slack = slack,
     peers = peers
   )
@@ -61,17 +58,15 @@ compute_dea <- function(
 #' @inheritParams compute_efficiency
 #' @return list
 #' @noRd
-compute_dea_ <- function(x, y, ids, rts, orientation, super, scale, slack, peers) {
+compute_dea_ <- function(x, y, ids, rts, orientation, super, slack, peers) {
 
   # Set initial values
   super_res <- NULL
   slack_res <- NULL
   peers_res <- NULL
-  scale_res <- NULL
 
   eff_res <- compute_efficiency(x, y, rts = rts, orientation = orientation)
   if (super) super_res <- compute_super_efficiency(x, y, rts = rts, orientation = orientation)
-  if (scale) scale_res <- compute_scale_efficiency_internal(x, y, orientation = orientation)
   if (slack) slack_res <- compute_slack(x, y, eff_res)
   if (peers) {
     peers_res <- get_peers(eff_res, ids)
@@ -81,7 +76,6 @@ compute_dea_ <- function(x, y, ids, rts, orientation, super, scale, slack, peers
   res <- list(
     efficiency = eff_res$values,
     super_efficiency = super_res$values,
-    scale_efficiency = scale_res$values,
     slack = slack_res$values
   )
   res <- do.call('cbind', res)

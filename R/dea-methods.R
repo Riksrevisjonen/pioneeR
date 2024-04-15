@@ -158,44 +158,6 @@ compute_slack <- function(x, y, model) {
   res
 }
 
-#' Compute scale efficiency
-#'
-#' Compute DEA scale efficiency scores.
-#'
-#' @inheritParams compute_efficiency
-#' @noRd
-compute_scale_efficiency_internal <- function(x, y, orientation) {
-
-  check_data(x, y)
-  # orientation <- match.arg(orientation)
-
-  # Run DEA models
-  crs_mod <- compute_efficiency(x, y, rts = 'crs', orientation = orientation, values_only = TRUE)$values
-  vrs_mod <- compute_efficiency(x, y, rts = 'vrs', orientation = orientation, values_only = TRUE)$values
-  nirs_mod <- compute_efficiency(x, y, rts = 'drs', orientation = orientation, values_only = TRUE)$values
-
-  # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
-  # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When
-  # the CRS and VRS models differ, and the ratio of the NIRS and VRS models is *not*
-  # equal to 1, the unit should increase its size.
-  equal_crs_vrs <- round(crs_mod, 6L) == round(vrs_mod, 6L)
-  optimal_scale <- ifelse(
-    !equal_crs_vrs,
-    ifelse(vrs_mod / nirs_mod == 1, 'Decrease', 'Increase'),
-    '-'
-  )
-
-  list(
-    values = crs_mod / vrs_mod, # scale efficiency
-    data = data.frame(
-      crs = crs_mod,
-      vrs = vrs_mod,
-      vrs_nirs_ratio = vrs_mod / nirs_mod,
-      optimal_scale_size = optimal_scale
-    )
-  )
-}
-
 #' Get peers
 #'
 #' Get peers for each DMU.

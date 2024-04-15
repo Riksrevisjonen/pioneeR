@@ -12,7 +12,6 @@ compute_dea(
   rts = c("crs", "vrs", "drs", "irs"),
   orientation = c("in", "out"),
   super = FALSE,
-  scale = FALSE,
   slack = FALSE,
   peers = FALSE
 )
@@ -37,8 +36,6 @@ compute_dea(
 \item{orientation}{Model orientation.}
 
 \item{super}{If \code{TRUE} super efficiency scores are calculated.}
-
-\item{scale}{If \code{TRUE} scale efficiency scores are calculated.}
 
 \item{slack}{If \code{TRUE} slack values are calculated.}
 
