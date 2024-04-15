@@ -4,6 +4,7 @@ require(reactable)
 require(bslib)
 
 ver <- utils::packageVersion('pioneeR')
+bs_ver <- 5
 
 sidebar_width <- 400
 

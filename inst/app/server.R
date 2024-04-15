@@ -958,7 +958,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), params()$year)
 
-    df <- checkBalance(selection(), params()$id, params()$year)
+    df <- check_balance(selection(), params()$id, params()$year)
     if (nrow(df$data) == 0) {
       out <- alert(
         color = 'danger', icon = 'danger',
@@ -982,7 +982,7 @@ shinyServer(function(input, output, session) {
 
     req(selection())
 
-    df <- checkBalance(selection(), params()$id, params()$year)
+    df <- check_balance(selection(), params()$id, params()$year)
 
     malmquist <- malm(
       data = df$data, id.var = params()$id, time.var = params()$year,

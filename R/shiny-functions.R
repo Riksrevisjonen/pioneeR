@@ -52,3 +52,29 @@ runPioneeR <- run_pioneer
 #'
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
+
+check_balance <- function(data, id_var, time_var) {
+
+  units <- unique(data[, id_var])
+  time <- unique(data[, time_var])
+
+  miss <- sapply(units, function(u) {
+    unit_time <- unique(df[df[,id_var] == u, time_var])
+    all(sapply(time, function(t) t %in% unit_time))
+  })
+
+  r <- list()
+
+  if (!all(miss)) {
+    r$data <- df[df[,id_var] %in% units[miss],]
+    r$listwise <- TRUE
+    r$message <- 'Data was not balanced, listwise deleting has been performed'
+  } else {
+    r$data <- df
+    r$listwise <- FALSE
+    r$message <- NULL
+  }
+
+  return(r)
+
+}
