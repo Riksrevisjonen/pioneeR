@@ -4,8 +4,6 @@
 
 - Updated documentation for `run_pioneer()`
 - Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
-- `create_matrix()` has been deprecated. It will be removed in a future release. (#80)
-- The current version of `compute_scale_efficiency()` has been deprecated. It will receive breaking changes in a future release. (#80)
 
 ## Bug fixes
 
