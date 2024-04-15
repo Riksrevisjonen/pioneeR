@@ -3,13 +3,13 @@ Title: Perform productivity analyses in a web browser
 Version: 0.3.0.9000
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
+    person("Aleksander", "Eilertsen", role = "aut", email = "ale@riksrevisjonen.no"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),
     person("Lars Skaage", "Engebretsen", role = "ctb", email = "lse@riksrevisjonen.no"),
     person("Jonas", "Månsson", role = "ctb", email = "jonas.mansson@riksrevisjonen.no"),
-    person("Aleksander", "Eilertsen", role = "ctb", email = "ale@riksrevisjonen.no"),
     person("Joachim", "Sandnes", role = "ctb", email = "jsn@riksrevisjonen.no"),
     person(family = "Riksrevisjonen", role = "cph"))
-Description: What the package does (one paragraph).
+Description: Application to conduct productivity and efficiency (DEA) analysis. 
 License: GPL-3 | file LICENSE
 URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
 BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
@@ -17,7 +17,7 @@ Depends:
     R (>= 4.1.0),
     shiny (>= 1.7.0)
 Imports:
-    Benchmarking (>= 0.30),
+    lpSolveAPI (>= 5.5.2),
     haven (>= 2.5.0),
     markdown,
     productivity (>= 1.1.0),
@@ -25,22 +25,22 @@ Imports:
     writexl,
     bslib (>= 0.5.1),
     ggplot2 (>= 3.3.0),
-    reactable (>= 0.4.0)
+    reactable (>= 0.4.0),
+    cli (>= 3.6.0)
 Suggests:
-    cli,
+    Benchmarking (>= 0.30),
     data.table,
-    lpSolve,
-    lpSolveAPI,
     rmarkdown,
     knitr,
     scales,
     rlang,
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    withr
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 Config/testthat/edition: 3

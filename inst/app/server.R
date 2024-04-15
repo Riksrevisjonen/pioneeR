@@ -1,9 +1,6 @@
 # Load required packages
 require(readxl)
 require(ucminf)
-require(lpSolveAPI)
-require(lpSolve)
-require(Benchmarking)
 require(productivity)
 require(ggplot2)
 require(scales)
@@ -254,9 +251,9 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- Benchmarking::dea(
-      dea.in(), dea.out(), RTS = model_params$rts,
-      ORIENTATION = model_params$orientation)
+    d <- pioneeR:::compute_efficiency(
+      dea.in(), dea.out(), rts = model_params$rts,
+      orientation = model_params$orientation)
 
     d
 
@@ -264,7 +261,7 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      Benchmarking::slack(dea.in(), dea.out(), dea.prod())
+      pioneeR:::compute_slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -277,9 +274,10 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- Benchmarking::sdea(
-      dea.in(), dea.out(), RTS = model_params$rts,
-      ORIENTATION = model_params$orientation)
+    d <- pioneeR:::compute_super_efficiency(
+      dea.in(), dea.out(), rts = model_params$rts,
+      orientation = model_params$orientation
+    )
 
     d
 
@@ -296,7 +294,7 @@ shinyServer(function(input, output, session) {
     if (is.matrix(x)) x <- rowSums(x)
     if (is.matrix(y)) y <- rowSums(y)
 
-    data.frame(dmu = rownames(dea.in()), x = unname(x), y = unname(y), eff = unname(prod$eff))
+    data.frame(dmu = rownames(dea.in()), x = unname(x), y = unname(y), eff = unname(prod$values))
   })
 
   dea_plot <- reactive({
@@ -380,7 +378,7 @@ shinyServer(function(input, output, session) {
 
   dea_scaleeff <- reactive({
 
-    out <- compute_scale_efficiency(dea.in(), dea.out(), model_params$orientation, 4L)
+    out <- compute_scale_efficiency(dea.in(), dea.out(), model_params$orientation, input$dea_round)
     out
 
   })
@@ -393,7 +391,7 @@ shinyServer(function(input, output, session) {
       dmu = selection()[[params()$id]],
       inputs = sapply(seq_len(nrow(dea.in())), function(i) sum(dea.in()[i,])),
       outputs = sapply(seq_len(nrow(dea.out())), function(i) sum(dea.out()[i,])),
-      eff = dea.prod()$eff,
+      eff = dea.prod()$values,
       stringsAsFactors = FALSE
     )
 
@@ -474,16 +472,15 @@ shinyServer(function(input, output, session) {
 
     req(dea.prod())
 
-    eff_tbl <- summary_tbl_dea(dea.prod())
-    eff <- dea.prod()$eff
-
+    eff <- dea.prod()$values
+    eff_tbl <- summary_tbl_dea(eff)
     if (model_params$orientation == 'in')
       sum_eff <- sum(dea.in() * eff) / sum(dea.in())
     else if (model_params$orientation == 'out')
       sum_eff <- sum(dea.out() * eff) / sum(dea.out())
 
     rts <- switch(
-      dea.prod()$RTS,
+      input$dea_rts,
       crs = 'Constant',
       vrs = 'Variable',
       drs = 'Non-increasing',
@@ -491,7 +488,7 @@ shinyServer(function(input, output, session) {
     )
 
     orient <- switch(
-      dea.prod()$ORIENTATION,
+      input$dea_orientation,
       'in' = 'Input',
       'out' = 'Output'
     )
@@ -582,7 +579,7 @@ shinyServer(function(input, output, session) {
 
   dea.tbl <- reactive({
 
-    deff <- matrix(dea.prod()$eff, ncol = 1, dimnames = list(NULL, 'Efficiency'))
+    deff <- matrix(dea.prod()$values, ncol = 1, dimnames = list(NULL, 'Efficiency'))
 
     # Initialize to NULL
     ins <- outs <- sl <- seff <- NULL
@@ -598,13 +595,13 @@ shinyServer(function(input, output, session) {
       outs <- apply(dea.out(), 1, sum)
 
     if (input$out.slack)
-      sl <- matrix(dea.slack()$sum, ncol = 1, dimnames = list(NULL, 'Slack'))
+      sl <- matrix(dea.slack()$values, ncol = 1, dimnames = list(NULL, 'Slack'))
 
     if (input$out.sdea)
-      seff <- matrix(sdea.prod()$eff, ncol = 1, dimnames = list(NULL, 'sDEA'))
+      seff <- matrix(sdea.prod()$values, ncol = 1, dimnames = list(NULL, 'sDEA'))
 
     df <- data.frame(
-      DMU = names(dea.prod()$eff),
+      DMU = selection()[, input$dea_id],
       round(cbind(ins, outs, deff, sl, seff), input$dea_round),
       stringsAsFactors = FALSE, row.names = NULL
     )
@@ -627,8 +624,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$dea.slack <- renderReactable({
-    sl <- dea.slack()
-    df <- data.frame(round(cbind(sl$sx, sl$sy, sl$sum), 3))
+    df <- round(dea.slack()$data, input$dea_round)
     colnames(df)[ncol(df)] <- 'Total'
 
     opts <- list2(!!!reactable_opts, data = df)
@@ -636,11 +632,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    pr <- dea.prod()
-    pe <- Benchmarking::peers(pr, NAMES = TRUE)
-    df <- data.frame(
-      cbind(selection()[, input$dea_id], pe),
-      stringsAsFactors = FALSE)
+    df <- pioneeR:::get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
@@ -692,13 +684,14 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$save_model, {
     if (length(models()) >= 10) return()
+    # EDIT HERE!
     mod <- dea.prod()
     mod_save <- list(
       id = rand_id(),
       data = data.frame(
-        idx = seq_len(length(mod$eff)),
-        dmu = names(mod$eff),
-        eff = round(unname(mod$eff), input$dea_round)
+        idx = seq_len(length(mod$values)),
+        dmu = selection()[, input$dea_id], #names(mod$eff),
+        eff = round(unname(mod$values), input$dea_round)
       ),
       params = list(
         rts = mod$RTS,
@@ -860,7 +853,7 @@ shinyServer(function(input, output, session) {
     y <- isolate(dea.out())
 
     withProgress(message = 'Running', value = 0, {
-      theta <- isolate(as.vector(dea.prod()$eff))
+      theta <- isolate(as.vector(dea.prod()$values))
       # theta >= 1 if 'out', <= if 'in'
       h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
       boot <- matrix(NA, nrow = nrow(x), ncol = b)
@@ -906,16 +899,16 @@ shinyServer(function(input, output, session) {
       return()
 
     # Add DMU names and round inputs
-    df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+    df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
-        eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
-        bias = colDef(show = input$boot_show_bias, name = 'Bias'),
-        eff_bc = colDef(name = 'Bias corr. score'),
-        lower = colDef(name = 'Lower bound'),
-        upper = colDef(name = 'Upper bound'),
-        range = colDef(name = 'CI range')
-      )
+      eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
+      bias = colDef(show = input$boot_show_bias, name = 'Bias'),
+      eff_bc = colDef(name = 'Bias corr. score'),
+      lower = colDef(name = 'Lower bound'),
+      upper = colDef(name = 'Upper bound'),
+      range = colDef(name = 'CI range')
+    )
     )
     tbl <- do.call(reactable, opts)
 
@@ -945,7 +938,7 @@ shinyServer(function(input, output, session) {
     },
     content = function(file) {
       res <- dea_boostrap()
-      df <- cbind(data.frame(DMU = names(dea.prod()$eff)), round(res$tbl, input$boot_round))
+      df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
       # Export based on chosen file format
       if (input$boot_fileformat == 'dta') {
         colnames(df) <- gsub('\\s', '_', colnames(df))

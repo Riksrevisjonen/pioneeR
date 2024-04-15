@@ -64,12 +64,12 @@ knitr::kable(df)
 The technology for the model is `r mod$rts` and the orientation is `r mod$orient`.
 
 ```{r, echo=FALSE}
-tbl <- summary_tbl_dea(params$model$eff)
+tbl <- summary_tbl_dea(params$model$values)
 knitr::kable(tbl)
 ```
 
 ```{r, echo=FALSE}
-x <- summary(params$model$eff)
+x <- summary(params$model$values)
 x <- data.frame(as.list(x))
 colnames(x) <- gsub('^X', '', colnames(x))
 knitr::kable(x)
@@ -81,7 +81,7 @@ The efficiency scores have been estimated using the `dea` function from the `Ben
 
 ```{r, echo=FALSE}
 d <- data.frame(
-  `Efficiency score` = round(params$model$eff, params$settings$digits),
+  `Efficiency score` = round(params$model$values, params$settings$digits),
   check.names = FALSE
 )
 knitr::kable(d)
@@ -173,26 +173,35 @@ idvar <- params$params$id
 inputs <- c(params$inputs)
 outputs <- c(params$outputs)
 
-x <- create_matrix(df, inputs, idvar, normalize = params$params$normalize)
-y <- create_matrix(df, outputs, idvar, normalize = params$params$normalize)
-
 # Estimate the DEA model
-model <- Benchmarking::dea(
-  x, y, RTS = rts, ORIENTATION = orientation
+model <- compute_dea(
+  df,
+  idvar,
+  inputs,
+  outputs,
+  rts = rts,
+  orientation = orientation
 )
 
 # Print out the summary of the DEA model
 summary_tbl_dea(model)
 
-# Summary statistics for the efficiency scores
-summary(model$eff)
+# Estimate the model with slack and super efficiency
+model <- compute_dea(
+  df,
+  idvar,
+  inputs,
+  outputs,
+  rts = rts,
+  orientation = orientation,
+  slack = TRUE,
+  super = TRUE
+)
 
-# Estimate slack for all DMUs using the DEA model
-slack <- Benchmarking::slack(x, y, model)
-
-# Estimate super efficiency
-super_eff <- Benchmarking::sdea(x, y, RTS = rts, ORIENTATION = orientation)
+# Create input and output matrises for scale efficiency
+x <- create_matrix(df, inputs, idvar, normalize = params$params$normalize)
+y <- create_matrix(df, outputs, idvar, normalize = params$params$normalize)
 
 # Get table for scale efficiency
-compute_scale_efficiency(inputs, outputs, orientation, digits = 4L)
+compute_scale_efficiency(x, y, orientation, digits = 4L)
 ```
