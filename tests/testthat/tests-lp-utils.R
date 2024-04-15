@@ -33,7 +33,7 @@ test_that('get_dims() works correctly', {
   yref <- matrix(5:6, nrow=2, ncol=1)
 
   # crs
-  result <- get_dims(x, y, type = 'crs')
+  result <- get_dims(x, y, rts = 'crs')
   expect_equal(result$n_inputs, 2L)
   expect_equal(result$n_outputs, 1L)
   expect_equal(result$n_units, 3L)
@@ -42,7 +42,7 @@ test_that('get_dims() works correctly', {
   expect_equal(result$n_vars, 4L)
 
   # irs/drs
-  result <- get_dims(x, y, type = 'irs')
+  result <- get_dims(x, y, rts = 'irs')
   expect_equal(result$n_inputs, 2L)
   expect_equal(result$n_outputs, 1L)
   expect_equal(result$n_units, 3L)
@@ -51,7 +51,7 @@ test_that('get_dims() works correctly', {
   expect_equal(result$n_vars, 4L)
 
   # vrs
-  result <- get_dims(x, y, type = 'vrs')
+  result <- get_dims(x, y, rts = 'vrs')
   expect_equal(result$n_inputs, 2L)
   expect_equal(result$n_outputs, 1L)
   expect_equal(result$n_units, 3L)
@@ -60,12 +60,12 @@ test_that('get_dims() works correctly', {
   expect_equal(result$n_vars, 4L)
 
   # xref/yref (only two units here)
-  result <- get_dims(x, y, xref, yref, type = 'crs')
+  result <- get_dims(x, y, xref, yref, rts = 'crs')
   expect_equal(result$n_units, 2L)
   expect_equal(result$n_vars, 3L)
 
   # slack (LP matrix is transposed in this calculation, hence n_vars = n_inputs + n_outputs + n_units)
-  result <- get_dims(x, y, type = 'crs', slack = TRUE)
+  result <- get_dims(x, y, rts = 'crs', slack = TRUE)
   expect_equal(result$n_vars, 6L)
 
 })

@@ -14,16 +14,16 @@ compute_efficiency <- function(
     x, y,
     xref = NULL,
     yref = NULL,
-    type,
+    rts,
     orientation,
     values_only = FALSE) {
   # Get dims
-  dims <- get_dims(x, y, xref, yref, type = type, slack = FALSE)
+  dims <- get_dims(x, y, xref, yref, rts = rts, slack = FALSE)
   # Create linear program model
   lp <- create_lp(
     x = x, y = y,
     xref = xref, yref = yref,
-    type = type,
+    rts = rts,
     orientation = orientation,
     m = dims$n_inputs,
     n = dims$n_outputs,
@@ -42,7 +42,7 @@ compute_efficiency <- function(
   # Return
   res <- create_dea_output(
     res,
-    type = type,
+    rts = rts,
     orientation = orientation,
     dims = dims,
     values_only = values_only)
@@ -57,9 +57,9 @@ compute_efficiency <- function(
 #' @noRd
 compute_super_efficiency <- function(
     x, y,
-    type,
+    rts,
     orientation) {
-  dims <- get_dims(x, y, type = type, slack = FALSE)
+  dims <- get_dims(x, y, rts = rts, slack = FALSE)
   lambda <- matrix(0, dims$n_units, dims$n_units)
   values <- rep(NA_real_, dims$n_units)
   for (i in seq_len(dims$n_units)) {
@@ -67,7 +67,7 @@ compute_super_efficiency <- function(
     lp <- create_lp(
       x[-i,,drop=FALSE],
       y[-i,,drop=FALSE],
-      type = type,
+      rts = rts,
       orientation = orientation,
       m = dims$n_inputs,
       n = dims$n_outputs,
@@ -91,7 +91,7 @@ compute_super_efficiency <- function(
   # Return
   res <- create_dea_output(
     res,
-    type = type,
+    rts = rts,
     orientation = orientation,
     dims = dims,
     values_only = FALSE)
@@ -108,7 +108,7 @@ compute_super_efficiency <- function(
 #' @noRd
 compute_slack <- function(x, y, model) {
   # Get dims
-  dims <- get_dims(x, y, type = model$info$type, slack = TRUE)
+  dims <- get_dims(x, y, rts = model$info$rts, slack = TRUE)
   # Scale inputs and outputs if needed
   scale <- scale_vars(
     x, y,
@@ -118,7 +118,7 @@ compute_slack <- function(x, y, model) {
   # Create linear program model
   lp <- create_lp(
     scale$x, scale$y,
-    type = model$info$type,
+    rts = model$info$rts,
     orientation = model$info$orientation,
     m = dims$n_inputs,
     n = dims$n_outputs,
@@ -151,7 +151,7 @@ compute_slack <- function(x, y, model) {
   # Return
   res <- create_dea_output(
     res,
-    type = model$info$type,
+    rts = model$info$rts,
     orientation = model$info$orientation,
     dims = dims,
     values_only = FALSE)
@@ -170,9 +170,9 @@ compute_scale_efficiency_internal <- function(x, y, orientation) {
   # orientation <- match.arg(orientation)
 
   # Run DEA models
-  crs_mod <- compute_efficiency(x, y, type = 'crs', orientation = orientation, values_only = TRUE)$values
-  vrs_mod <- compute_efficiency(x, y, type = 'vrs', orientation = orientation, values_only = TRUE)$values
-  nirs_mod <- compute_efficiency(x, y, type = 'drs', orientation = orientation, values_only = TRUE)$values
+  crs_mod <- compute_efficiency(x, y, rts = 'crs', orientation = orientation, values_only = TRUE)$values
+  vrs_mod <- compute_efficiency(x, y, rts = 'vrs', orientation = orientation, values_only = TRUE)$values
+  nirs_mod <- compute_efficiency(x, y, rts = 'drs', orientation = orientation, values_only = TRUE)$values
 
   # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
   # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When

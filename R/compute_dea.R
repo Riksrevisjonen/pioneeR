@@ -6,7 +6,7 @@
 #' @param id A string with the DMU id or name variable.
 #' @param input A character vector with input variables.
 #' @param output A character vector with output variables.
-#' @param type Type of model.
+#' @param rts Returns to scale.
 #' \tabular{rlll}{
 #'    \tab crs \tab\tab Constant returns to scale, convexity and free disposability. \cr
 #'    \tab vrs \tab\tab Variable returns to scale, convexity and free disposability. \cr
@@ -25,14 +25,14 @@ compute_dea <- function(
     id,
     input,
     output,
-    type = c('crs', 'vrs', 'drs', 'irs'),
+    rts = c('crs', 'vrs', 'drs', 'irs'),
     orientation = c('in', 'out'),
     super = FALSE,
     scale = FALSE,
     slack = FALSE,
     peers = FALSE) {
 
-  type <- match.arg(type)
+  rts <- match.arg(rts)
   orientation <- match.arg(orientation)
 
   # Prepare and validate input
@@ -44,7 +44,7 @@ compute_dea <- function(
   # Calculate DEA metrics
   res <- compute_dea_(
     x, y, ids,
-    type = type,
+    rts = rts,
     orientation = orientation,
     super = super,
     scale = scale,
@@ -61,7 +61,7 @@ compute_dea <- function(
 #' @inheritParams compute_efficiency
 #' @return list
 #' @noRd
-compute_dea_ <- function(x, y, ids, type, orientation, super, scale, slack, peers) {
+compute_dea_ <- function(x, y, ids, rts, orientation, super, scale, slack, peers) {
 
   # Set initial values
   super_res <- NULL
@@ -69,8 +69,8 @@ compute_dea_ <- function(x, y, ids, type, orientation, super, scale, slack, peer
   peers_res <- NULL
   scale_res <- NULL
 
-  eff_res <- compute_efficiency(x, y, type = type, orientation = orientation)
-  if (super) super_res <- compute_super_efficiency(x, y, type = type, orientation = orientation)
+  eff_res <- compute_efficiency(x, y, rts = rts, orientation = orientation)
+  if (super) super_res <- compute_super_efficiency(x, y, rts = rts, orientation = orientation)
   if (scale) scale_res <- compute_scale_efficiency_internal(x, y, orientation = orientation)
   if (slack) slack_res <- compute_slack(x, y, eff_res)
   if (peers) {

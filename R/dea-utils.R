@@ -70,9 +70,9 @@ compute_scale_efficiency <- function(
   orientation <- match.arg(orientation)
 
   # Run DEA models
-  crs_mod <- compute_efficiency(x, y, type = 'crs', orientation = orientation, values_only = TRUE)$values
-  vrs_mod <- compute_efficiency(x, y, type = 'vrs', orientation = orientation, values_only = TRUE)$values
-  nirs_mod <- compute_efficiency(x, y, type = 'drs', orientation = orientation, values_only = TRUE)$values
+  crs_mod <- compute_efficiency(x, y, rts = 'crs', orientation = orientation, values_only = TRUE)$values
+  vrs_mod <- compute_efficiency(x, y, rts = 'vrs', orientation = orientation, values_only = TRUE)$values
+  nirs_mod <- compute_efficiency(x, y, rts = 'drs', orientation = orientation, values_only = TRUE)$values
 
   # If efficiency scores for a unit differs in the CRS and VRS models and the ratio
   # of the NIRS and VRS models is equal to 1, the unit should decrease its size. When
@@ -154,20 +154,20 @@ check_nunits <- function(x, y, ref = FALSE) {
 
 #' create_dea_output
 #' @noRd
-create_dea_output <- function(res, type, orientation, dims, values_only) {
+create_dea_output <- function(res, rts, orientation, dims, values_only) {
   if (values_only) {
     res <- list(values = res$values)
   } else {
-    res$info <- create_model_info(type, orientation, dims)
+    res$info <- create_model_info(rts, orientation, dims)
   }
   res
 }
 
 #' create_model_info
 #' @noRd
-create_model_info <- function(type, orientation, dims) {
+create_model_info <- function(rts, orientation, dims) {
   list(
-    type = type,
+    rts = rts,
     orientation = orientation,
     dims = dims
   )

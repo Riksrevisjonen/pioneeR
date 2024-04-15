@@ -11,7 +11,7 @@
 create_lp <- function(x, y,
                       xref = NULL,
                       yref = NULL,
-                      type,
+                      rts,
                       orientation,
                       m, n,
                       n_units,
@@ -22,7 +22,7 @@ create_lp <- function(x, y,
   if (is.null(xref) && is.null(yref)) {
     lp <- create_lp_(
       x, y,
-      type = type,
+      rts = rts,
       orientation = orientation,
       m = m,
       n = n,
@@ -34,7 +34,7 @@ create_lp <- function(x, y,
   } else {
     lp <- create_lp_(
       xref, yref,
-      type = type,
+      rts = rts,
       orientation = orientation,
       m = m,
       n = n,
@@ -50,7 +50,7 @@ create_lp <- function(x, y,
 #' Create linear program
 #' @inheritParams create_lp
 #' @noRd
-create_lp_ <- function(x, y, type, orientation, m, n, n_units, n_constraints,
+create_lp_ <- function(x, y, rts, orientation, m, n, n_units, n_constraints,
                        n_vars, n_lambda, slack) {
   lp <- lpSolveAPI::make.lp(n_constraints, n_vars)
   if (slack) {
@@ -65,7 +65,7 @@ create_lp_ <- function(x, y, type, orientation, m, n, n_units, n_constraints,
   }
   lpSolveAPI::lp.control(lp, scaling = c('range', 'equilibrate', 'integers'))
   lp <- set_lp_constraints(
-    lp, x, y, type, m = m, n = n, n_units = n_units,
+    lp, x, y, rts, m = m, n = n, n_units = n_units,
     n_vars = n_vars, slack = slack)
   lp
 }
@@ -74,7 +74,7 @@ create_lp_ <- function(x, y, type, orientation, m, n, n_units, n_constraints,
 #' @param lp An lpSolve linear program model object.
 #' @inheritParams create_lp
 #' @noRd
-set_lp_constraints <- function(lp, x, y, type, m, n, n_units, n_vars, slack) {
+set_lp_constraints <- function(lp, x, y, rts, m, n, n_units, n_vars, slack) {
   if (slack) {
     l1 <- m+n+1
     # Set restrictions on matrix
@@ -87,29 +87,29 @@ set_lp_constraints <- function(lp, x, y, type, m, n, n_units, n_vars, slack) {
     for (h in seq_len(n)) lpSolveAPI::set.row(lp, m+h, c(0, y[,h])) # outputs
   }
   lp <- set_lambda_constraints(
-    lp, type = type, m = m, n = n,
+    lp, rts = rts, m = m, n = n,
     n_units = n_units, slack = slack)
   lp
 }
 
 #' set_lambda_constraints
 #' @noRd
-set_lambda_constraints <- function(lp, type, m, n, n_units, slack){
+set_lambda_constraints <- function(lp, rts, m, n, n_units, slack){
   if (slack) q <- rep(0, m+n) else q <- 0 # Set number of starting zeros
-  if (type != 'crs') {
+  if (rts != 'crs') {
     l1 <- m+n+1; l2 <- m+n+2
-    if (type == 'vrs') {
+    if (rts == 'vrs') {
       # lpSolveAPI::set.row(lp, l1, c(0, rep(-1, n_units)))
       # lpSolveAPI::set.row(lp, l2, c(0, rep(1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(-1, n_units)))
       lpSolveAPI::set.row(lp, l2, c(q, rep(1, n_units)))
       lpSolveAPI::set.rhs(lp, c(-1, 1), l1:l2)
-    } else if (type == 'irs') {
+    } else if (rts == 'irs') {
       # lpSolveAPI::set.row(lp, l1, c(0, rep(1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(1, n_units)))
       lpSolveAPI::set.rhs(lp, 1, l1)
       if (slack) lpSolveAPI::set.constr.type(lp, '>=', l1)
-    } else if (type == 'drs') {
+    } else if (rts == 'drs') {
       # lpSolveAPI::set.row(lp, l1, c(0, rep(-1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(-1, n_units)))
       lpSolveAPI::set.rhs(lp, -1, l1)
@@ -274,13 +274,13 @@ adjust_lambda <- function(x, eps) {
 #' Get model dimensions
 #' @inheritParams create_lp
 #' @noRd
-get_dims <- function(x, y, xref = NULL, yref = NULL, type, slack = FALSE) {
+get_dims <- function(x, y, xref = NULL, yref = NULL, rts, slack = FALSE) {
   n_inputs <- ncol(x)
   n_outputs <- ncol(y)
   n_units <- if (!is.null(xref)) nrow(xref) else nrow(x)
-  if (type == 'crs') {
+  if (rts == 'crs') {
     n_lambda <- 0
-  } else if (type %in% c('irs', 'drs')) {
+  } else if (rts %in% c('irs', 'drs')) {
     n_lambda <- 1
   } else {
     n_lambda <- 2

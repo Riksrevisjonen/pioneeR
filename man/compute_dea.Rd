@@ -9,7 +9,7 @@ compute_dea(
   id,
   input,
   output,
-  type = c("crs", "vrs", "drs", "irs"),
+  rts = c("crs", "vrs", "drs", "irs"),
   orientation = c("in", "out"),
   super = FALSE,
   scale = FALSE,
@@ -26,7 +26,7 @@ compute_dea(
 
 \item{output}{A character vector with output variables.}
 
-\item{type}{Type of model.
+\item{rts}{Returns to scale.
 \tabular{rlll}{
 \tab crs \tab\tab Constant returns to scale, convexity and free disposability. \cr
 \tab vrs \tab\tab Variable returns to scale, convexity and free disposability. \cr

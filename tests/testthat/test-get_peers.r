@@ -29,7 +29,7 @@ test_that('get_peers() gives the correct results', {
   # --- Frontier 4.1 data --- #
 
   bench_res <- benchmarking_results$frontier41$out_crs$efficiency$peers
-  res <- compute_efficiency(f41_x, f41_y, type = 'crs', orientation = 'out')
+  res <- compute_efficiency(f41_x, f41_y, rts = 'crs', orientation = 'out')
   df <- get_peers(res, ids = as.character(frontier41$firm))
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
@@ -37,7 +37,7 @@ test_that('get_peers() gives the correct results', {
   # --- Norwegian District Courts --- #
 
   bench_res <- benchmarking_results$norCourts2018$out_vrs$efficiency$peers
-  res <- compute_efficiency(nc_x, nc_y, type = 'vrs', orientation = 'out')
+  res <- compute_efficiency(nc_x, nc_y, rts = 'vrs', orientation = 'out')
   df <- get_peers(res, ids = norCourts2018$district_court)
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
@@ -50,7 +50,7 @@ test_that('get_peers() gives the correct results', {
   # --- Hospitals --- #
 
   bench_res <- benchmarking_results$hospitals$out_vrs$efficiency$peers
-  res <- compute_efficiency(hp_x, hp_y, type = 'vrs', orientation = 'out')
+  res <- compute_efficiency(hp_x, hp_y, rts = 'vrs', orientation = 'out')
   df <- get_peers(res, ids = as.character(hospitals$firm_id))
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
@@ -60,7 +60,7 @@ test_that('get_peers() gives the correct results', {
   # --- Electric Plants --- #
 
   bench_res <- benchmarking_results$electricPlants$out_drs$efficiency$peers
-  res <- compute_efficiency(ecp_x, ecp_y, type = 'drs', orientation = 'out')
+  res <- compute_efficiency(ecp_x, ecp_y, rts = 'drs', orientation = 'out')
   df <- get_peers(res, ids = electricPlants$plant)
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])

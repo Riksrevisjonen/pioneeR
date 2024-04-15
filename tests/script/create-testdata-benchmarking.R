@@ -37,16 +37,16 @@ hospitals_y <- as.matrix(hospitals[c('inpatients', 'outpatients')])
 #' @param y A matrix with output values.
 create_testdata <- function(x, y, xref = NULL, yref = NULL, ids) {
   orientations <- c('in', 'out')
-  types <- c('crs', 'vrs', 'drs', 'irs')
+  rts_ <- c('crs', 'vrs', 'drs', 'irs')
   dl <- list()
   for (a in seq_along(orientations)) {
-    for (b in seq_along(types)) {
+    for (b in seq_along(rts_)) {
       tmp <- create_testdata_single(
         x, y, xref, yref, ids,
-        type = types[b],
+        rts = rts_[b],
         orientation = orientations[a])
       tmp <- list(tmp)
-      names(tmp) <- paste0(orientations[a], '_', types[b])
+      names(tmp) <- paste0(orientations[a], '_', rts_[b])
       dl <- append(dl, tmp)
     }
   }
@@ -56,11 +56,11 @@ create_testdata <- function(x, y, xref = NULL, yref = NULL, ids) {
 #' Create DEA test data (single)
 #' @param x A matrix with input values.
 #' @param y A matrix with output values.
-#' @param type Type of model
+#' @param rts Returns to scale
 #' @param orientation Model orientation
-create_testdata_single <- function(x, y, xref, yref, ids, type, orientation) {
-  eff <- Benchmarking::dea(x, y, XREF = xref, YREF = yref, RTS = type, ORIENTATION = orientation)
-  super_eff <- Benchmarking::sdea(x, y, RTS = type, ORIENTATION = orientation)
+create_testdata_single <- function(x, y, xref, yref, ids, rts, orientation) {
+  eff <- Benchmarking::dea(x, y, XREF = xref, YREF = yref, RTS = rts, ORIENTATION = orientation)
+  super_eff <- Benchmarking::sdea(x, y, RTS = rts, ORIENTATION = orientation)
   slack <- Benchmarking::slack(x, y, e = eff)
   colnames(eff$lambda) <- ids
   peers <- Benchmarking::peers(eff, NAMES = TRUE)

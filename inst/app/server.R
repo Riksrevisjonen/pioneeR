@@ -252,7 +252,7 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- pioneeR:::compute_efficiency(
-      dea.in(), dea.out(), type = model_params$rts,
+      dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation)
 
     d
@@ -275,7 +275,7 @@ shinyServer(function(input, output, session) {
     req(data(), dea.in(), dea.out())
 
     d <- pioneeR:::compute_super_efficiency(
-      dea.in(), dea.out(), type = model_params$rts,
+      dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation
     )
 
