@@ -26,8 +26,7 @@ Imports:
     bslib (>= 0.5.1),
     ggplot2 (>= 3.3.0),
     reactable (>= 0.4.0),
-    cli (>= 3.6.0),
-    lifecycle (>= 1.0.0)
+    cli (>= 3.6.0)
 Suggests:
     Benchmarking (>= 0.30),
     data.table,
