@@ -8,13 +8,8 @@
 #' @param id The name of the column with the DMU IDs
 #' @param normalize If `TRUE`, all columns will be normalized with a mean of 1
 #'
-#' @description
-#' `r lifecycle::badge("deprecated")`
 #' @export
 create_matrix <- function(df, columns, id, normalize = FALSE) {
-  lifecycle::deprecate_warn(
-    '0.4.0', 'create_matrix()',
-    details = 'create_matrix() is no longer needed and will be removed in the next release.')
   if (!inherits(df, 'data.frame')) {
     cli::cli_abort('You must provide a valid data.frame')
   }
