@@ -184,6 +184,5 @@ round_numeric <- function(df, digits = 4L) {
 #' @noRd
 print.pioneer_dea <- function(x, ...) {
   cat("DEA result:\n")
-  # x$results <- round_numeric(x$results, 4L)
   utils::str(x)
 }

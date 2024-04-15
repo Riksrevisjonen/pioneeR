@@ -99,18 +99,14 @@ set_lambda_constraints <- function(lp, rts, m, n, n_units, slack){
   if (rts != 'crs') {
     l1 <- m+n+1; l2 <- m+n+2
     if (rts == 'vrs') {
-      # lpSolveAPI::set.row(lp, l1, c(0, rep(-1, n_units)))
-      # lpSolveAPI::set.row(lp, l2, c(0, rep(1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(-1, n_units)))
       lpSolveAPI::set.row(lp, l2, c(q, rep(1, n_units)))
       lpSolveAPI::set.rhs(lp, c(-1, 1), l1:l2)
     } else if (rts == 'irs') {
-      # lpSolveAPI::set.row(lp, l1, c(0, rep(1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(1, n_units)))
       lpSolveAPI::set.rhs(lp, 1, l1)
       if (slack) lpSolveAPI::set.constr.type(lp, '>=', l1)
     } else if (rts == 'drs') {
-      # lpSolveAPI::set.row(lp, l1, c(0, rep(-1, n_units)))
       lpSolveAPI::set.row(lp, l1, c(q, rep(-1, n_units)))
       lpSolveAPI::set.rhs(lp, -1, l1)
       if (slack) lpSolveAPI::set.constr.type(lp, '>=', l1)
@@ -182,7 +178,6 @@ solve_lp_slack <- function(lp, x, y, values, orientation, m, n, n_units, n_vars)
         solution <- rep(0, n_vars) #m+n+Kr
         solution[mn+i] <- 1
       } else {
-        # message('Error in solving for unit ', i, ': Status = ', status)
         values[i] <- NA_real_
         solution <- NA_real_
       }
