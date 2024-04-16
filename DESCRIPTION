@@ -17,23 +17,25 @@ Depends:
     R (>= 4.1.0),
     shiny (>= 1.7.0)
 Imports:
-    lpSolveAPI (>= 5.5.2),
+    bslib (>= 0.5.1),
+    cli (>= 3.6.0),
+    ggplot2 (>= 3.3.0),
     haven (>= 2.5.0),
+    htmltools,
+    lpSolveAPI (>= 5.5.2),
     markdown,
     productivity (>= 1.1.0),
-    readxl,
-    writexl,
-    bslib (>= 0.5.1),
-    ggplot2 (>= 3.3.0),
     reactable (>= 0.4.0),
-    cli (>= 3.6.0)
+    readxl,
+    rlang (>= 1.1.0),
+    scales,
+    writexl
 Suggests:
     Benchmarking (>= 0.30),
     data.table,
     rmarkdown,
     knitr,
-    scales,
-    rlang,
+    magick,
     testthat (>= 3.0.0),
     tibble,
     withr
