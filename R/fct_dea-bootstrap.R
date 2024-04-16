@@ -1,3 +1,6 @@
+#' @importFrom stats complete.cases median quantile rnorm sd var
+NULL
+
 bw_rule <- function(delta, rule = 'ucv') {
   # Values must be in range 1, Inf. Take inverse if values are in range 0, 1
   if (min(delta) < 1) {
@@ -8,10 +11,10 @@ bw_rule <- function(delta, rule = 'ucv') {
   delta_2m <- c(delta_m, 2 - delta_m)
   # See Daraio & Wilson (2007) for a discussion on methods for determining bandwidth
   h <- switch(rule,
-    silverman = bw.nrd0(delta_2m),
-    scott = bw.nrd(delta_2m),
-    ucv = suppressWarnings({ h <- bw.ucv(delta_2m) }),
-    suppressWarnings({ h <- bw.ucv(delta_2m) })
+    silverman = stats::bw.nrd0(delta_2m),
+    scott = stats::bw.nrd(delta_2m),
+    ucv = suppressWarnings({ h <- stats::bw.ucv(delta_2m) }),
+    suppressWarnings({ h <- stats::bw.ucv(delta_2m) })
   )
   # See Daraio & Wilson (2007), p. 61, eq. 3.26
   h <- h * 2^(1/5) * (length(delta_m)/length(delta))^(1/5) * (sd(delta)/sd(delta_2m))
@@ -38,11 +41,11 @@ perform_boot <- function(x, y, rts, orientation, i, h, theta, boot) {
   beta <- bootstrap_sample(theta, h = h)
   if (orientation == 'in') {
     x_ref <- (theta / beta) * x
-    boot[, i] <- pioneeR:::compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x_ref, yref = y, values_only = TRUE)$values
+    boot[, i] <- compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x_ref, yref = y, values_only = TRUE)$values
   } else if (orientation == 'out') {
     beta <- 1 / beta
     y_ref <- (theta / beta) * y
-    boot[, i] <- pioneeR:::compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x, yref = y_ref, values_only = TRUE)$values
+    boot[, i] <- compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x, yref = y_ref, values_only = TRUE)$values
   }
   return(invisible(boot))
 }

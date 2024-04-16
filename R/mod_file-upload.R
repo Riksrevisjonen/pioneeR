@@ -1,5 +1,3 @@
-library(reactable)
-
 file_upload_ui <- function(id, wrap = FALSE, ...) {
   ns <- NS(id)
   if (wrap) {
@@ -76,7 +74,7 @@ file_upload_srv <- function(id) {
         if (ext %in% c('csv', 'tsv', 'dsv', 'txt')) {
           req(input$file_sep, input$file_dec)
           header <- if (is.null(input$file_header)) TRUE else as.logical(input$file_header)
-          clean_doc <- read.table(
+          clean_doc <- utils::read.table(
             textConnection(raw_file()),
             sep = input$file_sep,
             dec = input$file_dec,

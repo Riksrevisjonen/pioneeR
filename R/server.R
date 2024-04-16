@@ -1,13 +1,10 @@
-# Load required packages
-require(readxl)
-require(ucminf)
-require(productivity)
-require(ggplot2)
-require(scales)
-require(haven)
-require(writexl)
-require(reactable)
-require(rlang)
+#' @import reactable
+#' @import ggplot2
+#' @importFrom productivity malm
+#' @importFrom grDevices chull nclass.FD nclass.Sturges
+#' @importFrom rlang list2
+#' @importFrom scales label_number
+NULL
 
 # Define server logic
 server <- function(input, output, session) {
@@ -250,7 +247,7 @@ server <- function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- pioneeR:::compute_efficiency(
+    d <- compute_efficiency(
       dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation)
 
@@ -260,7 +257,7 @@ server <- function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      pioneeR:::compute_slack(dea.in(), dea.out(), dea.prod())
+      compute_slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -273,7 +270,7 @@ server <- function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- pioneeR:::compute_super_efficiency(
+    d <- compute_super_efficiency(
       dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation
     )
@@ -317,19 +314,19 @@ server <- function(input, output, session) {
         if (model_params$rts == 'vrs') {
           # Use chull to find the points which lie on the convex hull
           hpts <- chull(d$x, d$y)
-          hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(min(d$x), d$x[hpts], max(d$x))
         } else if (model_params$rts == 'drs') {
           # If we have NIRS, the front starts at origo, so we add origo to our coordinates
           hpts <- chull(c(0, d$x), c(0, d$y))
           hpts <- hpts[hpts != 1]-1
-          hpts <- hpts[c(which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          hpts <- hpts[c(which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(0, d$x[hpts], max(d$x))
         }
         # Remove observations where the value on the y-axis is reduced
-        rm <- c(TRUE, mapply(\(t1, t2) t2 < t1, t1 = tail(y, -1), t2 = head(y, -1)))
+        rm <- c(TRUE, mapply(\(t1, t2) t2 < t1, t1 = utils::tail(y, -1), t2 = utils::head(y, -1)))
         coords <- data.frame(y = y[rm], x = x[rm])
         p <- p + geom_line(data = coords, aes(x = x, y = y), color = '#f9ab55', linewidth = 1)
       }
@@ -416,7 +413,8 @@ server <- function(input, output, session) {
 
     color <- sprintf('#%s', input$salter.color) # 'rgb(8,48,107)'
 
-    g <- ggplot(d, aes(x = wt, y = eff, width = inputs, fill = as.character(row.names(d)))) +
+    # To avoid R CMD notes about no visible bindings, we use the .data pronoun
+    g <- ggplot(d, aes(x = .data$wt, y = .data$eff, width = .data$inputs, fill = as.character(row.names(d)))) +
       geom_bar(stat = 'identity', position = 'identity', show.legend = FALSE) +
       scale_fill_manual(values = rep(c('#084887', '#f9ab55'), length.out = nrow(d))) +
       labs(x = input$salter.xtitle, y = input$salter.ytitle) +
@@ -564,18 +562,6 @@ server <- function(input, output, session) {
 
   })
 
-  observeEvent(input$exportplot, {
-
-    require(processx)
-
-    p <- plot.dea()
-
-    tmpFile <- tempfile(fileext = ".png")
-    export(p, file = tmpFile)
-    browseURL(tmpFile)
-
-  })
-
   dea.tbl <- reactive({
 
     deff <- matrix(dea.prod()$values, ncol = 1, dimnames = list(NULL, 'Efficiency'))
@@ -631,7 +617,7 @@ server <- function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    df <- pioneeR:::get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
+    df <- get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
     opts <- list2(!!!reactable_opts, data = df, columns = list(
@@ -656,7 +642,7 @@ server <- function(input, output, session) {
       } else if (input$exportfileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$exportfileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -946,7 +932,7 @@ server <- function(input, output, session) {
       } else if (input$boot_fileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$boot_fileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -1027,7 +1013,7 @@ server <- function(input, output, session) {
       } else if (input$malm.fileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$malm.fileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -1047,8 +1033,9 @@ server <- function(input, output, session) {
       sprintf('dea-model-%s-%s.pdf', model_params$rts, model_params$orientation)
     },
     content = function(file) {
+      template <- system.file('files', 'dea_analysis.Rmd', package = 'pioneeR')
       tempReport <- file.path(tempdir(), 'dea_analysis.Rmd')
-      file.copy('dea_analysis.Rmd', tempReport, overwrite = TRUE)
+      file.copy(template, tempReport, overwrite = TRUE)
 
       params <- list(
         data = selection(),
