@@ -1,8 +1,4 @@
 # Load required packages
-require(data.table)
-require(reactable)
-require(bslib)
-
 ver <- utils::packageVersion('pioneeR')
 bs_ver <- 5
 
@@ -31,10 +27,7 @@ ui <- function(request) { page_navbar(
   fluid = TRUE,
 
   # Add custom CSS
-  header = tags$head(
-    tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
-    tags$script(src = 'pioneer.js') # pioneer.min.js
-  ),
+  header = pioneer_scripts(),
 
   tabPanel(
     'Data', value = 'pioneer_upload',
@@ -294,7 +287,7 @@ ui <- function(request) { page_navbar(
   tabPanel(
     'About', value = 'pioneeR_about',
     content_div(
-      includeMarkdown('about.md')
+      includeMarkdown(system.file('files', 'about.md', package = 'pioneeR'))
     )
   ),
 
@@ -304,7 +297,7 @@ ui <- function(request) { page_navbar(
       Norway](https://www.riksrevisjonen.no/en)**.
 
       &copy; %s Office of the Auditor General of Norway &#8212; Version %s with bslib %s',
-      format(Sys.Date(), '%Y'), ver, packageVersion('bslib')
+      format(Sys.Date(), '%Y'), ver, utils::packageVersion('bslib')
     ))
   )
 
