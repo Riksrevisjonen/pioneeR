@@ -1,4 +1,3 @@
-
 #' Create Bootstrap dropdown button with custom UI
 #'
 #' @param title The name of the dropdown button
@@ -11,7 +10,7 @@
 #' @param direction The direction of the dropdown Default value \code{'down'}.
 #' @param autoclose If \code{TRUE} the dropdown will close when the user clicks inside it
 #'
-#' @export
+#' @noRd
 dropdown_button <- function(
     title, ..., color = 'primary', outline = FALSE, size = c('normal', 'sm', 'lg'),
     width = 400, direction = c('down', 'right', 'up', 'left'), autoclose = TRUE)
@@ -39,6 +38,8 @@ dropdown_button <- function(
 
 }
 
+#' Automatically assign a scale for large numbers in ggplot2
+#' @noRd
 find_scale <- function(x) {
   m <- abs(max(x))
   i <- c(0, 1e3, 1e6, 1e9, 1e12)
@@ -47,7 +48,9 @@ find_scale <- function(x) {
   return(list(names(i)[findInterval(m, i)], x[findInterval(m, i)]))
 }
 
-theme_pioneer <- function(){
+#' Theme for ggplot2
+#' @noRd
+theme_pioneer <- function() {
   theme(
     axis.text.x = element_text(
       angle = 0, color = '#183271', vjust = 0.5,
@@ -91,6 +94,8 @@ theme_pioneer <- function(){
     panel.spacing = unit(2, "lines"))
 }
 
+#' Save function for ggplot2 objects
+#' @noRd
 ggsave_ <- function(filename, plot, format = 'png', size = c('A5', 'A4', 'A3')) {
   size <- match.arg(size)
   dims <- switch(
@@ -106,6 +111,8 @@ ggsave_ <- function(filename, plot, format = 'png', size = c('A5', 'A4', 'A3')) 
     ))
 }
 
+#' Create a random ID
+#' @noRd
 rand_id <- function() {
   # For true random IDs, we should use uuid or openssl libraries, but this will do
   hex_digits <- c(0:9, letters[1:6])
