@@ -1,3 +1,5 @@
+#' UI module for file upload function
+#' @noRd 
 file_upload_ui <- function(id, wrap = FALSE, ...) {
   ns <- NS(id)
   if (wrap) {
@@ -7,6 +9,8 @@ file_upload_ui <- function(id, wrap = FALSE, ...) {
   }
 }
 
+#' Server module for file upload function
+#' @noRd 
 file_upload_srv <- function(id) {
   moduleServer(
     id, function(input, output, session) {
