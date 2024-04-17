@@ -543,7 +543,7 @@ server <- function(input, output, session) {
         renderPlot({
           # Find to optimal number of bins using Freedman-Diaconis rule if N is less
           # than 200, and Sturge's rule if N is equal or greater than 200
-          n_bins <- if (length(eff) < 200) nclass.FD(eff) else nclass.Sturges(eff)
+          n_bins <- if (length(eff) < 200) grDevices::nclass.FD(eff) else grDevices::nclass.Sturges(eff)
           bins <- pretty(range(eff), n = n_bins, min.n = 1)
           ggplot(data.frame(eff = eff), aes(x = eff)) +
             stat_bin(fill = '#ee2255', color = '#eeeeee', breaks = bins) +
