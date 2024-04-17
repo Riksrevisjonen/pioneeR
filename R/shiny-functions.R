@@ -9,6 +9,19 @@
 #' @import writexl
 NULL
 
+#' Function to add JS and CSS dependencies to the app
+#' @noRd
+pioneer_scripts <- function() {
+  htmltools::htmlDependency(
+    name = 'pioneer-assets',
+    version = utils::packageVersion('pioneeR'),
+    package = 'pioneeR',
+    src = 'www',
+    script = 'pioneer.js',
+    style = 'style.css'
+  )
+}
+
 #' Run pioneeR
 #'
 #' Run the pioneeR app on your local machine.
@@ -38,7 +51,17 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
     port <- check_for_unsafe_port(port)
   }
 
-  shiny::runApp(system.file('app', package = 'pioneeR'), port = port, ...)
+  pioneer_env <- new.env()
+  environment(ui) <- pioneer_env
+  environment(server) <- pioneer_env
+
+  # shiny::runApp(system.file('app', package = 'pioneeR'), port = port, ...)
+  shiny::shinyApp(
+    ui,
+    server,
+    enableBookmarking = 'server',
+    ...
+  )
 
 }
 
@@ -52,3 +75,31 @@ runPioneeR <- run_pioneer
 #'
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
+
+#' Check if time series data is balanced for use in Malmquist models
+#' @noRd
+check_balance <- function(data, id_var, time_var) {
+
+  units <- unique(data[, id_var])
+  time <- unique(data[, time_var])
+
+  miss <- sapply(units, function(u) {
+    unit_time <- unique(data[data[,id_var] == u, time_var])
+    all(sapply(time, function(t) t %in% unit_time))
+  })
+
+  r <- list()
+
+  if (!all(miss)) {
+    r$data <- data[data[,id_var] %in% units[miss],]
+    r$listwise <- TRUE
+    r$message <- 'Data was not balanced, listwise deleting has been performed'
+  } else {
+    r$data <- data
+    r$listwise <- FALSE
+    r$message <- NULL
+  }
+
+  r
+
+}

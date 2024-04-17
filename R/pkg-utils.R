@@ -1,3 +1,5 @@
+#' Create temporary data that can be used by pioneeR when run locally
+#' @noRd
 set_local_data <- function(x) {
 
   if (nzchar(Sys.getenv('PIONEER_DATA'))) {
@@ -28,12 +30,16 @@ set_local_data <- function(x) {
 
 }
 
+#' Get list of unsafe ports that are used in Chrome
+#' @noRd
 unsafe_ports <- function() {
   return(
     c(3659, 4045, 5060, 5061, 6000, 6566, 6665:6669, 6697)
   )
 }
 
+#' Checks if the specified port is inside the ranges that are considered safe
+#' @noRd
 check_for_unsafe_port <- function(port) {
   if (is.null(port)) return()
   port <- as.numeric(port)

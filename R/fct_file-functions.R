@@ -1,3 +1,5 @@
+#' Check user provided file
+#' @noRd 
 check_file <- function(file) {
 
   check_missing <- sapply(1:nrow(file), function(i) all(is.na(file[i,])))
@@ -28,6 +30,8 @@ check_file <- function(file) {
 
 }
 
+#' Check if a cell in Excel has a value
+#' @noRd 
 has_value <- function(x) {
   if (length(x) > 1L) return(sapply(x, has_value, USE.NAMES = FALSE))
   if (is.null(x) || is.na(x)) return(FALSE)

@@ -1,16 +1,10 @@
-# Load required packages
-require(readxl)
-require(ucminf)
-require(productivity)
-require(ggplot2)
-require(scales)
-require(haven)
-require(writexl)
-require(reactable)
-require(rlang)
+#' @import reactable
+#' @import ggplot2
+NULL
 
-# Define server logic
-shinyServer(function(input, output, session) {
+#' Define server logic for pioneeR
+#' @noRd
+server <- function(input, output, session) {
 
   reactable_opts <- list(
     compact = TRUE, sortable = TRUE, filterable = TRUE, striped = TRUE,
@@ -23,6 +17,7 @@ shinyServer(function(input, output, session) {
   load_data <- list(file = NULL, cols = NULL, error = NULL)
 
   # If we are running locally, and we have data, load the data
+  is_local <- !nzchar(Sys.getenv('SHINY_PORT'))
   if (is_local && nzchar(Sys.getenv('PIONEER_DATA'))) {
     local_data <- NULL
     if (file.exists(Sys.getenv('PIONEER_DATA'))) {
@@ -157,8 +152,6 @@ shinyServer(function(input, output, session) {
 
   })
 
-  source('conditionalUI.R', local = TRUE, encoding = 'UTF-8')
-
   output$preview <- renderReactable({
     # Input file is required. If input is NULL, return NULL
     req(preview())
@@ -251,7 +244,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- pioneeR:::compute_efficiency(
+    d <- compute_efficiency(
       dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation)
 
@@ -261,7 +254,7 @@ shinyServer(function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      pioneeR:::compute_slack(dea.in(), dea.out(), dea.prod())
+      compute_slack(dea.in(), dea.out(), dea.prod())
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -274,7 +267,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
-    d <- pioneeR:::compute_super_efficiency(
+    d <- compute_super_efficiency(
       dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation
     )
@@ -306,8 +299,8 @@ shinyServer(function(input, output, session) {
       geom_point(color = '#084887') +
       xlab(paste('Inputs:\n', paste(params()$inputs, collapse = ', '))) +
       ylab(paste('Outputs:\n', paste(params()$outputs, collapse = ', '))) +
-      scale_y_continuous(labels = label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
-      scale_x_continuous(labels = label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
+      scale_y_continuous(labels = scales::label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
+      scale_x_continuous(labels = scales::label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
       theme_pioneer()
 
     # Add frontier line
@@ -316,21 +309,21 @@ shinyServer(function(input, output, session) {
         p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55', linewidth = 1)
       } else {
         if (model_params$rts == 'vrs') {
-          # Use chull to find the points which lie on the convex hull
-          hpts <- chull(d$x, d$y)
-          hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          # Use chull from grDevices to find the points which lie on the convex hull
+          hpts <- grDevices::chull(d$x, d$y)
+          hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(min(d$x), d$x[hpts], max(d$x))
         } else if (model_params$rts == 'drs') {
           # If we have NIRS, the front starts at origo, so we add origo to our coordinates
-          hpts <- chull(c(0, d$x), c(0, d$y))
+          hpts <- grDevices::chull(c(0, d$x), c(0, d$y))
           hpts <- hpts[hpts != 1]-1
-          hpts <- hpts[c(which(head(d$x[hpts], -1) < tail(d$x[hpts], -1)) + 1)]
+          hpts <- hpts[c(which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(0, d$x[hpts], max(d$x))
         }
         # Remove observations where the value on the y-axis is reduced
-        rm <- c(TRUE, mapply(\(t1, t2) t2 < t1, t1 = tail(y, -1), t2 = head(y, -1)))
+        rm <- c(TRUE, mapply(\(t1, t2) t2 < t1, t1 = utils::tail(y, -1), t2 = utils::head(y, -1)))
         coords <- data.frame(y = y[rm], x = x[rm])
         p <- p + geom_line(data = coords, aes(x = x, y = y), color = '#f9ab55', linewidth = 1)
       }
@@ -417,12 +410,13 @@ shinyServer(function(input, output, session) {
 
     color <- sprintf('#%s', input$salter.color) # 'rgb(8,48,107)'
 
-    g <- ggplot(d, aes(x = wt, y = eff, width = inputs, fill = as.character(row.names(d)))) +
+    # To avoid R CMD notes about no visible bindings, we use the .data pronoun
+    g <- ggplot(d, aes(x = .data$wt, y = .data$eff, width = .data$inputs, fill = as.character(row.names(d)))) +
       geom_bar(stat = 'identity', position = 'identity', show.legend = FALSE) +
       scale_fill_manual(values = rep(c('#084887', '#f9ab55'), length.out = nrow(d))) +
       labs(x = input$salter.xtitle, y = input$salter.ytitle) +
-      scale_x_continuous(labels = label_number(suffix = find_scale(d$wt)[[1]], scale = find_scale(d$wt)[[2]])) +
-      scale_y_continuous(labels = label_number(suffix = find_scale(d$eff)[[1]], scale = find_scale(d$eff)[[2]])) +
+      scale_x_continuous(labels = scales::label_number(suffix = find_scale(d$wt)[[1]], scale = find_scale(d$wt)[[2]])) +
+      scale_y_continuous(labels = scales::label_number(suffix = find_scale(d$eff)[[1]], scale = find_scale(d$eff)[[2]])) +
       theme_pioneer()
 
   })
@@ -549,7 +543,7 @@ shinyServer(function(input, output, session) {
         renderPlot({
           # Find to optimal number of bins using Freedman-Diaconis rule if N is less
           # than 200, and Sturge's rule if N is equal or greater than 200
-          n_bins <- if (length(eff) < 200) nclass.FD(eff) else nclass.Sturges(eff)
+          n_bins <- if (length(eff) < 200) grDevices::nclass.FD(eff) else grDevices::nclass.Sturges(eff)
           bins <- pretty(range(eff), n = n_bins, min.n = 1)
           ggplot(data.frame(eff = eff), aes(x = eff)) +
             stat_bin(fill = '#ee2255', color = '#eeeeee', breaks = bins) +
@@ -562,18 +556,6 @@ shinyServer(function(input, output, session) {
         })
       )
     )
-
-  })
-
-  observeEvent(input$exportplot, {
-
-    require(processx)
-
-    p <- plot.dea()
-
-    tmpFile <- tempfile(fileext = ".png")
-    export(p, file = tmpFile)
-    browseURL(tmpFile)
 
   })
 
@@ -617,7 +599,7 @@ shinyServer(function(input, output, session) {
 
   output$dea.table <- renderReactable({
     df <- dea.tbl()
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left')
     ))
     do.call(reactable, opts)
@@ -627,15 +609,15 @@ shinyServer(function(input, output, session) {
     df <- round(dea.slack()$data, input$dea_round)
     colnames(df)[ncol(df)] <- 'Total'
 
-    opts <- list2(!!!reactable_opts, data = df)
+    opts <- rlang::list2(!!!reactable_opts, data = df)
     do.call(reactable, opts)
   })
 
   output$peers.table <- renderReactable({
-    df <- pioneeR:::get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
+    df <- get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left')
     ))
     do.call(reactable, opts)
@@ -657,7 +639,7 @@ shinyServer(function(input, output, session) {
       } else if (input$exportfileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$exportfileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -667,7 +649,7 @@ shinyServer(function(input, output, session) {
     num_cols <- which(sapply(df, is.numeric, USE.NAMES = FALSE))
     df[, num_cols] <- round(df[, num_cols], input$dea_round)
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left'),
       Scale.eff. = colDef(name = 'Scale eff.'),
       VRS.NIRS.ratio = colDef(
@@ -901,7 +883,7 @@ shinyServer(function(input, output, session) {
     # Add DMU names and round inputs
     df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
       bias = colDef(show = input$boot_show_bias, name = 'Bias'),
       eff_bc = colDef(name = 'Bias corr. score'),
@@ -947,7 +929,7 @@ shinyServer(function(input, output, session) {
       } else if (input$boot_fileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$boot_fileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -958,7 +940,7 @@ shinyServer(function(input, output, session) {
 
     req(data(), params()$year)
 
-    df <- checkBalance(selection(), params()$id, params()$year)
+    df <- check_balance(selection(), params()$id, params()$year)
     if (nrow(df$data) == 0) {
       out <- alert(
         color = 'danger', icon = 'danger',
@@ -982,9 +964,9 @@ shinyServer(function(input, output, session) {
 
     req(selection())
 
-    df <- checkBalance(selection(), params()$id, params()$year)
+    df <- check_balance(selection(), params()$id, params()$year)
 
-    malmquist <- malm(
+    malmquist <- productivity::malm(
       data = df$data, id.var = params()$id, time.var = params()$year,
       x.vars = params()$inputs, y.vars = params()$outputs,
       rts = input$malm_rts, orientation = input$malm_orientation, scaled = TRUE)
@@ -1028,7 +1010,7 @@ shinyServer(function(input, output, session) {
       } else if (input$malm.fileformat == 'xlsx') {
         writexl::write_xlsx(df, file)
       } else if (input$malm.fileformat == 'csv') {
-        write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
+        utils::write.csv2(df, file, fileEncoding = 'CP1252', row.names = FALSE)
       }
     }
   )
@@ -1048,8 +1030,9 @@ shinyServer(function(input, output, session) {
       sprintf('dea-model-%s-%s.pdf', model_params$rts, model_params$orientation)
     },
     content = function(file) {
+      template <- system.file('files', 'dea_analysis.Rmd', package = 'pioneeR')
       tempReport <- file.path(tempdir(), 'dea_analysis.Rmd')
-      file.copy('dea_analysis.Rmd', tempReport, overwrite = TRUE)
+      file.copy(template, tempReport, overwrite = TRUE)
 
       params <- list(
         data = selection(),
@@ -1082,8 +1065,140 @@ shinyServer(function(input, output, session) {
     stopApp(x)
   })
 
+  # From conditionalUI.R
+  # Functions to render the UI based on other input
+
+  output$ui_id <- renderUI({
+
+    req(data())
+
+    if (is.null(data()$file)) return(NULL)
+
+    choices <- colnames(data()$file)
+    selectInput('dea_id', 'Firm ID', choices = choices, multiple = FALSE)
+
+  })
+
+  output$ui_inputs <- renderUI({
+
+    req(data())
+
+    if (is.null(data()$file)) return(NULL)
+
+    # Restore input if we are restoring previous state
+    selected <- if (!is.null(restoreVals$inputs)) restoreVals$inputs else NULL
+    choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+
+    selectInput('dea_input', 'Inputs', choices = choices, selected = selected, multiple = TRUE)
+
+  })
+
+  observeEvent(input$dea_input, {
+    selected_inputs <- input$dea_input
+    selected <- input$dea_output
+    choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+    if (length(selected_inputs) > 0) {
+      choices <- choices[!(choices %in% selected_inputs)]
+    }
+    if (!is.null(selected) && any(selected %in% selected_inputs)) {
+      selected <- selected[!(selected %in% selected_inputs)]
+    }
+    updateSelectInput(session, 'dea_output', choices = choices, selected = selected)
+  })
+
+  output$ui_outputs <- renderUI({
+
+    req(data())
+
+    if (is.null(data()$file)) return(NULL)
+
+    # Restore input if we are restoring previous state
+    selected <- if (!is.null(restoreVals$outputs)) restoreVals$outputs else NULL
+    choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+
+    selectInput('dea_output', 'Outputs', choices = choices, selected = selected, multiple = TRUE)
+
+  })
+
+  observeEvent(input$dea_output, {
+    selected_outputs <- input$dea_output
+    selected <- input$dea_input
+    choices <- data()$cols[sapply(data()$file, is.numeric, USE.NAMES = FALSE)]
+    if (length(selected_outputs) > 0) {
+      choices <- choices[!(choices %in% selected_outputs)]
+    }
+    if (!is.null(selected) && any(selected %in% selected_outputs)) {
+      selected <- selected[!(selected %in% selected_outputs)]
+    }
+    updateSelectInput(session, 'dea_input', choices = choices, selected = selected)
+  })
+
+  output$ui_timeseries <- renderUI({
+
+    req(data()$file)
+
+    checkboxInput('hasyear', 'Time series data', value = FALSE)
+
+  })
+
+  output$ui_year <- renderUI({
+
+    req(data(), input$hasyear)
+
+    # We only want to show the input if we have time series data
+    if (!input$hasyear) return(NULL)
+
+    df <- data()$file
+
+    identify_year_variable <- \(x) {
+      if (!is.atomic(x) || !is.numeric(x) || any(is.na(x))) {
+        return(FALSE)
+      }
+      return(all(abs(2000 - range(x)) < 100))
+    }
+
+    choices <- data()$cols
+    year_variable <- df[names(df[(which(sapply(df, identify_year_variable)))])]
+    selected <- ifelse(length(year_variable) >= 1, names(year_variable[1]), choices[[1]])
+    selectInput('dea_year', 'Time series variable', choices = choices, selected = selected, multiple = FALSE)
+
+  })
+
+  output$ui_subset <- renderUI({
+
+    req(data()$file)
+
+    tagList(
+      checkboxInput('data.subset', 'Subset data', value = FALSE)
+    )
+
+  })
+
+  output$ui_subset_info <- renderUI({
+
+    req(data()$file)
+
+    n_rows <- length(preview_selected())
+    t_rows <- nrow(data()$file)
+    one <- n_rows == 1
+
+    tagList(
+      p(
+        class = 'small', helpText(sprintf(
+          'Click to subset data. You can select the rows to include in the analysis by
+        clicking the rows in the table. Currently %s %s of %s %s selected',
+          n_rows, if (one) 'row' else 'rows', t_rows, if (one) 'is' else 'are'
+        ))
+      ),
+      actionButton('data.subset.select', 'Select all'),
+      actionButton('data.subset.deselect', 'Deselect all')
+    )
+
+  })
+  # Stop from conditionalUI.R
+
   onStop(function() {
     Sys.unsetenv('PIONEER_DATA')
   })
 
-})
+}

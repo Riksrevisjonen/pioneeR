@@ -4,6 +4,7 @@
 
 - Updated documentation for `run_pioneer()`
 - Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
+- All R functions - including `server()` and `ui()` - have now been moved to the `R` directory with benefits to how internal functions are accessed. In additions, the global environment should be untouched when the app is run (#87)
 
 ## Bug fixes
 

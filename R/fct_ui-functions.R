@@ -1,3 +1,5 @@
+#' Create a bootstrap styled alert box
+#' @noRd
 alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
 
   cls <- sprintf('alert alert-%s', color)
@@ -14,6 +16,8 @@ alert <- function(..., color = 'primary', icon = NULL, dismissable = FALSE) {
 
 }
 
+#' Create a bootstrap styled modal button
+#' @noRd
 bs_modal_button <- function(
     label = 'Close', color = 'default', size = c('normal', 'sm', 'lg'))
 {
@@ -23,6 +27,8 @@ bs_modal_button <- function(
   tags$button(type = 'button', class = cls, `data-bs-dismiss` = 'modal', label)
 }
 
+#' Create a content element with proper Bootstrap styling
+#' @noRd
 content_div <- function(...) {
   tags$div(
     class = 'container mt-1',
