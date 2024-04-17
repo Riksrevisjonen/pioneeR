@@ -18,7 +18,8 @@ if (utils::packageVersion('bslib') > '0.5.1') {
   theme_args = list(version = bs_ver)
 }
 
-# Define UI for application that draws a histogram
+#' Define the user interface for pioneeR
+#' @noRd
 ui <- function(request) { page_navbar(
 
   title = 'pioneeR',

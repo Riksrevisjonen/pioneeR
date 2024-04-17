@@ -1,12 +1,9 @@
 #' @import reactable
 #' @import ggplot2
-#' @importFrom productivity malm
-#' @importFrom grDevices chull nclass.FD nclass.Sturges
-#' @importFrom rlang list2
-#' @importFrom scales label_number
 NULL
 
-# Define server logic
+#' Define server logic for pioneeR
+#' @noRd
 server <- function(input, output, session) {
 
   reactable_opts <- list(
@@ -302,8 +299,8 @@ server <- function(input, output, session) {
       geom_point(color = '#084887') +
       xlab(paste('Inputs:\n', paste(params()$inputs, collapse = ', '))) +
       ylab(paste('Outputs:\n', paste(params()$outputs, collapse = ', '))) +
-      scale_y_continuous(labels = label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
-      scale_x_continuous(labels = label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
+      scale_y_continuous(labels = scales::label_number(suffix = find_scale(d$x)[[1]], scale = find_scale(d$x)[[2]])) +
+      scale_x_continuous(labels = scales::label_number(suffix = find_scale(d$y)[[1]], scale = find_scale(d$y)[[2]])) +
       theme_pioneer()
 
     # Add frontier line
@@ -312,14 +309,14 @@ server <- function(input, output, session) {
         p <- p + geom_abline(intercept = 0, slope = max(d$y/d$x), color = '#f9ab55', linewidth = 1)
       } else {
         if (model_params$rts == 'vrs') {
-          # Use chull to find the points which lie on the convex hull
-          hpts <- chull(d$x, d$y)
+          # Use chull from grDevices to find the points which lie on the convex hull
+          hpts <- grDevices::chull(d$x, d$y)
           hpts <- hpts[c(which(d$x[hpts] == min(d$x[hpts])), which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
           x <- c(min(d$x), d$x[hpts], max(d$x))
         } else if (model_params$rts == 'drs') {
           # If we have NIRS, the front starts at origo, so we add origo to our coordinates
-          hpts <- chull(c(0, d$x), c(0, d$y))
+          hpts <- grDevices::chull(c(0, d$x), c(0, d$y))
           hpts <- hpts[hpts != 1]-1
           hpts <- hpts[c(which(utils::head(d$x[hpts], -1) < utils::tail(d$x[hpts], -1)) + 1)]
           y <- c(0, d$y[hpts], max(d$y))
@@ -418,8 +415,8 @@ server <- function(input, output, session) {
       geom_bar(stat = 'identity', position = 'identity', show.legend = FALSE) +
       scale_fill_manual(values = rep(c('#084887', '#f9ab55'), length.out = nrow(d))) +
       labs(x = input$salter.xtitle, y = input$salter.ytitle) +
-      scale_x_continuous(labels = label_number(suffix = find_scale(d$wt)[[1]], scale = find_scale(d$wt)[[2]])) +
-      scale_y_continuous(labels = label_number(suffix = find_scale(d$eff)[[1]], scale = find_scale(d$eff)[[2]])) +
+      scale_x_continuous(labels = scales::label_number(suffix = find_scale(d$wt)[[1]], scale = find_scale(d$wt)[[2]])) +
+      scale_y_continuous(labels = scales::label_number(suffix = find_scale(d$eff)[[1]], scale = find_scale(d$eff)[[2]])) +
       theme_pioneer()
 
   })
@@ -602,7 +599,7 @@ server <- function(input, output, session) {
 
   output$dea.table <- renderReactable({
     df <- dea.tbl()
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left')
     ))
     do.call(reactable, opts)
@@ -612,7 +609,7 @@ server <- function(input, output, session) {
     df <- round(dea.slack()$data, input$dea_round)
     colnames(df)[ncol(df)] <- 'Total'
 
-    opts <- list2(!!!reactable_opts, data = df)
+    opts <- rlang::list2(!!!reactable_opts, data = df)
     do.call(reactable, opts)
   })
 
@@ -620,7 +617,7 @@ server <- function(input, output, session) {
     df <- get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left')
     ))
     do.call(reactable, opts)
@@ -652,7 +649,7 @@ server <- function(input, output, session) {
     num_cols <- which(sapply(df, is.numeric, USE.NAMES = FALSE))
     df[, num_cols] <- round(df[, num_cols], input$dea_round)
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       DMU = colDef(sticky = 'left'),
       Scale.eff. = colDef(name = 'Scale eff.'),
       VRS.NIRS.ratio = colDef(
@@ -886,7 +883,7 @@ server <- function(input, output, session) {
     # Add DMU names and round inputs
     df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
 
-    opts <- list2(!!!reactable_opts, data = df, columns = list(
+    opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
       eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
       bias = colDef(show = input$boot_show_bias, name = 'Bias'),
       eff_bc = colDef(name = 'Bias corr. score'),
@@ -969,7 +966,7 @@ server <- function(input, output, session) {
 
     df <- check_balance(selection(), params()$id, params()$year)
 
-    malmquist <- malm(
+    malmquist <- productivity::malm(
       data = df$data, id.var = params()$id, time.var = params()$year,
       x.vars = params()$inputs, y.vars = params()$outputs,
       rts = input$malm_rts, orientation = input$malm_orientation, scaled = TRUE)

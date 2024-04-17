@@ -9,6 +9,8 @@
 #' @import writexl
 NULL
 
+#' Function to add JS and CSS dependencies to the app
+#' @noRd
 pioneer_scripts <- function() {
   htmltools::htmlDependency(
     name = 'pioneer-assets',
@@ -74,6 +76,8 @@ runPioneeR <- run_pioneer
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
 
+#' Check if time series data is balanced for use in Malmquist models
+#' @noRd
 check_balance <- function(data, id_var, time_var) {
 
   units <- unique(data[, id_var])
@@ -96,6 +100,6 @@ check_balance <- function(data, id_var, time_var) {
     r$message <- NULL
   }
 
-  return(r)
+  r
 
 }
