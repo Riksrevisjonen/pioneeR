@@ -183,6 +183,31 @@ round_numeric <- function(df, digits = 4L) {
 #' pioneer_dea print method
 #' @noRd
 print.pioneer_dea <- function(x, ...) {
-  cat("DEA result:\n")
-  utils::str(x)
+  cat('Efficiency scores:\n')
+  print(x$efficiency)
+  invisible(x)
+}
+
+#' pioneer_dea summary method
+#' @noRd
+summary.pioneer_dea <- function(x, ...) {
+  cat(sprintf(
+    'Technology is %s and %s oriented efficiency\n',
+    toupper(attr(x$model, 'rts')),
+    switch(attr(x$model, 'orientation'), 'in' = 'input', 'out' = 'output')
+  ))
+  cat(sprintf('Mean efficiency: %s\n', round(mean(x$efficiency), 4L)))
+  cat('-----------\n')
+  summary(x$efficiency)
+}
+
+#' pioneer_dea as.data.frame method
+#' @noRd
+as.data.frame.pioneer_dea <- function(x, ...) {
+  out <- list(dmu = attr(x$model, 'dmu'), efficiency = x$efficiency)
+  if (!is.null(x$super_efficiency)) out$super_efficiency <- x$super_efficiency
+  if (!is.null(x$slack)) out$slack <- x$slack
+  if (!is.null(x$peers)) out <- cbind(out, x$peers)
+  out <- cbind(out, x$model)
+  structure(out, row.names = seq_len(dim(x$model)[1L]), class = 'data.frame')
 }
