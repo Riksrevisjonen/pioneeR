@@ -58,7 +58,7 @@ create_model_object <- function(
   }
   attr(model, 'rts') <- rts
   attr(model, 'orientation') <- orientation
-  model
+  structure(model, class = 'pioneer_model')
 
 }
 
@@ -69,8 +69,8 @@ create_model_object <- function(
 #' @noRd
 compute_dea_ <- function(model, super, slack, peers) {
 
-  x <- as.matrix(model[attr(model, 'input')])
-  y <- as.matrix(model[attr(model, 'output')])
+  x <- get_matrix_from_model(model, 'input')
+  y <- get_matrix_from_model(model, 'output')
 
   check_data(x, y)
 

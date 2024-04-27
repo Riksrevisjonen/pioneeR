@@ -180,6 +180,14 @@ round_numeric <- function(df, digits = 4L) {
   df
 }
 
+#' get an input or output matrix from a model object
+#' @noRd
+get_matrix_from_model <- function(model, type = c('input', 'output')) {
+  if (!inherits(model, 'pioneer_model')) cli::cli_abort('Object must be of type pioneer_model')
+  type = match.arg(type)
+  as.matrix(as.data.frame(model[attr(model, type)]))
+}
+
 #' pioneer_dea print method
 #' @noRd
 print.pioneer_dea <- function(x, ...) {
