@@ -1,6 +1,56 @@
 #' @importFrom stats complete.cases median quantile rnorm sd var
 NULL
 
+#' Bootstrap a DEA model
+#'
+#' Run bootstrap on a DEA model to estimate bias corrected efficiency scores and confidence
+#' intervals
+#'
+#' @param dea An object of type pioneer_dea from `compute_dea()`
+#' @param alpha One minus the confidence level required (defaults to 0.05)
+#' @param bw_rule A string with the type of bandwidth rule to be used, or a number with the
+#'   bandwidth parameter. See details.
+#' @param iterations The number of bootstrap iterations to be performed
+#'
+#' @details
+#' The bandwidth argument can be set to either `ucv` for unbiased cross validation,
+#' `silverman` for the Silverman rule, or `scott` for the Scott rule. If you provide a
+#' number, this will be used directly as the bandwidth parameter `h`. This can be useful
+#' to replicate results where `h` is given, such as Simar & Wilson (1998). For most practical
+#' applications of the bootstrap, the default of unbias cross validation is sensible.
+#'
+#' @return A list object of class `pioneer_bootstrap`
+#' @seealso [compute_dea()]
+#'
+#' @export
+bootstrap_dea <- function(dea, alpha = 0.05, bw_rule = 'ucv', iterations = 2000) {
+
+  if (!inherits(dea, 'pioneer_dea')) {
+    msg <- 'You must provide an object of class pioneer_dea. Run compute_dea() first'
+    cli::cli_abort(
+      message = c(
+        msg,
+        'x' = 'You must provide an object of class pioneer_data'
+      ))
+  }
+
+  rts <- attr(dea$model, 'rts')
+  if (!rts %in% c('crs', 'vrs')) {
+    msg <- 'Only constant returns to scale and variable returns to scale are supported'
+    cli::cli_abort(
+      message = c(
+        msg,
+        'x' = 'Only vrs and crs are supported in the rts argument',
+        'i' = 'You supplied {rts}'
+      ))
+  }
+  orientation <- attr(dea$model, 'orientation')
+  theta <- dea$efficiency
+  x <- pioneeR:::get_matrix_from_model(dea$model, 'input')
+  y <- pioneeR:::get_matrix_from_model(dea$model, 'output')
+  bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, iterations)
+}
+
 bw_rule <- function(delta, rule = 'ucv') {
   # Values must be in range 1, Inf. Take inverse if values are in range 0, 1
   if (min(delta) < 1) {
@@ -21,6 +71,8 @@ bw_rule <- function(delta, rule = 'ucv') {
   h
 }
 
+#' Perform bootstrap sampling according to Simar & Wilson
+#' @noRd
 bootstrap_sample <- function(delta, h, n = length(delta)) {
   # Values must be in range 1, Inf. Take inverse if values are in range 0, 1
   if (min(delta) < 1) {
@@ -37,42 +89,68 @@ bootstrap_sample <- function(delta, h, n = length(delta)) {
   1/beta
 }
 
-perform_boot <- function(x, y, rts, orientation, i, h, theta, boot) {
+#' Perform the actual bootstrap iteration
+#' @noRd
+perform_boot <- function(x, y, rts, orientation, h, theta) {
   beta <- bootstrap_sample(theta, h = h)
   if (orientation == 'in') {
     x_ref <- (theta / beta) * x
-    boot[, i] <- compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x_ref, yref = y, values_only = TRUE)$values
+    boot <- compute_efficiency(x, y, x_ref, y, rts = rts, orientation = orientation)$values
   } else if (orientation == 'out') {
     beta <- 1 / beta
     y_ref <- (theta / beta) * y
-    boot[, i] <- compute_efficiency(x, y, rts = rts, orientation = orientation, xref = x, yref = y_ref, values_only = TRUE)$values
+    boot <- compute_efficiency(x, y, x, y_ref, rts = rts, orientation = orientation)$values
   }
   return(invisible(boot))
 }
 
-process_boot <- function(rts, orientation, h, alpha, theta, boot) {
+#' Internal function to perform the bootstrap. This is also used by server.R
+#' @noRd
+bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, bw_rule, iterations) {
+  # Calculate h to be used in the kernel density function
+  h <- if (is.numeric(bw_rule)) bw_rule else pioneeR:::bw_rule(theta, rule = bw_rule)
+  # Initiate an empty matrix to store results from each bootstrap iteration
+  boot <- matrix(NA_real_, nrow = length(theta), ncol = iterations)
+  # If we are in a Shiny app, we inform the user of progress using withProgress
+  if (shiny::isRunning()) {
+    withProgress(message = 'Running', min = 0, max = iterations, value = 0, {
+      for (i in seq_len(iterations)) {
+        incProgress(1, detail = sprintf('Iteration %s', i))
+        boot[, i] <- perform_boot(x, y, rts, orientation, h, theta)
+      }
+    })
+    # If we are in interactive mode outside of a Shiny app, we inform the user with txtProgressBar
+  } else if (interactive()) {
+    pg <- utils::txtProgressBar(min = 0, max = iterations, style = 3)
+    for (i in seq_len(iterations)) {
+      utils::setTxtProgressBar(pg, i)
+      boot[, i] <- perform_boot(x, y, rts, orientation, h, theta)
+    }
+    close(pg)
+  } else {
+    for (i in seq_len(iterations)) {
+      boot[, i] <- perform_boot(x, y, rts, orientation, h, theta)
+    }
+  }
   # Correcting for bias and constructing CI based on SW98, eq. 2.17 and 2.18
   bias <- as.vector(rowMeans(boot, na.rm = TRUE) - theta)
   theta_tilde <- theta - bias
   theta_ci <- t(apply(boot, 1, quantile, probs = c(alpha / 2, 1 - alpha / 2), na.rm = TRUE)) - (2 * bias)
   # Check for missingness
   is_missing <- apply(boot, 1, \(x) any(is.na(x)))
-
-  # Return data
+  # Return a list of values
   out <- list(
-    eff = theta,
+    efficiency = theta,
+    bootstrap = boot,
+    efficiency_bc = theta_tilde,
     bias = bias,
-    eff_bc = theta_tilde,
-    ci = theta_ci,
-    missing = if (all(!is_missing)) NULL else which(is_missing),
-    tbl = data.frame(
-      eff = theta,
-      bias = bias,
-      eff_bc = theta_tilde,
-      lower = as.vector(theta_ci[, 1]),
-      upper = as.vector(theta_ci[, 2]),
-      range = apply(theta_ci, 1, diff)
-    )
+    conf_int = theta_ci,
+    range = apply(theta_ci, 1, diff)
   )
-  invisible(out)
+  attr(out$bootstrap, 'alpha') <- alpha
+  attr(out$bootstrap, 'bandwidth') <- list(h = h, bw_rule = bw_rule)
+  attr(out$bootstrap, 'iterations') <- iterations
+  attr(out$bootstrap, 'rts') <- rts
+  attr(out$bootstrap, 'orientation') <- orientation
+  structure(out, class = 'pioneer_bootstrap')
 }
