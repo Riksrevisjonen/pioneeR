@@ -1,10 +1,15 @@
 # pioneeR 0.3.0.9000
 
+## Breaking changes
+
+- pioneeR now depends on bslib 0.6.0 or higher (#73)
+
 ## Changes & improvements
 
 - Updated documentation for `run_pioneer()`
 - Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
 - All R functions - including `server()` and `ui()` - have now been moved to the `R` directory with benefits to how internal functions are accessed. In additions, the global environment should be untouched when the app is run (#87)
+- Added new exported bootstrap function for bootstrapping a DEA model (#93)
 
 ## Bug fixes
 
