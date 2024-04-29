@@ -79,8 +79,8 @@ compute_dea_ <- function(model, super, slack, peers) {
 
   eff_res <- compute_efficiency(x, y, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
   if (super) super_res <- compute_super_efficiency(x, y, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
-  if (slack) slack_res <- compute_slack(x, y, eff_res)
-  if (peers) peers_res <- get_peers(eff_res, attr(model, 'dmu'))[-1]
+  if (slack) slack_res <- compute_slack(x, y, eff_res$unadj_values, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
+  if (peers) peers_res <- get_peers(eff_res$lambda, attr(model, 'dmu'))[-1]
 
   res <- list(
     efficiency = as.vector(eff_res$values)

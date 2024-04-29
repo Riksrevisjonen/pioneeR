@@ -30,7 +30,7 @@ test_that('get_peers() gives the correct results', {
 
   bench_res <- benchmarking_results$frontier41$out_crs$efficiency$peers
   res <- compute_efficiency(f41_x, f41_y, rts = 'crs', orientation = 'out')
-  df <- get_peers(res, ids = as.character(frontier41$firm))
+  df <- get_peers(res$lambda, ids = as.character(frontier41$firm))
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
 
@@ -38,7 +38,7 @@ test_that('get_peers() gives the correct results', {
 
   bench_res <- benchmarking_results$norCourts2018$out_vrs$efficiency$peers
   res <- compute_efficiency(nc_x, nc_y, rts = 'vrs', orientation = 'out')
-  df <- get_peers(res, ids = norCourts2018$district_court)
+  df <- get_peers(res$lambda, ids = norCourts2018$district_court)
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
   expect_identical(df$peer3, bench_res[,3])
@@ -51,7 +51,7 @@ test_that('get_peers() gives the correct results', {
 
   bench_res <- benchmarking_results$hospitals$out_vrs$efficiency$peers
   res <- compute_efficiency(hp_x, hp_y, rts = 'vrs', orientation = 'out')
-  df <- get_peers(res, ids = as.character(hospitals$firm_id))
+  df <- get_peers(res$lambda, ids = as.character(hospitals$firm_id))
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
   expect_identical(df$peer3, bench_res[,3])
@@ -61,7 +61,7 @@ test_that('get_peers() gives the correct results', {
 
   bench_res <- benchmarking_results$electricPlants$out_drs$efficiency$peers
   res <- compute_efficiency(ecp_x, ecp_y, rts = 'drs', orientation = 'out')
-  df <- get_peers(res, ids = electricPlants$plant)
+  df <- get_peers(res$lambda, ids = electricPlants$plant)
   expect_identical(df$peer1, bench_res[,1])
   expect_identical(df$peer2, bench_res[,2])
 

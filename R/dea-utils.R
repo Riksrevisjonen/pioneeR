@@ -20,7 +20,7 @@ create_matrix <- function(df, columns, id, normalize = FALSE) {
     cli::cli_abort('ID column not found in the supplied data.frame')
   }
   x <- as.matrix(df[, columns])
-  rownames(x) <- as.vector(df[, id])
+  rownames(x) <- df[[id]]
   colnames(x) <- columns
   x <- if (normalize) apply(x, 2, FUN = \(x) { x / mean(x) }) else x
   x
@@ -150,27 +150,6 @@ check_nunits <- function(x, y, ref = FALSE) {
     }
     cli::cli_abort(c('Inconsistent number of units: ', 'x' = msg))
   }
-}
-
-#' create_dea_output
-#' @noRd
-create_dea_output <- function(res, rts, orientation, dims, values_only) {
-  if (values_only) {
-    res <- list(values = res$values)
-  } else {
-    res$info <- create_model_info(rts, orientation, dims)
-  }
-  res
-}
-
-#' create_model_info
-#' @noRd
-create_model_info <- function(rts, orientation, dims) {
-  list(
-    rts = rts,
-    orientation = orientation,
-    dims = dims
-  )
 }
 
 #' round_numeric
