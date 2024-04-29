@@ -28,7 +28,7 @@ remotes::install_github('riksrevisjonen/pioneeR@stable')
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.2.0')
+remotes::install_github('riksrevisjonen/pioneeR@v0.3.0')
 ```
 
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
@@ -71,7 +71,7 @@ Note that Shiny will not run with port numbers that Google Chrome considers unsa
 
 ### Use a data set from the current session
 
-If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument `x` in the `runPioneeR`-function. The argument supports an object of type `data.frame`, `tbl_df`, `data.table` or `matrix`.
+If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument `x` in the `run_pioneer()`-function. The argument supports an object of type `data.frame`, `tbl_df`, `data.table` or `matrix`.
 
 ```r
 runPioneeR(x = my_data_frame)
