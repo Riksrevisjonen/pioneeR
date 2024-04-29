@@ -179,15 +179,15 @@ print.pioneer_dea <- function(x, ...) {
 #' pioneer_dea summary method
 #' @export
 #' @noRd
-summary.pioneer_dea <- function(x, ...) {
+summary.pioneer_dea <- function(object, ...) {
   cat(sprintf(
     'Technology is %s and %s oriented efficiency\n',
-    toupper(attr(x$model, 'rts')),
-    switch(attr(x$model, 'orientation'), 'in' = 'input', 'out' = 'output')
+    toupper(attr(object$model, 'rts')),
+    switch(attr(object$model, 'orientation'), 'in' = 'input', 'out' = 'output')
   ))
-  cat(sprintf('Mean efficiency: %s\n', round(mean(x$efficiency), 4L)))
+  cat(sprintf('Mean efficiency: %s\n', round(mean(object$efficiency), 4L)))
   cat('-----------\n')
-  summary(x$efficiency)
+  summary(object$efficiency)
 }
 
 #' pioneer_dea as.data.frame method

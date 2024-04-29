@@ -46,8 +46,8 @@ bootstrap_dea <- function(dea, alpha = 0.05, bw_rule = 'ucv', iterations = 2000)
   }
   orientation <- attr(dea$model, 'orientation')
   theta <- dea$efficiency
-  x <- pioneeR:::get_matrix_from_model(dea$model, 'input')
-  y <- pioneeR:::get_matrix_from_model(dea$model, 'output')
+  x <- get_matrix_from_model(dea$model, 'input')
+  y <- get_matrix_from_model(dea$model, 'output')
   bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, iterations)
 }
 
@@ -108,7 +108,7 @@ perform_boot <- function(x, y, rts, orientation, h, theta) {
 #' @noRd
 bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, bw_rule, iterations) {
   # Calculate h to be used in the kernel density function
-  h <- if (is.numeric(bw_rule)) bw_rule else pioneeR:::bw_rule(theta, rule = bw_rule)
+  h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
   # Initiate an empty matrix to store results from each bootstrap iteration
   boot <- matrix(NA_real_, nrow = length(theta), ncol = iterations)
   # If we are in a Shiny app, we inform the user of progress using withProgress
