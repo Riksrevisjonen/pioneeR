@@ -254,7 +254,10 @@ server <- function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      compute_slack(dea.in(), dea.out(), dea.prod())
+      compute_slack(
+        dea.in(), dea.out(), dea.prod()$unadj_values, model_params$rts,
+        model_params$orientation
+      )
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -614,7 +617,7 @@ server <- function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    df <- get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
+    df <- get_peers(dea.prod()$lambda, ids = selection()[, input$dea_id])
     colnames(df)[1] <- 'DMU'
 
     opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
