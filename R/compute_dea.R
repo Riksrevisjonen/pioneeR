@@ -58,7 +58,7 @@ create_model_object <- function(
   }
   attr(model, 'rts') <- rts
   attr(model, 'orientation') <- orientation
-  structure(model, class = 'pioneer_model')
+  structure(model, class = c('pioneer_model', 'data.frame'))
 
 }
 

@@ -185,10 +185,11 @@ round_numeric <- function(df, digits = 4L) {
 get_matrix_from_model <- function(model, type = c('input', 'output')) {
   if (!inherits(model, 'pioneer_model')) cli::cli_abort('Object must be of type pioneer_model')
   type = match.arg(type)
-  as.matrix(as.data.frame(model[attr(model, type)]))
+  as.matrix(model[attr(model, type)])
 }
 
 #' pioneer_dea print method
+#' @export
 #' @noRd
 print.pioneer_dea <- function(x, ...) {
   cat('Efficiency scores:\n')
@@ -197,6 +198,7 @@ print.pioneer_dea <- function(x, ...) {
 }
 
 #' pioneer_dea summary method
+#' @export
 #' @noRd
 summary.pioneer_dea <- function(x, ...) {
   cat(sprintf(
@@ -210,6 +212,7 @@ summary.pioneer_dea <- function(x, ...) {
 }
 
 #' pioneer_dea as.data.frame method
+#' @export
 #' @noRd
 as.data.frame.pioneer_dea <- function(x, ...) {
   out <- list(dmu = attr(x$model, 'dmu'), efficiency = x$efficiency)
