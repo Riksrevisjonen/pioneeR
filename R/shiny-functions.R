@@ -47,9 +47,7 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
     set_local_data(x)
   }
 
-  if (!is.null(port)) {
-    port <- check_for_unsafe_port(port)
-  }
+  port <- check_for_unsafe_port(port)
 
   pioneer_env <- new.env()
   environment(ui) <- pioneer_env
@@ -60,6 +58,7 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
     ui,
     server,
     enableBookmarking = 'server',
+    options = list(port = port),
     ...
   )
 

@@ -34,16 +34,24 @@ set_local_data <- function(x) {
 #' @noRd
 unsafe_ports <- function() {
   return(
-    c(3659, 4045, 5060, 5061, 6000, 6566, 6665:6669, 6697)
+    c(3659L, 4045L, 5060L, 5061L, 6000L, 6566L, 6665L:6669L, 6697L)
   )
+}
+
+#' Get a random safe port. We do not want to use the full range, so we cap at 9999
+#' @noRd
+get_safe_port <- function() {
+  port_range <- 3000L:9999L
+  port_range <- port_range[!port_range %in% unsafe_ports()]
+  sample(port_range, 1)
 }
 
 #' Checks if the specified port is inside the ranges that are considered safe
 #' @noRd
 check_for_unsafe_port <- function(port) {
-  if (is.null(port)) return()
-  port <- as.numeric(port)
-  if (!port %in% 3000:65535 || port %in% unsafe_ports()) {
+  if (is.null(port) || is.na(suppressWarnings(as.numeric(port)))) {
+    port <- get_safe_port()
+  } else if (!port %in% 3000:65535 || port %in% unsafe_ports()) {
     msg <- 'A random port will be used instead'
     if (port %in% unsafe_ports()) {
       msg <- sprintf('Port {.strong {port}} is considered unsafe. %s', msg)
@@ -51,7 +59,7 @@ check_for_unsafe_port <- function(port) {
       msg <- sprintf('Port number must be in the range 3000 through 65535. %s', msg)
     }
     cli::cli_warn(msg)
-    port <- NULL
+    port <- get_safe_port()
   }
   return(invisible(port))
 }
