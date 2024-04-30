@@ -42,7 +42,7 @@ compute_dea(
 \item{peers}{If \code{TRUE} peers are added to the response.}
 }
 \value{
-list
+A list of class \code{pioneer_dea}
 }
 \description{
 DEA analysis.

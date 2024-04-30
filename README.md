@@ -1,12 +1,3 @@
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
 # pioneeR <a href="https://riksrevisjonen.github.io/pioneeR/"><img src="man/figures/logo.png" align="right" height="139" /></a>
 
 R package for running a Shiny app for DEA analysis. Full documentation is available on our [GitHub Pages](https://riksrevisjonen.github.io/pioneeR/).
@@ -28,7 +19,7 @@ remotes::install_github('riksrevisjonen/pioneeR@stable')
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.2.0')
+remotes::install_github('riksrevisjonen/pioneeR@v0.3.0')
 ```
 
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
@@ -71,10 +62,10 @@ Note that Shiny will not run with port numbers that Google Chrome considers unsa
 
 ### Use a data set from the current session
 
-If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument `x` in the `runPioneeR`-function. The argument supports an object of type `data.frame`, `tbl_df`, `data.table` or `matrix`.
+If you have already loaded a data set to your current R session, you can tell pioneeR to use this data set when the app launches. In order to initialise pioneeR with a data set, you set the argument `x` in the `run_pioneer()`-function. The argument supports an object of type `data.frame`, `tbl_df`, `data.table` or `matrix`.
 
 ```r
-runPioneeR(x = my_data_frame)
+run_pioneer(x = my_data_frame)
 ```
 
 ### Save results to the current session
@@ -88,6 +79,10 @@ x <- run_pioneer()
 ## Guideline for contribution
 
 We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines of how to contribute.
+
+## Acknowledgements
+ 
+The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book *Benchmarking with DEA, SFA, and R* (2011). The codebase is also inspired by the supplementary R package [Benchmarking](https://CRAN.R-project.org/package=Benchmarking).
 
 ## License
 

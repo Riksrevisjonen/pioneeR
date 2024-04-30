@@ -254,7 +254,10 @@ server <- function(input, output, session) {
 
   dea.slack <- reactive({
     x <- tryCatch({
-      compute_slack(dea.in(), dea.out(), dea.prod())
+      compute_slack(
+        dea.in(), dea.out(), dea.prod()$unadj_values, model_params$rts,
+        model_params$orientation
+      )
     }, warning = function(e) {
       NULL
     }, error = function(e) {
@@ -614,7 +617,7 @@ server <- function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    df <- get_peers(dea.prod(), ids = selection()[, input$dea_id], threshold = 0)
+    df <- get_peers(dea.prod()$lambda, ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
     opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
@@ -824,33 +827,30 @@ server <- function(input, output, session) {
   dea_boostrap <- reactive({
     if (input$run_boot == 0)
       return()
+
+    # Set up bootstrap params
     rts <- isolate(model_params$rts)
     orientation <- isolate(model_params$orientation)
-    # Set up bootstrap params
     b <- isolate(input$boot_b)
     bw_rule <- isolate(input$boot_bw)
     alpha <- isolate(as.numeric(input$boot_alpha))
-
     x <- isolate(dea.in())
     y <- isolate(dea.out())
+    theta <- isolate(as.vector(dea.prod()$values))
 
-    withProgress(message = 'Running', value = 0, {
-      theta <- isolate(as.vector(dea.prod()$values))
-      # theta >= 1 if 'out', <= if 'in'
-      h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
-      boot <- matrix(NA, nrow = nrow(x), ncol = b)
-      for (i in seq_len(b)) {
-        incProgress(1/b, detail = sprintf('Iteration %s', i))
-        boot <- perform_boot(
-          x, y, rts, orientation, h = h, i = i, theta = theta, boot = boot
-        )
-      }
-    })
-    res <- process_boot(
-      rts, orientation, h = h, alpha = alpha, theta = theta,
-      boot = boot
+    # Perform bootstrap
+    res <- bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, b)
+
+    # Return a data.frame
+    data.frame(
+      efficiency = res$efficiency,
+      bias = res$bias,
+      bias_corrected = res$efficiency_bc,
+      lower = as.vector(res$conf_int[, 1]),
+      upper = as.vector(res$conf_int[, 2]),
+      range = res$range
     )
-    res
+
   })
 
   output$boot_rts_warn <- renderUI({
@@ -881,17 +881,16 @@ server <- function(input, output, session) {
       return()
 
     # Add DMU names and round inputs
-    df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res$tbl, input$boot_round))
+    df <- cbind(data.frame(DMU = names(dea.prod()$values)), round(res, input$boot_round))
 
     opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
-      eff = colDef(show = input$boot_show_eff, name = 'Efficiency'),
+      efficiency = colDef(show = input$boot_show_eff, name = 'Efficiency'),
       bias = colDef(show = input$boot_show_bias, name = 'Bias'),
-      eff_bc = colDef(name = 'Bias corr. score'),
+      bias_corrected = colDef(name = 'Bias corr. score'),
       lower = colDef(name = 'Lower bound'),
       upper = colDef(name = 'Upper bound'),
       range = colDef(name = 'CI range')
-    )
-    )
+    ))
     tbl <- do.call(reactable, opts)
 
     # Add warning if there are any missing observations

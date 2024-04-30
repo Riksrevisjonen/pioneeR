@@ -47,21 +47,15 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
     set_local_data(x)
   }
 
-  if (!is.null(port)) {
-    port <- check_for_unsafe_port(port)
-  }
+  port <- check_for_unsafe_port(port)
 
   pioneer_env <- new.env()
   environment(ui) <- pioneer_env
   environment(server) <- pioneer_env
 
-  # shiny::runApp(system.file('app', package = 'pioneeR'), port = port, ...)
-  shiny::shinyApp(
-    ui,
-    server,
-    enableBookmarking = 'server',
-    ...
-  )
+  # Create app object and run app
+  app <- shiny::shinyApp(ui, server, enableBookmarking = 'server')
+  shiny::runApp(app, port = port, ...)
 
 }
 

@@ -21,6 +21,11 @@ test_that('set_lcoal_data() fails if PIONEER_DATA is already set', {
   Sys.unsetenv('PIONEER_DATA')
 })
 
+test_that('valid ports are set as expected', {
+  expect_equal(check_for_unsafe_port(7700), 7700L)
+  expect_equal(check_for_unsafe_port('7700'), 7700L)
+})
+
 test_that('unsafe ports issue a warning and returns NULL', {
   expect_warning(check_for_unsafe_port(4045))
   expect_warning(check_for_unsafe_port(6566))
@@ -30,6 +35,7 @@ test_that('unsafe ports issue a warning and returns NULL', {
   expect_null(suppressWarnings(check_for_unsafe_port(6566)))
   expect_null(suppressWarnings(check_for_unsafe_port(6666)))
   expect_null(suppressWarnings(check_for_unsafe_port(6697)))
+  expect_null(suppressWarnings(check_for_unsafe_port('abc')))
   expect_equal(suppressWarnings(check_for_unsafe_port(4743)), 4743)
 })
 

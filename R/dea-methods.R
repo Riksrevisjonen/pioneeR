@@ -39,13 +39,10 @@ compute_efficiency <- function(
     n = dims$n_outputs)
   # Adjust values
   res <- adjust_values(res$values, res$lambda, res$eps)
-  # Return
-  res <- create_dea_output(
-    res,
-    rts = rts,
-    orientation = orientation,
-    dims = dims,
-    values_only = values_only)
+  if (values_only) {
+    res <- list(values = res$values)
+  }
+
   res
 }
 
@@ -88,13 +85,7 @@ compute_super_efficiency <- function(
   }
   eps <- lpSolveAPI::lp.control(lp)$epsilon['epsint']
   res <- adjust_values(values, lambda, eps)
-  # Return
-  res <- create_dea_output(
-    res,
-    rts = rts,
-    orientation = orientation,
-    dims = dims,
-    values_only = FALSE)
+
   res
 }
 
@@ -106,9 +97,9 @@ compute_super_efficiency <- function(
 #' @param model Output of `compute_efficiency()`.
 #' @return list
 #' @noRd
-compute_slack <- function(x, y, model) {
+compute_slack <- function(x, y, values, rts, orientation) {
   # Get dims
-  dims <- get_dims(x, y, rts = model$info$rts, slack = TRUE)
+  dims <- get_dims(x, y, rts = rts, slack = TRUE)
   # Scale inputs and outputs if needed
   scale <- scale_vars(
     x, y,
@@ -118,8 +109,8 @@ compute_slack <- function(x, y, model) {
   # Create linear program model
   lp <- create_lp(
     scale$x, scale$y,
-    rts = model$info$rts,
-    orientation = model$info$orientation,
+    rts = rts,
+    orientation = orientation,
     m = dims$n_inputs,
     n = dims$n_outputs,
     n_units = dims$n_units,
@@ -131,8 +122,8 @@ compute_slack <- function(x, y, model) {
   res <- solve_lp_slack(
     lp,
     scale$x, scale$y,
-    values = model$unadj_values, # slack is calculated based on unadjusted eff.scores
-    orientation = model$info$orientation,
+    values = values, # slack is calculated based on unadjusted eff.scores
+    orientation = orientation,
     m = dims$n_inputs,
     n = dims$n_outputs,
     n_units = dims$n_units,
@@ -148,13 +139,7 @@ compute_slack <- function(x, y, model) {
     m = dims$n_inputs,
     n = dims$n_outputs,
     n_units = dims$n_units)
-  # Return
-  res <- create_dea_output(
-    res,
-    rts = model$info$rts,
-    orientation = model$info$orientation,
-    dims = dims,
-    values_only = FALSE)
+
   res
 }
 
@@ -167,8 +152,7 @@ compute_slack <- function(x, y, model) {
 #' @param threshold Minimum weight for extracted peers. Defaults to 0.
 #' @return data.frame
 #' @noRd
-get_peers <- function(model, ids, threshold = 0) {
-  lambda <- model$lambda
+get_peers <- function(lambda, ids, threshold = 0) {
   pt_ <- apply(lambda, 1, function(x) {which(x > threshold)})
   if (dim(lambda)[1] == 1) pt_ <- list(c(pt_))  # Only 1 DMU
   bench <- t(mapply(function(x) x[1:max(sapply(pt_, length))], pt_))

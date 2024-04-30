@@ -41,17 +41,29 @@ unsafe_ports <- function() {
 #' Checks if the specified port is inside the ranges that are considered safe
 #' @noRd
 check_for_unsafe_port <- function(port) {
-  if (is.null(port)) return()
-  port <- as.numeric(port)
-  if (!port %in% 3000:65535 || port %in% unsafe_ports()) {
-    msg <- 'A random port will be used instead'
-    if (port %in% unsafe_ports()) {
-      msg <- sprintf('Port {.strong {port}} is considered unsafe. %s', msg)
+  if (is.null(port)) return(port)
+  if (is.character(port)) {
+    if (is.na(suppressWarnings(as.numeric(port)))) {
+      port <- NULL
     } else {
-      msg <- sprintf('Port number must be in the range 3000 through 65535. %s', msg)
+      port <- as.numeric(port)
+      return(check_for_unsafe_port(port))
     }
-    cli::cli_warn(msg)
-    port <- NULL
+  } else if (is.list(port)) {
+    port <- unlist(port)[1]
+    return(check_for_unsafe_port(port))
+  } else if (is.numeric(port)) {
+    port <- as.integer(port)
+    if (!port %in% 3000L:65535L || port %in% unsafe_ports()) {
+      msg <- 'A random port will be used instead'
+      if (port %in% unsafe_ports()) {
+        msg <- sprintf('Port {.strong {port}} is considered unsafe. %s', msg)
+      } else {
+        msg <- sprintf('Port number must be in the range 3000 through 65535. %s', msg)
+      }
+      cli::cli_warn(msg)
+      port <- NULL
+    }
   }
   return(invisible(port))
 }

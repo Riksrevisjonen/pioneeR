@@ -31,15 +31,7 @@ test_that('compute_super_efficiency() returns the correct structure', {
   # class
   expect_identical(class(res), 'list')
   # object names
-  expect_identical(names(res), c('values', 'unadj_values', 'lambda', 'info'))
-  expect_identical(names(res$info), c('rts', 'orientation', 'dims'))
-  expect_identical(names(res$info$dims), c('n_inputs', 'n_outputs', 'n_units', 'n_constraints', 'n_vars', 'n_lambda'))
-  expect_identical(res$info$rts, 'vrs')
-  expect_identical(res$info$orientation, 'out')
-  # dimensions (dim object)
-  expect_equal(res$info$dims$n_units, nrow(f41_x))
-  expect_equal(res$info$dims$n_inputs, ncol(f41_x))
-  expect_equal(res$info$dims$n_outputs, ncol(f41_y))
+  expect_identical(names(res), c('values', 'unadj_values', 'lambda'))
   # dimensions (values)
   expect_equal(length(res$values), nrow(f41_x))
   expect_equal(length(res$unadj_values), nrow(f41_x))

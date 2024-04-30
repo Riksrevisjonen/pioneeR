@@ -17,7 +17,7 @@
 #' @param super If `TRUE` super efficiency scores are calculated.
 #' @param slack If `TRUE` slack values are calculated.
 #' @param peers If `TRUE` peers are added to the response.
-#' @return list
+#' @return A list of class `pioneer_dea`
 #' @export
 compute_dea <- function(
     data,
@@ -33,23 +33,33 @@ compute_dea <- function(
   rts <- match.arg(rts)
   orientation <- match.arg(orientation)
 
-  # Prepare and validate input
-  x <- as.matrix(data[input])
-  y <- as.matrix(data[output])
-  ids <- data[[id]]
-  check_data(x, y)
+  # Create model object
+  model <- new_pioneer_model(data, id, input, output, rts, orientation, model_type = 'dea')
 
   # Calculate DEA metrics
-  res <- compute_dea_(
-    x, y, ids,
-    rts = rts,
-    orientation = orientation,
-    super = super,
-    slack = slack,
-    peers = peers
-  )
+  compute_dea_(model, super, slack, peers)
 
-  res
+}
+
+#' Constructor function for S3 class pioneer_model
+#' @noRd
+new_pioneer_model <- function(
+    data, id, input, output, rts, orientation, time,
+    model_type = c('dea', 'malmquist')) {
+
+  stopifnot(is.data.frame(data))
+  model_type <- match.arg(model_type)
+  model <- cbind(data[input], data[output])
+  attr(model, 'model') <- model_type
+  attr(model, 'input') <- input
+  attr(model, 'output') <- output
+  attr(model, 'dmu') <- data[[id]]
+  if (model_type == 'malmquist') {
+    attr(model, 'time') <- data[[time]]
+  }
+  attr(model, 'rts') <- rts
+  attr(model, 'orientation') <- orientation
+  structure(model, class = c('pioneer_model', 'data.frame'))
 
 }
 
@@ -58,34 +68,36 @@ compute_dea <- function(
 #' @inheritParams compute_efficiency
 #' @return list
 #' @noRd
-compute_dea_ <- function(x, y, ids, rts, orientation, super, slack, peers) {
+compute_dea_ <- function(model, super, slack, peers) {
+
+  x <- get_matrix_from_model(model, 'input')
+  y <- get_matrix_from_model(model, 'output')
+
+  check_data(x, y)
 
   # Set initial values
-  super_res <- NULL
-  slack_res <- NULL
-  peers_res <- NULL
+  super_res <- slack_res <- peers_res <- NULL
 
-  eff_res <- compute_efficiency(x, y, rts = rts, orientation = orientation)
-  if (super) super_res <- compute_super_efficiency(x, y, rts = rts, orientation = orientation)
-  if (slack) slack_res <- compute_slack(x, y, eff_res)
-  if (peers) {
-    peers_res <- get_peers(eff_res, ids)
-    peers_res <- peers_res[2:ncol(peers_res)]
-  }
+  eff_res <- compute_efficiency(x, y, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
+  if (super) super_res <- compute_super_efficiency(x, y, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
+  if (slack) slack_res <- compute_slack(x, y, eff_res$unadj_values, rts = attr(model, 'rts'), orientation = attr(model, 'orientation'))
+  if (peers) peers_res <- get_peers(eff_res$lambda, attr(model, 'dmu'))[-1]
 
   res <- list(
-    efficiency = eff_res$values,
-    super_efficiency = super_res$values,
-    slack = slack_res$values
+    efficiency = as.vector(eff_res$values)
   )
-  res <- do.call('cbind', res)
-  if (peers) res <- cbind(res, peers_res)
+  if (super) res$super_efficiency <- as.vector(super_res$values)
+  if (slack) res$slack <- as.vector(slack_res$values)
+  if (peers) res$peers <- peers_res
+  res$model <- model
 
-  out <- structure(
-    list(
-      results = data.frame(dmu = ids, res),
-      info = eff_res$info
-    ), class = 'pioneer_dea'
-  )
+  new_pioneer_dea(res)
 
+}
+
+#' Constructor function for S3 object pioneer_dea
+#' @noRd
+new_pioneer_dea <- function(object) {
+  stopifnot(is.list(object), !is.null(object$efficiency))
+  structure(object, class = 'pioneer_dea')
 }

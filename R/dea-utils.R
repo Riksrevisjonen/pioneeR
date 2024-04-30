@@ -20,7 +20,7 @@ create_matrix <- function(df, columns, id, normalize = FALSE) {
     cli::cli_abort('ID column not found in the supplied data.frame')
   }
   x <- as.matrix(df[, columns])
-  rownames(x) <- as.vector(df[, id])
+  rownames(x) <- df[[id]]
   colnames(x) <- columns
   x <- if (normalize) apply(x, 2, FUN = \(x) { x / mean(x) }) else x
   x
@@ -152,27 +152,6 @@ check_nunits <- function(x, y, ref = FALSE) {
   }
 }
 
-#' create_dea_output
-#' @noRd
-create_dea_output <- function(res, rts, orientation, dims, values_only) {
-  if (values_only) {
-    res <- list(values = res$values)
-  } else {
-    res$info <- create_model_info(rts, orientation, dims)
-  }
-  res
-}
-
-#' create_model_info
-#' @noRd
-create_model_info <- function(rts, orientation, dims) {
-  list(
-    rts = rts,
-    orientation = orientation,
-    dims = dims
-  )
-}
-
 #' round_numeric
 #' @noRd
 round_numeric <- function(df, digits = 4L) {
@@ -180,9 +159,39 @@ round_numeric <- function(df, digits = 4L) {
   df
 }
 
-#' pioneer_dea print method
+#' get an input or output matrix from a model object
 #' @noRd
+get_matrix_from_model <- function(model, type = c('input', 'output')) {
+  if (!inherits(model, 'pioneer_model')) cli::cli_abort('Object must be of type pioneer_model')
+  type = match.arg(type)
+  as.matrix(model[attr(model, type)])
+}
+
+#' @export
 print.pioneer_dea <- function(x, ...) {
-  cat("DEA result:\n")
-  utils::str(x)
+  cat('Efficiency scores:\n')
+  print(x$efficiency)
+  invisible(x)
+}
+
+#' @export
+summary.pioneer_dea <- function(object, ...) {
+  cat(sprintf(
+    'Technology is %s and %s oriented efficiency\n',
+    toupper(attr(object$model, 'rts')),
+    switch(attr(object$model, 'orientation'), 'in' = 'input', 'out' = 'output')
+  ))
+  cat(sprintf('Mean efficiency: %s\n', round(mean(object$efficiency), 4L)))
+  cat('-----------\n')
+  summary(object$efficiency)
+}
+
+#' @export
+as.data.frame.pioneer_dea <- function(x, ...) {
+  out <- list(dmu = attr(x$model, 'dmu'), efficiency = x$efficiency)
+  if (!is.null(x$super_efficiency)) out$super_efficiency <- x$super_efficiency
+  if (!is.null(x$slack)) out$slack <- x$slack
+  if (!is.null(x$peers)) out <- cbind(out, x$peers)
+  out <- cbind(out, x$model)
+  structure(out, row.names = seq_len(dim(x$model)[1L]), class = 'data.frame')
 }
