@@ -24,11 +24,27 @@ Run bootstrap on a DEA model to estimate bias corrected efficiency scores and co
 intervals
 }
 \details{
+In order to bootstrap a DEA model, you must first create a DEA model object using the
+\code{compute_dea()} function. Note that you currently can only bootstrap models using
+constant or variable returns to scale (RTS). If you try to bootstrap a model using another
+RTS, the bootstrap will fail with an error message.
+
 The bandwidth argument can be set to either \code{ucv} for unbiased cross validation,
 \code{silverman} for the Silverman rule, or \code{scott} for the Scott rule. If you provide a
 number, this will be used directly as the bandwidth parameter \code{h}. This can be useful
 to replicate results where \code{h} is given, such as Simar & Wilson (1998). For most practical
 applications of the bootstrap, the default of unbias cross validation is sensible.
+}
+\examples{
+\dontrun{
+# Get data
+fare89 <- deaR::Electric_plants
+# Estimate efficiency
+mod <- compute_dea(fare89, 'Plant', c('Labor', 'Fuel', 'Capital'), 'Output', 'vrs', 'in')
+# Run bootstrap
+boot <- bootstrap_dea(mod, iterations = 2000)
+}
+
 }
 \seealso{
 \code{\link[=compute_dea]{compute_dea()}}
