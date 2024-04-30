@@ -34,26 +34,27 @@ compute_dea <- function(
   orientation <- match.arg(orientation)
 
   # Create model object
-  model <- create_model_object(data, id, input, output, rts, orientation, model_type = 'dea')
+  model <- new_pioneer_model(data, id, input, output, rts, orientation, model_type = 'dea')
 
   # Calculate DEA metrics
   compute_dea_(model, super, slack, peers)
 
 }
 
-#' create_model_object
+#' Constructor function for S3 class pioneer_model
 #' @noRd
-create_model_object <- function(
+new_pioneer_model <- function(
     data, id, input, output, rts, orientation, time,
     model_type = c('dea', 'malmquist')) {
 
+  stopifnot(is.data.frame(data))
   model_type <- match.arg(model_type)
   model <- cbind(data[input], data[output])
   attr(model, 'model') <- model_type
   attr(model, 'input') <- input
   attr(model, 'output') <- output
   attr(model, 'dmu') <- data[[id]]
-  if (model_type == 'malm') {
+  if (model_type == 'malmquist') {
     attr(model, 'time') <- data[[time]]
   }
   attr(model, 'rts') <- rts
@@ -90,6 +91,13 @@ compute_dea_ <- function(model, super, slack, peers) {
   if (peers) res$peers <- peers_res
   res$model <- model
 
-  structure(res, class = 'pioneer_dea')
+  new_pioneer_dea(res)
 
+}
+
+#' Constructor function for S3 object pioneer_dea
+#' @noRd
+new_pioneer_dea <- function(object) {
+  stopifnot(is.list(object), !is.null(object$efficiency))
+  structure(object, class = 'pioneer_dea')
 }

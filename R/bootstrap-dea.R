@@ -51,7 +51,8 @@ bootstrap_dea <- function(dea, alpha = 0.05, bw_rule = 'ucv', iterations = 2000)
   bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, iterations)
 }
 
-bw_rule <- function(delta, rule = 'ucv') {
+bw_rule <- function(delta, rule = c('ucv', 'silverman', 'scott')) {
+  rule <- match.arg(rule)
   # Values must be in range 1, Inf. Take inverse if values are in range 0, 1
   if (min(delta) < 1) {
     delta <- 1/delta
@@ -147,10 +148,20 @@ bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, bw_rule, iterat
     conf_int = theta_ci,
     range = apply(theta_ci, 1, diff)
   )
-  attr(out$bootstrap, 'alpha') <- alpha
-  attr(out$bootstrap, 'bandwidth') <- list(h = h, bw_rule = bw_rule)
-  attr(out$bootstrap, 'iterations') <- iterations
-  attr(out$bootstrap, 'rts') <- rts
-  attr(out$bootstrap, 'orientation') <- orientation
-  structure(out, class = 'pioneer_bootstrap')
+  new_pioneer_bootstrap(
+    out, alpha, list(h = h, bw_rule = bw_rule), iterations, rts, orientation
+  )
+}
+
+#' Constructor for S3 class pioneer_bootstrap
+#' @noRd
+new_pioneer_bootstrap <- function(object, alpha, bandwidth, iterations, rts, orientation) {
+  stopifnot(is.list(object))
+  stopifnot(!is.null(object$bootstrap))
+  attr(object$bootstrap, 'alpha') <- alpha
+  attr(object$bootstrap, 'bandwidth') <- bandwidth
+  attr(object$bootstrap, 'iterations') <- iterations
+  attr(object$bootstrap, 'rts') <- rts
+  attr(object$bootstrap, 'orientation') <- orientation
+  structure(object, class = 'pioneer_bootstrap')
 }
