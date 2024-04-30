@@ -167,18 +167,14 @@ get_matrix_from_model <- function(model, type = c('input', 'output')) {
   as.matrix(model[attr(model, type)])
 }
 
-#' pioneer_dea print method
 #' @export
-#' @noRd
 print.pioneer_dea <- function(x, ...) {
   cat('Efficiency scores:\n')
   print(x$efficiency)
   invisible(x)
 }
 
-#' pioneer_dea summary method
 #' @export
-#' @noRd
 summary.pioneer_dea <- function(object, ...) {
   cat(sprintf(
     'Technology is %s and %s oriented efficiency\n',
@@ -190,9 +186,7 @@ summary.pioneer_dea <- function(object, ...) {
   summary(object$efficiency)
 }
 
-#' pioneer_dea as.data.frame method
 #' @export
-#' @noRd
 as.data.frame.pioneer_dea <- function(x, ...) {
   out <- list(dmu = attr(x$model, 'dmu'), efficiency = x$efficiency)
   if (!is.null(x$super_efficiency)) out$super_efficiency <- x$super_efficiency

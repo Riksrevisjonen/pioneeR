@@ -617,7 +617,7 @@ server <- function(input, output, session) {
   })
 
   output$peers.table <- renderReactable({
-    df <- get_peers(dea.prod()$lambda, ids = selection()[, input$dea_id])
+    df <- get_peers(dea.prod()$lambda, ids = selection()[, input$dea_id], threshold = 0)
     colnames(df)[1] <- 'DMU'
 
     opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
