@@ -53,14 +53,9 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
   environment(ui) <- pioneer_env
   environment(server) <- pioneer_env
 
-  # shiny::runApp(system.file('app', package = 'pioneeR'), port = port, ...)
-  shiny::shinyApp(
-    ui,
-    server,
-    enableBookmarking = 'server',
-    options = list(port = port),
-    ...
-  )
+  # Create app object and run app
+  app <- shiny::shinyApp(ui, server, enableBookmarking = 'server')
+  shiny::runApp(app, port = port, ...)
 
 }
 
