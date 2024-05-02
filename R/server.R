@@ -674,13 +674,16 @@ server <- function(input, output, session) {
     mod_save <- list(
       id = rand_id(),
       data = data.frame(
-        idx = seq_len(length(mod$values)),
-        dmu = selection()[, input$dea_id], #names(mod$eff),
+        idx = seq_along(mod$values),
+        dmu = selection()[, input$dea_id],
         eff = round(unname(mod$values), input$dea_round)
       ),
+      # We currently use the reactive model values from the app state to record
+      # model params. However, we should create a model object as we do in compute_dea()
+      # and return this object with attributes instead.
       params = list(
-        rts = mod$RTS,
-        orientation = mod$ORIENTATION
+        rts = model_params$rts,
+        orientation = model_params$orientation
       )
     )
     models(append(models(), list(mod_save)))
