@@ -1,6 +1,7 @@
 #' Compute DEA
 #'
-#' DEA analysis.
+#' Solve an input or output oriented DEA model under constant, `crs`, variable, `vrs`,
+#' non-increasing, `drs`, or non-decreasing, `irs` returns to scale.
 #'
 #' @param data Dataset to analyse.
 #' @param id A string with the DMU id or name variable.
@@ -17,6 +18,7 @@
 #' @param super If `TRUE` super efficiency scores are calculated.
 #' @param slack If `TRUE` slack values are calculated.
 #' @param peers If `TRUE` peers are added to the response.
+#'
 #' @return A list of class `pioneer_dea`
 #' @export
 compute_dea <- function(
@@ -32,6 +34,8 @@ compute_dea <- function(
 
   rts <- match.arg(rts)
   orientation <- match.arg(orientation)
+  # Allow missing argument for id
+  id <- if (missing(id)) NULL else id
 
   # Create model object
   model <- new_pioneer_model(data, id, input, output, rts, orientation, model_type = 'dea')
@@ -53,7 +57,7 @@ new_pioneer_model <- function(
   attr(model, 'model') <- model_type
   attr(model, 'input') <- input
   attr(model, 'output') <- output
-  attr(model, 'dmu') <- data[[id]]
+  if (!is.null(id)) attr(model, 'dmu') <- data[[id]]
   if (model_type == 'malmquist') {
     attr(model, 'time') <- data[[time]]
   }
@@ -65,7 +69,6 @@ new_pioneer_model <- function(
 
 #' compute_dea_ (internal helper)
 #' @inheritParams compute_dea
-#' @inheritParams compute_efficiency
 #' @return list
 #' @noRd
 compute_dea_ <- function(model, super, slack, peers) {

@@ -45,5 +45,6 @@ compute_dea(
 A list of class \code{pioneer_dea}
 }
 \description{
-DEA analysis.
+Solve an input or output oriented DEA model under constant, \code{crs}, variable, \code{vrs},
+non-increasing, \code{drs}, or non-decreasing, \code{irs} returns to scale.
 }
