@@ -32,6 +32,22 @@ test_that('bootstrap_dea() will perform a bootstrap for all supported technologi
   expect_equal(attr(boot_crs_out$bootstrap, 'orientation'), 'out')
 })
 
+test_that('bootstrap_sample() returns a vector in the interval [0, 1]', {
+  # We create a vector of random floats in the interval [0, 1]
+  # We do not set a seed, as we do not want (fully) deterministic values
+  rand_eff <- runif(20)
+  h <- bw_rule(rand_eff)
+  b_sample <- bootstrap_sample(rand_eff, h)
+  expect_equal(class(b_sample), 'numeric')
+  expect_equal(typeof(b_sample), 'double')
+  expect_true(max(b_sample) <= 1)
+  expect_true(min(b_sample) >= 0)
+  # Output oriented scores should still produce sample values [0, 1]
+  b_sample <- bootstrap_sample(1/rand_eff, h)
+  expect_true(max(b_sample) <= 1)
+  expect_true(min(b_sample) >= 0)
+})
+
 test_that('bw_rule can be set as expected', {
   boot_ucv <- bootstrap_dea(mod_vrs_in, bw_rule = 'ucv', iterations = 2)
   expect_equal(attr(boot_ucv$bootstrap, 'bandwidth')$bw_rule, 'ucv')
