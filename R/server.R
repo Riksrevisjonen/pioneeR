@@ -835,14 +835,14 @@ server <- function(input, output, session) {
     rts <- isolate(model_params$rts)
     orientation <- isolate(model_params$orientation)
     b <- isolate(input$boot_b)
-    bw_rule <- isolate(input$boot_bw)
     alpha <- isolate(as.numeric(input$boot_alpha))
     x <- isolate(dea.in())
     y <- isolate(dea.out())
     theta <- isolate(as.vector(dea.prod()$values))
+    h <- isolate(bw_rule(theta, input$boot_bw))
 
     # Perform bootstrap
-    res <- bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, b)
+    res <- bootstrap_dea_(x, y, theta, rts, orientation, alpha, h, b)
 
     # Return a data.frame
     data.frame(
