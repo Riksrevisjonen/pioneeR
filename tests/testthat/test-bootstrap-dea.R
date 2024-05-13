@@ -1,11 +1,11 @@
 # Frontier 4.1
 frontier41 <- readRDS('../testdata/frontier41.RDS')
 
-mod_vrs_in <- compute_dea(frontier41, 'firm', c('labour', 'capital'), 'output', rts = 'vrs', orientation = 'in')
-mod_vrs_out <- compute_dea(frontier41, 'firm', c('labour', 'capital'), 'output', rts = 'vrs', orientation = 'out')
-mod_crs_in <- compute_dea(frontier41, 'firm', c('labour', 'capital'), 'output', rts = 'crs', orientation = 'in')
-mod_crs_out <- compute_dea(frontier41, 'firm', c('labour', 'capital'), 'output', rts = 'crs', orientation = 'out')
-mod_irs_in <- compute_dea(frontier41, 'firm', c('labour', 'capital'), 'output', rts = 'irs', orientation = 'in')
+mod_vrs_in <- compute_dea(frontier41, id = 'firm', input = c('labour', 'capital'), output = 'output', rts = 'vrs', orientation = 'in')
+mod_vrs_out <- compute_dea(frontier41, id = 'firm',input = c('labour', 'capital'), output = 'output', rts = 'vrs', orientation = 'out')
+mod_crs_in <- compute_dea(frontier41, id = 'firm', input = c('labour', 'capital'), output ='output', rts = 'crs', orientation = 'in')
+mod_crs_out <- compute_dea(frontier41, id = 'firm', input = c('labour', 'capital'), output = 'output', rts = 'crs', orientation = 'out')
+mod_irs_in <- compute_dea(frontier41, id = 'firm', input = c('labour', 'capital'), output = 'output', rts = 'irs', orientation = 'in')
 
 test_that('bootstrap_dea() returns error as expected', {
   expect_error(bootstrap_dea(data.frame(x = 1:10)))

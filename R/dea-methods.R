@@ -147,7 +147,7 @@ compute_slack <- function(x, y, values, rts, orientation) {
 #'
 #' Get peers for each DMU.
 #'
-#' @param lambda A vector of l.
+#' @param lambda Output of `compute_efficiency()$lambda`.
 #' @param ids A vector with DMU names or ids.
 #' @param threshold Minimum weight for extracted peers. Defaults to 0.
 #' @return data.frame

@@ -1,10 +1,10 @@
 #' Compute DEA
 #'
-#' Solve an input or output oriented DEA model under constant, `crs`, variable, `vrs`,
-#' non-increasing, `drs`, or non-decreasing, `irs` returns to scale.
+#' Solve an input or output oriented DEA model under constant (`crs`), variable (`vrs`),
+#' non-increasing (`drs`), or non-decreasing (`irs`) returns to scale.
 #'
 #' @param data Dataset to analyse.
-#' @param id A string with the DMU id or name variable.
+#' @param id Optional. A string with the DMU id or name variable. Defaults to the rownames of the dataset.
 #' @param input A character vector with input variables.
 #' @param output A character vector with output variables.
 #' @param rts Returns to scale.
@@ -23,9 +23,9 @@
 #' @export
 compute_dea <- function(
     data,
-    id,
     input,
     output,
+    id = NULL,
     rts = c('crs', 'vrs', 'drs', 'irs'),
     orientation = c('in', 'out'),
     super = FALSE,
@@ -34,8 +34,6 @@ compute_dea <- function(
 
   rts <- match.arg(rts)
   orientation <- match.arg(orientation)
-  # Allow missing argument for id
-  id <- if (missing(id)) NULL else id
 
   # Create model object
   model <- new_pioneer_model(data, id, input, output, rts, orientation, model_type = 'dea')
