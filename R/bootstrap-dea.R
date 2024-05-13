@@ -61,11 +61,21 @@ bootstrap_dea <- function(dea, alpha = 0.05, bw_rule = 'ucv', iterations = 2000)
   }
   orientation <- attr(dea$model, 'orientation')
   theta <- dea$efficiency
+  dmu <- attr(dea$model, 'dmu')
   x <- get_matrix_from_model(dea$model, 'input')
   y <- get_matrix_from_model(dea$model, 'output')
-  bootstrap_dea_(x, y, theta, rts, orientation, alpha, bw_rule, iterations)
+  # Calculate h to be used in the kernel density function
+  h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
+  # Perform bootstrap
+  boot <- bootstrap_dea_(x, y, theta, rts, orientation, alpha, h, iterations)
+  # Return bootstrap object
+  new_pioneer_bootstrap(
+    boot, dmu, alpha, list(h = h, bw_rule = bw_rule), iterations, rts, orientation
+  )
 }
 
+#' Find bandwidth parameter h based on data and bandwidth rule
+#' @noRd
 bw_rule <- function(delta, rule = c('ucv', 'silverman', 'scott')) {
   rule <- match.arg(rule)
   # Values must be in range 1, Inf. Take inverse if values are in range 0, 1
@@ -122,9 +132,7 @@ perform_boot <- function(x, y, rts, orientation, h, theta) {
 
 #' Internal function to perform the bootstrap. This is also used by server.R
 #' @noRd
-bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, bw_rule, iterations) {
-  # Calculate h to be used in the kernel density function
-  h <- if (is.numeric(bw_rule)) bw_rule else bw_rule(theta, rule = bw_rule)
+bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, h, iterations) {
   # Initiate an empty matrix to store results from each bootstrap iteration
   boot <- matrix(NA_real_, nrow = length(theta), ncol = iterations)
   # If we are in a Shiny app, we inform the user of progress using withProgress
@@ -163,20 +171,56 @@ bootstrap_dea_ <- function(x, y, theta, rts, orientation, alpha, bw_rule, iterat
     conf_int = theta_ci,
     range = apply(theta_ci, 1, diff)
   )
-  new_pioneer_bootstrap(
-    out, alpha, list(h = h, bw_rule = bw_rule), iterations, rts, orientation
-  )
 }
 
 #' Constructor for S3 class pioneer_bootstrap
 #' @noRd
-new_pioneer_bootstrap <- function(object, alpha, bandwidth, iterations, rts, orientation) {
+new_pioneer_bootstrap <- function(object, dmu, alpha, bandwidth, iterations, rts, orientation) {
   stopifnot(is.list(object))
   stopifnot(!is.null(object$bootstrap))
+  if (!is.null(dmu)) attr(object$bootstrap, 'dmu') <- dmu
   attr(object$bootstrap, 'alpha') <- alpha
   attr(object$bootstrap, 'bandwidth') <- bandwidth
   attr(object$bootstrap, 'iterations') <- iterations
   attr(object$bootstrap, 'rts') <- rts
   attr(object$bootstrap, 'orientation') <- orientation
   structure(object, class = 'pioneer_bootstrap')
+}
+
+#' @export
+summary.pioneer_bootstrap <- function(object, ...) {
+  cat(sprintf(
+    'Bootstrap with %s iterations of DEA model with technology %s and %s oriented efficieny\n',
+    attr(object$bootstrap, 'iterations'),
+    toupper(attr(object$bootstrap, 'rts')),
+    switch(attr(object$bootstrap, 'orientation'), 'in' = 'input', 'out' = 'output')
+  ))
+  cat(sprintf(
+    'Mean bias corrected efficiency: %s\n', round(mean(object$efficiency_bc), 4L)
+  ))
+  cat(sprintf('Mean bias: %s\n', round(mean(object$bias), 4L)))
+  cat('-----------\n')
+  summary(object$efficiency_bc)
+}
+
+#' @export
+print.pioneer_bootstrap <- function(x, ...) {
+  cat('Bias corrected efficiency scores:\n')
+  print(x$efficiency_bc)
+  invisible(x)
+}
+
+#' @export
+as.data.frame.pioneer_bootstrap <- function(x, ...) {
+  stopifnot(is.matrix(x$bootstrap))
+  out <- list(
+    if (!is.null(attr(x$bootstrap, 'dmu'))) dmu = attr(x$bootstrap, 'dmu'),
+    efficiency = x$efficiency,
+    bias = x$bias,
+    bias_corrected = x$efficiency_bc,
+    lower = as.vector(x$conf_int[, 1]),
+    upper = as.vector(x$conf_int[, 2]),
+    range = x$range
+  )
+  structure(out, row.names = seq_len(dim(x$bootstrap)[1L]), class = 'data.frame')
 }

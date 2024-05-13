@@ -188,10 +188,12 @@ summary.pioneer_dea <- function(object, ...) {
 
 #' @export
 as.data.frame.pioneer_dea <- function(x, ...) {
-  out <- list(dmu = attr(x$model, 'dmu'), efficiency = x$efficiency)
+  out <- list()
+  if (!is.null(attr(x$model, 'dmu'))) x$dmu = attr(x$model, 'dmu')
+  out$efficiency = x$efficiency
   if (!is.null(x$super_efficiency)) out$super_efficiency <- x$super_efficiency
   if (!is.null(x$slack)) out$slack <- x$slack
-  if (!is.null(x$peers)) out <- cbind(out, x$peers)
-  out <- cbind(out, x$model)
+  if (!is.null(x$peers)) out <- c(out, x$peers)
+  out <- c(out, x$model)
   structure(out, row.names = seq_len(dim(x$model)[1L]), class = 'data.frame')
 }

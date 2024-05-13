@@ -147,19 +147,18 @@ compute_slack <- function(x, y, values, rts, orientation) {
 #'
 #' Get peers for each DMU.
 #'
-#' @param model Output of `compute_efficiency()`.
+#' @param lambda Output of `compute_efficiency()$lambda`.
 #' @param ids A vector with DMU names or ids.
 #' @param threshold Minimum weight for extracted peers. Defaults to 0.
 #' @return data.frame
 #' @noRd
 get_peers <- function(lambda, ids, threshold = 0) {
-  pt_ <- apply(lambda, 1, function(x) {which(x > threshold)})
-  if (dim(lambda)[1] == 1) pt_ <- list(c(pt_))  # Only 1 DMU
-  bench <- t(mapply(function(x) x[1:max(sapply(pt_, length))], pt_))
-  maxp <- max(sapply(pt_, length))
-  if (maxp == 0 | is.na(maxp)) maxp <- 1
-  dim(bench) <- c(dim(lambda)[1], maxp)
-  bench <- matrix(ids[bench], nrow=nrow(bench))
+  ids <- if (is.null(ids)) seq_len(dim(lambda)[1L]) else ids
+  pt_ <- lapply(seq_len(nrow(lambda)), \(i) which(lambda[i,] > threshold))
+  maxp <- max(lengths(pt_))
+  if (is.na(maxp) || maxp == 0) maxp <- 1
+  bench <- t(vapply(pt_, \(x) x[1:maxp], numeric(maxp)))
+  bench <- matrix(ids[bench], nrow = nrow(bench))
   colnames(bench) <- paste0('peer', 1:ncol(bench))
   bench <- data.frame(cbind(dmu = ids, bench))
   bench

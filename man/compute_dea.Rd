@@ -6,9 +6,9 @@
 \usage{
 compute_dea(
   data,
-  id,
   input,
   output,
+  id = NULL,
   rts = c("crs", "vrs", "drs", "irs"),
   orientation = c("in", "out"),
   super = FALSE,
@@ -19,11 +19,11 @@ compute_dea(
 \arguments{
 \item{data}{Dataset to analyse.}
 
-\item{id}{A string with the DMU id or name variable.}
-
 \item{input}{A character vector with input variables.}
 
 \item{output}{A character vector with output variables.}
+
+\item{id}{Optional. A string with the DMU id or name variable. Defaults to the rownames of the dataset.}
 
 \item{rts}{Returns to scale.
 \tabular{rlll}{
@@ -45,5 +45,6 @@ compute_dea(
 A list of class \code{pioneer_dea}
 }
 \description{
-DEA analysis.
+Solve an input or output oriented DEA model under constant (\code{crs}), variable (\code{vrs}),
+non-increasing (\code{drs}), or non-decreasing (\code{irs}) returns to scale.
 }
