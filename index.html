@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,7 +85,7 @@
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@stable'</span><span class="op">)</span></span></code></pre></div>
 <p>If you want to install a specific version of pioneeR, you can add the release version:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@v0.3.0'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@v0.4.0'</span><span class="op">)</span></span></code></pre></div>
 <p>Note that pioneeR will install the <code>productivity</code> package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency <code>GLPK</code> first. On Ubuntu this can be done by typing the following command:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">sudo</span> apt-get install libglpk-dev</span></code></pre></div>
 <p>On macOS, we recommend that you install <code>glpk</code> with <a href="https://brew.sh" class="external-link">Homebrew</a>. Open the terminal and type:</p>
@@ -93,7 +93,7 @@
 <div class="section level3">
 <h3 id="exporting-reports-as-pdf">Exporting reports as PDF<a class="anchor" aria-label="anchor" href="#exporting-reports-as-pdf"></a>
 </h3>
-<p>pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the <a href="https://yihui.name/tinytex/" class="external-link"><code>tinytex</code>-package</a> by Yihui Xie. Install LaTeX on your system by typing:</p>
+<p>pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the <a href="https://yihui.org/tinytex/" class="external-link"><code>tinytex</code>-package</a> by Yihui Xie. Install LaTeX on your system by typing:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'tinytex'</span><span class="op">)</span></span>
 <span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/install_tinytex.html" class="external-link">install_tinytex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>

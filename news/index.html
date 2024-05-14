@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,22 +45,24 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0.9000" id="pioneer-0309000">pioneeR 0.3.0.9000<a class="anchor" aria-label="anchor" href="#pioneer-0309000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.0" id="pioneer-040">pioneeR 0.4.0<a class="anchor" aria-label="anchor" href="#pioneer-040"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-0-3-0-9000">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-3-0-9000"></a></h3>
-<ul><li>pioneeR now depends on bslib 0.6.0 or higher (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/73" class="external-link">#73</a>)</li>
+<h3 id="breaking-changes-0-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0"></a></h3>
+<ul><li><p>pioneeR now depends on bslib 0.6.0 or higher (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/73" class="external-link">#73</a>)</p></li>
+<li><p><code><a href="../reference/summary_tbl_dea.html">summary_tbl_dea()</a></code> no longer supports <code>Farell</code>-type objects from the <code>{Benchmarking}</code> package (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/104" class="external-link">#104</a>)</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="changes--improvements-0-3-0-9000">Changes &amp; improvements<a class="anchor" aria-label="anchor" href="#changes--improvements-0-3-0-9000"></a></h3>
+<h3 id="changes--improvements-0-4-0">Changes &amp; improvements<a class="anchor" aria-label="anchor" href="#changes--improvements-0-4-0"></a></h3>
 <ul><li>Updated documentation for <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>
 </li>
+<li>Added a new package logo (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/21" class="external-link">#21</a>)</li>
 <li>Added custom functions for DEA calculations in order to remove <code>{Benchmarking}</code> as a dependency (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/80" class="external-link">#80</a>)</li>
-<li>All R functions - including <code>server()</code> and <code>ui()</code> - have now been moved to the <code>R</code> directory with benefits to how internal functions are accessed. In additions, the global environment should be untouched when the app is run (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/87" class="external-link">#87</a>)</li>
-<li>Added new exported bootstrap function for bootstrapping a DEA model (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/93" class="external-link">#93</a>)</li>
+<li>Added new exported functions for calculating, and bootstraping DEA models, <code><a href="../reference/compute_dea.html">compute_dea()</a></code> and <code><a href="../reference/bootstrap_dea.html">bootstrap_dea()</a></code> (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/80" class="external-link">#80</a>, <a href="https://github.com/Riksrevisjonen/pioneeR/issues/93" class="external-link">#93</a>)</li>
+<li>All R functions - including <code>server()</code> and <code>ui()</code> - have been moved to the <code>R</code> directory with benefits to how internal functions are accessed. In addition, the global environment is untouched when the app is run (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/87" class="external-link">#87</a>)</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-3-0-9000">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0-9000"></a></h3>
-<ul><li>Fixed bug where checkbox for timeseries would be available before any data is uploaded (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/74" class="external-link">#74</a>)</li>
+<h3 id="bug-fixes-0-4-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-0"></a></h3>
+<ul><li>Fixed a bug where the checkbox for timeseries would be available before any data is uploaded (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/74" class="external-link">#74</a>)</li>
 <li>Fixed a few bugs where the UI did not correctly reflect the user supplied input for rounding (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/84" class="external-link">#84</a>)</li>
 </ul></div>
 </div>
