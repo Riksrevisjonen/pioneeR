@@ -1,6 +1,6 @@
 Package: pioneeR
 Title: Perform productivity analyses in a web browser
-Version: 0.3.0.9000
+Version: 0.4.0
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
     person("Aleksander", "Eilertsen", role = "aut", email = "ale@riksrevisjonen.no"),
@@ -31,11 +31,8 @@ Imports:
     scales,
     writexl
 Suggests:
-    Benchmarking (>= 0.30),
-    data.table,
     rmarkdown,
     knitr,
-    magick,
     testthat (>= 3.0.0),
     tibble,
     withr

@@ -1,4 +1,5 @@
 # ---- Load datasets ---- #
+library(Benchmarking)
 
 # Simple example (taken from https://pystoned.readthedocs.io/en/latest/examples/DEA/dea_ref.html)
 x <- as.matrix(c(100, 200, 300, 500, 100, 200, 600, 400, 550, 600))
@@ -59,11 +60,11 @@ create_testdata <- function(x, y, xref = NULL, yref = NULL, ids) {
 #' @param rts Returns to scale
 #' @param orientation Model orientation
 create_testdata_single <- function(x, y, xref, yref, ids, rts, orientation) {
-  eff <- Benchmarking::dea(x, y, XREF = xref, YREF = yref, RTS = rts, ORIENTATION = orientation)
-  super_eff <- Benchmarking::sdea(x, y, RTS = rts, ORIENTATION = orientation)
-  slack <- Benchmarking::slack(x, y, e = eff)
+  eff <- dea(x, y, XREF = xref, YREF = yref, RTS = rts, ORIENTATION = orientation)
+  super_eff <- sdea(x, y, RTS = rts, ORIENTATION = orientation)
+  slack <- slack(x, y, e = eff)
   colnames(eff$lambda) <- ids
-  peers <- Benchmarking::peers(eff, NAMES = TRUE)
+  peers <- peers(eff, NAMES = TRUE)
 
   dimnames(eff$lambda) <- NULL
   dimnames(super_eff$lambda) <- NULL

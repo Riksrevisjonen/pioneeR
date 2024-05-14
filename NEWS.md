@@ -4,6 +4,8 @@
 
 - pioneeR now depends on bslib 0.6.0 or higher (#73)
 
+- `summary_tbl_dea()` no longer supports `Farell`-type objects from the `{Benchmarking}` package (#104)
+
 ## Changes & improvements
 
 - Updated documentation for `run_pioneer()`
