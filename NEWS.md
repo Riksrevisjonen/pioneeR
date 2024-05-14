@@ -1,19 +1,23 @@
-# pioneeR 0.3.0.9000
+# pioneeR 0.4.0
 
 ## Breaking changes
 
 - pioneeR now depends on bslib 0.6.0 or higher (#73)
 
+- `summary_tbl_dea()` no longer supports `Farell`-type objects from the `{Benchmarking}` package (#104)
+
 ## Changes & improvements
 
 - Updated documentation for `run_pioneer()`
+- Added a new package logo (#21)
 - Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
-- All R functions - including `server()` and `ui()` - have now been moved to the `R` directory with benefits to how internal functions are accessed. In additions, the global environment should be untouched when the app is run (#87)
-- Added new exported bootstrap function for bootstrapping a DEA model (#93)
+- Added new exported functions for calculating, and bootstraping DEA models, `compute_dea()` and `bootstrap_dea()` (#80, #93)
+- All R functions - including `server()` and `ui()` - have been moved to the `R` directory with benefits to how internal functions are accessed. In addition, the global environment is untouched when the app is run (#87)
+
 
 ## Bug fixes
 
-- Fixed bug where checkbox for timeseries would be available before any data is uploaded (#74)
+- Fixed a bug where the checkbox for timeseries would be available before any data is uploaded (#74)
 - Fixed a few bugs where the UI did not correctly reflect the user supplied input for rounding (#84)
 
 # pioneeR 0.3.0

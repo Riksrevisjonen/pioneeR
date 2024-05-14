@@ -13,11 +13,3 @@ test_that('output oriented models are summarised correctly', {
   expect_true(all(grepl('F', s$Range)))
   expect_equal(length(x), sum(s$Frequency))
 })
-
-test_that('Farrell objects are handled correctly', {
-  x <- matrix(runif(20), ncol = 2)
-  y <- matrix(runif(20), ncol = 2)
-  d <- Benchmarking::dea(x, y)
-  s <- summary_tbl_dea(d)
-  expect_equal(class(s), 'data.frame')
-})

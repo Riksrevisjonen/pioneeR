@@ -18,13 +18,6 @@ summary_tbl_dea <- function(x) {
   UseMethod('summary_tbl_dea')
 }
 
-#' @method summary_tbl_dea Farrell
-#' @export
-summary_tbl_dea.Farrell <- function(x) {
-  eff <- x$eff
-  summary_tbl_dea(eff)
-}
-
 #' @method summary_tbl_dea pioneer_dea
 #' @export
 summary_tbl_dea.pioneer_dea <- function(x) {

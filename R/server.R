@@ -1192,8 +1192,11 @@ server <- function(input, output, session) {
           n_rows, if (one) 'row' else 'rows', t_rows, if (one) 'is' else 'are'
         ))
       ),
-      actionButton('data.subset.select', 'Select all'),
-      actionButton('data.subset.deselect', 'Deselect all')
+      div(
+        class = 'grid',
+        div(class = 'g-col-6', actionButton('data.subset.select', class = 'w-100', 'Select all')),
+        div(class = 'g-col-6', actionButton('data.subset.deselect', class = 'w-100', 'Deselect all'))
+      )
     )
 
   })

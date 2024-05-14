@@ -19,7 +19,7 @@ remotes::install_github('riksrevisjonen/pioneeR@stable')
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.3.0')
+remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
 ```
 
 Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
@@ -36,7 +36,7 @@ brew install glpk
 
 ### Exporting reports as PDF
 
-pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.name/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
+pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.org/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
 
 ```r
 install.packages('tinytex')
