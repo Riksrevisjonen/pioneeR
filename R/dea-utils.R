@@ -152,13 +152,6 @@ check_nunits <- function(x, y, ref = FALSE) {
   }
 }
 
-#' round_numeric
-#' @noRd
-round_numeric <- function(df, digits = 4L) {
-  df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, digits) else x)
-  df
-}
-
 #' get an input or output matrix from a model object
 #' @noRd
 get_matrix_from_model <- function(model, type = c('input', 'output')) {

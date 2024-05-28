@@ -8,7 +8,6 @@ vals <- list(
   'rts' = c(
     'Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
     'Non-decreasing RTS' = 'irs'),
-  'malm_rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
 
@@ -254,7 +253,6 @@ ui <- function(request) { page_navbar(
         accordion(
           accordion_panel(
             title = 'Model',
-            selectInput('malm_rts', 'Returns to scale', choices = vals$malm_rts, selected = 'crs'),
             selectInput('malm_orientation', 'Orientation', choices = vals$orient, selected = 'in')
           ),
           accordion_panel(

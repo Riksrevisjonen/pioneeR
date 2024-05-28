@@ -59,7 +59,9 @@ new_pioneer_model <- function(
   if (model_type == 'malmquist') {
     attr(model, 'time') <- data[[time]]
   }
-  attr(model, 'rts') <- rts
+  if (model_type != 'malmquist') {
+    attr(model, 'rts') <- rts
+  }
   attr(model, 'orientation') <- orientation
   structure(model, class = c('pioneer_model', 'data.frame'))
 

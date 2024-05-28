@@ -968,31 +968,26 @@ server <- function(input, output, session) {
 
     df <- check_balance(selection(), params()$id, params()$year)
 
-    malmquist <- productivity::malm(
-      data = df$data, id.var = params()$id, time.var = params()$year,
-      x.vars = params()$inputs, y.vars = params()$outputs,
-      rts = input$malm_rts, orientation = input$malm_orientation, scaled = TRUE)
-
-    d <- malmquist$Changes[, c(1:6)]
-
-    colnames(d) <- c(params()$id, 'Year', 'Ref. year', 'Malmquist', 'Eff. change', 'Tech. change')
+    d <- compute_malmquist(
+      df$data, id = params()$id, time = params()$year,
+      input = params()$inputs, output = params()$outputs,
+      orientation = input$malm_orientation)
+    d  <- as.data.frame(d)[1:10]
 
     d
 
   })
 
-  malm.calc <- reactive({
-
-    d <- malm.mod()
-    d[, 3:6] <- sapply(d[,3:6], function(c) round(c, input$malm_round))
-    return(d)
-
-  })
-
   output$malm.render <- renderReactable({
     req(params()$year)
+    mlm_cols <- c('DMU', 'Time', 'Malmquist', 'Eff. change', 'Tech. change',
+                  'Input bias tech. change', 'Output bias tech. change',
+                  'Magnitude component', 'Pure eff. change',
+                  'Scale eff. change')
+    d <- malm.mod()
+    d <- round_numeric(d, input$malm_round)
+    names(d) <- mlm_cols
 
-    d <- malm.calc()
     withProgress(reactable(
       d, compact = TRUE, sortable = TRUE, filterable = TRUE,
       defaultPageSize = 100, class = 'small'
@@ -1004,7 +999,7 @@ server <- function(input, output, session) {
       paste0('malm-model-', Sys.Date(), '.', input$malm.fileformat)
     },
     content = function(file) {
-      df <- malm.calc()
+      df <- malm.mod()
       if (input$malm.fileformat == 'dta') {
         colnames(df) <- gsub('\\s', '_', colnames(df))
         colnames(df) <- gsub('[^A-Za-z0-9_]', '', colnames(df))

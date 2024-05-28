@@ -42,6 +42,7 @@ rsconnect/
 # Do not include development directories
 /dev/
 /docs/
+tmp/
 
 # Ignore macOS specific files
 .DS_Store

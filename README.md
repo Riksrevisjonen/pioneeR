@@ -22,18 +22,6 @@ If you want to install a specific version of pioneeR, you can add the release ve
 remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
 ```
 
-Note that pioneeR will install the `productivity` package as a dependency. In order for this package to be successfully installed on UNIX-like systems, you need to install the dependency `GLPK` first. On Ubuntu this can be done by typing the following command:
-
-```sh
-sudo apt-get install libglpk-dev
-```
-
-On macOS, we recommend that you install `glpk` with [Homebrew](https://brew.sh). Open the terminal and type:
-
-```sh
-brew install glpk
-```
-
 ### Exporting reports as PDF
 
 pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.org/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
@@ -83,6 +71,8 @@ We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md
 ## Acknowledgements
  
 The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book *Benchmarking with DEA, SFA, and R* (2011). The codebase is also inspired by the supplementary R package [Benchmarking](https://CRAN.R-project.org/package=Benchmarking).
+
+The implementation of the Malmquist index is based on the definitions given in *Intertemporal production frontiers: With dynamic DEA* by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package [productivity](https://cran.r-project.org/web/packages/productivity/index.html).
 
 ## License
 

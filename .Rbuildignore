@@ -6,6 +6,7 @@
 ^\.Rproj\.user$
 docs
 dev
+tmp
 ^pkgdown$
 ^\.github$
 ^CONTRIBUTING.md$

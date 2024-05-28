@@ -1,9 +1,22 @@
+# pioneeR 0.4.0.9000
+
+## Breaking changes
+
+- Results for the Malmquist index are now returned ala Farrell (not Shephard). This is consistent with how results
+for other models are currently presented in the app. Users should note that this changes the interpretation of the malmquist index for input-oriented models. See `?compute_malmquist()` for details. (#81)
+- Removed the select input box for returns to scale in the Malmquist analysis tab. The currently supported Malmquist index is the one defined by Färe & Grosskopf (1996). Components of the index is thus always computed based on the same returns to scale (either CRS or VRS depending on the specific component), so the select input box
+is not needed. 
+
+## Enhancements
+
+- Added a new exported function, `compute_malmquist()` for calculating productivity. This also removes the need for `{productivity}` as a dependency. (#81)
+- Further sub-components of the Malmquist index, including bias technical change and scale efficiency change, have been added to the results in the Malmquist analysis tab. (#81)
+
 # pioneeR 0.4.0
 
 ## Breaking changes
 
 - pioneeR now depends on bslib 0.6.0 or higher (#73)
-
 - `summary_tbl_dea()` no longer supports `Farell`-type objects from the `{Benchmarking}` package (#104)
 
 ## Changes & improvements
@@ -13,7 +26,6 @@
 - Added custom functions for DEA calculations in order to remove `{Benchmarking}` as a dependency (#80)
 - Added new exported functions for calculating, and bootstraping DEA models, `compute_dea()` and `bootstrap_dea()` (#80, #93)
 - All R functions - including `server()` and `ui()` - have been moved to the `R` directory with benefits to how internal functions are accessed. In addition, the global environment is untouched when the app is run (#87)
-
 
 ## Bug fixes
 
