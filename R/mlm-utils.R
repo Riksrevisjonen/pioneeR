@@ -7,14 +7,14 @@ create_mlm_matrix <- function(dl, value){
 #' get_mlm_values
 #' @noRd
 get_mlm_values <- function(res, n_units){
-  malmquist <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$malmquist))) |> as.vector()
-  effch <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$effch))) |> as.vector()
-  tech <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$tech))) |> as.vector()
-  obtech <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$obtech))) |> as.vector()
-  ibtech <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$ibtech))) |> as.vector()
-  matech <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$matech))) |> as.vector()
-  scale_effch <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$scale_effch))) |> as.vector()
-  pure_effch <- c(rep(NA_real_, n_units), do.call('c', lapply(res, \(x) x$pure_effch))) |> as.vector()
+  malmquist <- c(rep(NA_real_, n_units), vapply(res, \(x) x$malmquist, numeric(n_units))) |> as.vector()
+  effch <- c(rep(NA_real_, n_units), vapply(res, \(x) x$effch, numeric(n_units))) |> as.vector()
+  tech <- c(rep(NA_real_, n_units), vapply(res, \(x) x$tech, numeric(n_units))) |> as.vector()
+  obtech <- c(rep(NA_real_, n_units), vapply(res, \(x) x$obtech, numeric(n_units))) |> as.vector()
+  ibtech <- c(rep(NA_real_, n_units), vapply(res, \(x) x$ibtech, numeric(n_units))) |> as.vector()
+  matech <- c(rep(NA_real_, n_units), vapply(res, \(x) x$matech, numeric(n_units))) |> as.vector()
+  scale_effch <- c(rep(NA_real_, n_units), vapply(res, \(x) x$scale_effch, numeric(n_units))) |> as.vector()
+  pure_effch <- c(rep(NA_real_, n_units), vapply(res, \(x) x$pure_effch, numeric(n_units))) |> as.vector()
 
   list(malmquist = malmquist,
        tech = tech,

@@ -257,7 +257,8 @@ ui <- function(request) { page_navbar(
           ),
           accordion_panel(
             title = 'Table options',
-            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L)
+            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('malm_show_all', 'Show sub-components', value = FALSE)
           ),
           accordion_panel(
             title = 'Export',
@@ -270,6 +271,11 @@ ui <- function(request) { page_navbar(
               choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         )
+      ),
+      div(class = 'alert alert-info', role = 'info',
+          paste('Our implementation of Malmquist follows Färe & Grosskopf (1996).',
+                'From version 0.4.0.9000 results are presented a la Farrell.',
+                'Reference time is always t-1.')
       ),
       uiOutput('malm.dt')
     )
