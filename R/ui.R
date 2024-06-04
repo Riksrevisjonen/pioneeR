@@ -273,7 +273,7 @@ ui <- function(request) { page_navbar(
         )
       ),
       div(class = 'alert alert-info', role = 'info',
-          paste('Our implementation of Malmquist follows Färe & Grosskopf (1996).',
+          paste('Our implementation of Malmquist follows F\u00E4re & Grosskopf (1996).',
                 'From version 0.4.0.9000 results are presented a la Farrell.',
                 'Reference time is always t-1.')
       ),
