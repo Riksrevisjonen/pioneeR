@@ -92,7 +92,7 @@ sfa <- function(formula, data = NULL,   pars = NULL,
       z <- coef/sd
       p.value <- 2 * (1 - pnorm(abs(z)))
       ptable <- data.frame(coefficient = coef, SE = sd, z = z, p.value = p.value)
-      rownames(ptable) <- coef
+      rownames(ptable) <- names(coef)
       result <- list(coef = coef, hess = q$hessian, logLik = LogLik,
                   ols = ols, sigmau2 = coef["sigmau2"], sigmav2 = coef["sigmav2"],
                    sigma2 = sigma2, gamma = gamma, ptable = ptable, convergence = q$convergence)
