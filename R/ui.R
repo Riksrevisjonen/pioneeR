@@ -8,7 +8,6 @@ vals <- list(
   'rts' = c(
     'Variable' = 'vrs', 'Constant' = 'crs', 'Non-increasing RTS' = 'drs',
     'Non-decreasing RTS' = 'irs'),
-  'malm_rts' = c('Variable' = 'vrs', 'Constant' = 'crs',  'NIRS' = 'nirs', 'NDRS' = 'ndrs'),
   'orient' = c('Input oriented' = 'in', 'Output oriented' = 'out')
 )
 
@@ -254,12 +253,12 @@ ui <- function(request) { page_navbar(
         accordion(
           accordion_panel(
             title = 'Model',
-            selectInput('malm_rts', 'Returns to scale', choices = vals$malm_rts, selected = 'crs'),
             selectInput('malm_orientation', 'Orientation', choices = vals$orient, selected = 'in')
           ),
           accordion_panel(
             title = 'Table options',
-            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L)
+            numericInput('malm_round', 'Number of decimals', min = 1L, max = 15L, step = 1L, value = 4L),
+            checkboxInput('malm_show_all', 'Show sub-components', value = FALSE)
           ),
           accordion_panel(
             title = 'Export',
@@ -272,6 +271,11 @@ ui <- function(request) { page_navbar(
               choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         )
+      ),
+      div(class = 'alert alert-info', role = 'info',
+          paste('Our implementation of Malmquist follows F\u00E4re & Grosskopf (1996).',
+                'From version 0.5.0 results are presented a la Farrell.',
+                'Reference time is always t-1.')
       ),
       uiOutput('malm.dt')
     )

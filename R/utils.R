@@ -118,3 +118,10 @@ rand_id <- function() {
   hex_digits <- c(0:9, letters[1:6])
   paste(sample(hex_digits, 32, replace = TRUE), collapse = '')
 }
+
+#' round_numeric
+#' @noRd
+round_numeric <- function(df, digits) {
+  df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, digits) else x)
+  df
+}

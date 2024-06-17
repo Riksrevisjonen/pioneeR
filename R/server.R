@@ -966,37 +966,47 @@ server <- function(input, output, session) {
 
     req(selection())
 
-    df <- check_balance(selection(), params()$id, params()$year)
-
-    malmquist <- productivity::malm(
-      data = df$data, id.var = params()$id, time.var = params()$year,
-      x.vars = params()$inputs, y.vars = params()$outputs,
-      rts = input$malm_rts, orientation = input$malm_orientation, scaled = TRUE)
-
-    d <- malmquist$Changes[, c(1:6)]
-
-    colnames(d) <- c(params()$id, 'Year', 'Ref. year', 'Malmquist', 'Eff. change', 'Tech. change')
-
-    d
-
-  })
-
-  malm.calc <- reactive({
-
-    d <- malm.mod()
-    d[, 3:6] <- sapply(d[,3:6], function(c) round(c, input$malm_round))
-    return(d)
-
+    d <- check_balance(selection(), params()$id, params()$year)
+    res <- compute_malmquist(
+      d$data, id = params()$id, time = params()$year,
+      input = params()$inputs, output = params()$outputs,
+      orientation = input$malm_orientation)
+    df <- as.data.frame(res)[1:10]
+    df <- round_numeric(df, input$malm_round)
+    df
   })
 
   output$malm.render <- renderReactable({
     req(params()$year)
 
-    d <- malm.calc()
-    withProgress(reactable(
-      d, compact = TRUE, sortable = TRUE, filterable = TRUE,
-      defaultPageSize = 100, class = 'small'
-    ))
+    df <- malm.mod()
+
+    if (input$malm_show_all) {
+      opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
+        dmu = colDef(sticky = 'left', maxWidth = 200, name = 'DMU'),
+        time = colDef(maxWidth = 100, name = 'Time'),
+        malmquist = colDef(maxWidth = 200, name = 'Malmquist'),
+        effch = colDef(maxWidth = 200, name = 'Eff. change'),
+        tech = colDef(maxWidth = 200, name = 'Tech. change'),
+        obtech = colDef(maxWidth = 200, name = 'Input bias tech. chg.'),
+        ibtech = colDef(maxWidth = 200, name = 'Output bias tech. chg.'),
+        matech = colDef(maxWidth = 200, name = 'Magnitude component'),
+        scale_effch = colDef(maxWidth = 200, name = 'Scale eff. change'),
+        pure_effch = colDef(maxWidth = 200, name = 'Pure eff. change')
+      ))
+    } else {
+      df  <- df[1:5]
+      opts <- rlang::list2(!!!reactable_opts, data = df, columns = list(
+        dmu = colDef(sticky = 'left', maxWidth = 200, name = 'DMU'),
+        time = colDef(maxWidth = 100, name = 'Time'),
+        malmquist = colDef(maxWidth = 200, name = 'Malmquist'),
+        effch = colDef(maxWidth = 200, name = 'Eff. change'),
+        tech = colDef(maxWidth = 200, name = 'Tech. change')
+      ))
+    }
+
+    withProgress(do.call(reactable, opts))
+
   })
 
   output$malm.export <- downloadHandler(
@@ -1004,7 +1014,12 @@ server <- function(input, output, session) {
       paste0('malm-model-', Sys.Date(), '.', input$malm.fileformat)
     },
     content = function(file) {
-      df <- malm.calc()
+      df <- malm.mod()
+      mlm_cols <- c('DMU', 'Time', 'Malmquist', 'Eff. change', 'Tech. change',
+                    'Input bias tech. chg.', 'Output bias tech. chg.',
+                    'Magnitude component', 'Pure eff. change',
+                    'Scale eff. change')
+      names(df) <- mlm_cols
       if (input$malm.fileformat == 'dta') {
         colnames(df) <- gsub('\\s', '_', colnames(df))
         colnames(df) <- gsub('[^A-Za-z0-9_]', '', colnames(df))

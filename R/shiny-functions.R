@@ -3,7 +3,6 @@
 #' @import ggplot2
 #' @import haven
 #' @import markdown
-#' @import productivity
 #' @import reactable
 #' @import readxl
 #' @import writexl
