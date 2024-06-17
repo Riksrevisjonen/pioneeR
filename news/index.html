@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,11 +45,25 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0.9000" id="pioneer-0409000">pioneeR 0.4.0.9000<a class="anchor" aria-label="anchor" href="#pioneer-0409000"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-4-0-9000">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0-9000"></a></h3>
+<ul><li>Results for the Malmquist index are now returned ala Farrell (not Shephard). This is consistent with how results for other models are currently presented in the app. Users should note that this changes the interpretation of the malmquist index for input-oriented models. See <code>?compute_malmquist()</code> for details. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
+<li>Removed the select input box for returns to scale in the Malmquist analysis tab. The currently supported Malmquist index is the one defined by Färe &amp; Grosskopf (1996). Components of the index is thus always computed based on the same returns to scale (either CRS or VRS depending on the specific component), so the select input box is not needed.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-4-0-9000">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-4-0-9000"></a></h3>
+<ul><li>Added a new exported function, <code><a href="../reference/compute_malmquist.html">compute_malmquist()</a></code> for calculating productivity. This also removes the need for <code>{productivity}</code> as a dependency. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
+<li>Further sub-components of the Malmquist index, including bias technical change and scale efficiency change, have been added to the results in the Malmquist analysis tab. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="pioneer-040">pioneeR 0.4.0<a class="anchor" aria-label="anchor" href="#pioneer-040"></a></h2>
 <div class="section level3">
 <h3 id="breaking-changes-0-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0"></a></h3>
-<ul><li><p>pioneeR now depends on bslib 0.6.0 or higher (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/73" class="external-link">#73</a>)</p></li>
-<li><p><code><a href="../reference/summary_tbl_dea.html">summary_tbl_dea()</a></code> no longer supports <code>Farell</code>-type objects from the <code>{Benchmarking}</code> package (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/104" class="external-link">#104</a>)</p></li>
+<ul><li>pioneeR now depends on bslib 0.6.0 or higher (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/73" class="external-link">#73</a>)</li>
+<li>
+<code><a href="../reference/summary_tbl_dea.html">summary_tbl_dea()</a></code> no longer supports <code>Farell</code>-type objects from the <code>{Benchmarking}</code> package (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/104" class="external-link">#104</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="changes--improvements-0-4-0">Changes &amp; improvements<a class="anchor" aria-label="anchor" href="#changes--improvements-0-4-0"></a></h3>
