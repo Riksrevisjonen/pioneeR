@@ -56,6 +56,7 @@ ui <- function(request) { page_navbar(
           'and that states might be deleted by the server administrator.'
         )))
       ),
+      uiOutput('preview_messages'),
       uiOutput('data_preview')
     )
   ),
