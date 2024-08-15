@@ -97,3 +97,62 @@ check_balance <- function(data, id_var, time_var) {
   r
 
 }
+
+#' @param level Level of alert
+#' @param message The message to show the user
+#' @param object A reactive object to update
+#' @param append Boolean. If the message should be appended to the reative
+#' @noRd
+set_message <- function(level, message, object = NULL, append = FALSE) {
+  classes <- switch(
+    level,
+    warning = 'alert alert-warning',
+    error = 'alert alert-danger',
+    'alert alert-info'
+  )
+  icon <- if (level == 'info') 'info-circle' else 'exclamation-circle'
+  div <- div(class = classes, list(bsicons::bs_icon(icon, class = 'me-2'), message))
+  # If we do not have a reactive, return the div
+  if (is.null(object)) {
+    return(div)
+  }
+  # If we have a reactive object, set or append our div to the reative
+  if (append) {
+    current_tags <- object()
+    object(tagList(current_tags, div))
+  } else {
+    object(div)
+  }
+  invisible()
+}
+
+#' Check if a function issues a warning message and catch it so we can send it to
+#' the user
+#' @noRd
+catch_warnings <- function(expr, handler_expr, reactive, append = FALSE) {
+  if (shiny::isRunning() || as.logical(Sys.getenv('PIONEER_SUPPRESS_WARNINGS', FALSE))) {
+    withCallingHandlers(expr, warning = \(w) {
+      msg <- if (inherits(w, "rlang_warning")) cli::ansi_strip(w$message) else conditionMessage(w)
+      handler_expr('warning', msg, reactive)
+      tryInvokeRestart('muffleWarning')
+    })
+  } else {
+    expr
+  }
+}
+
+#' Check if a function raises an error and catch it so that the app does not stop,
+#' but the user is informed
+#' @noRd
+catch_exceptions <- function(expr, handler_expr, reactive, append = FALSE) {
+  # We only want to catch errors if the app is running
+  if (shiny::isRunning()) {
+    tryCatch(catch_warnings(expr, handler_expr, reactive), error = \(e) {
+      msg <- if (inherits(e, "rlang_error")) cli::ansi_strip(e$message) else conditionMessage(e)
+      handler_expr('error', msg, reactive)
+      NULL
+    })
+  } else {
+    expr
+  }
+}
