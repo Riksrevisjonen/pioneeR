@@ -43,13 +43,18 @@ test_that('check_numeric() works correctly', {
 
 test_that('check_nunits() works correctly', {
   # correct
-  x <- data.frame(a = c(1, 2, 3), b = c(4, 5, 6))
-  y <- data.frame(c = c(7, 8, 9), d = c(10, 11, 12))
+  x <- data.frame(a = 1:12, b = 13:24)
+  y <- data.frame(c = 25:36, d = 37:48)
   expect_silent(check_nunits(x, y))
 
   # incorrect
   x <- data.frame(a = c(1, 2, 3), b = c(4, 5, 6))
   y <- data.frame(c = c(7, 8, 9, 10), d = c(11, 12, 13, 14))
   expect_error(check_nunits(x, y))
+
+  # to few DMUs
+  x <- data.frame(a = c(1, 2, 3), b = c(4, 5, 6))
+  y <- data.frame(c = c(7, 8, 9), d = c(10, 11, 12))
+  expect_warning(check_nunits(x, y))
 })
 

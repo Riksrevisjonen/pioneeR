@@ -41,6 +41,7 @@ server <- function(input, output, session) {
     data = load_data,
     filename = NULL
   )
+  messages <- reactiveVal(tagList())
   # Add model parameters to a reactive with debounce so that they do not
   # fire immediately
   params <- reactive(
@@ -165,7 +166,8 @@ server <- function(input, output, session) {
 
     reactable(
       df, selection = 'multiple', selectionId = NULL, onClick = 'select',
-      class = 'small',
+      class = 'small', defaultPageSize = 20, showPageSizeOptions = TRUE,
+      pageSizeOptions = c(10, 20, 30, 40, 50),
       columns = coldefs,
       theme = reactableTheme(
         rowSelectedStyle = list(backgroundColor = "#eee", boxShadow = "inset .2em 0 0 0 #0d6efd")
@@ -183,6 +185,8 @@ server <- function(input, output, session) {
   observeEvent(input$data.subset.deselect, {
     updateReactable('preview', selected = NA)
   })
+
+  output$preview_messages <- renderUI({ messages() })
 
   output$data_preview <- renderUI({
 
@@ -209,21 +213,33 @@ server <- function(input, output, session) {
         ))
     } else {
       # Check for list wise deletion and inform the user if observations have been removed
-      msg_lw <- if (nrow(preview()) < nrow(data()$file)) {
-        alert(
-          'Some DMUs have missing observations on one or more variables. List wise deletion
-          has been performed')
-      } else {
-        NULL
+      lw_message <- NULL
+      if (nrow(preview()) < nrow(data()$file)) {
+        lw_message <- set_message(
+          'info',
+          'Some DMUs have missing observations on one or more variables. List wise deletion has been performed.',
+          )
       }
       tagList(
         h2('Data preview'),
         p(class = 'lead', 'This is a preview of the imported data'),
-        msg_lw,
+        lw_message,
         reactableOutput('preview')
       )
     }
 
+  })
+
+  observeEvent(preview_selected(), {
+    messages(tagList())
+    if (!is.null(preview_selected()) && length(params()$inputs) > 0 && length(params()$outputs) > 0) {
+      catch_exceptions(
+        check_data(
+          as.matrix(preview()[preview_selected(), params()$inputs]),
+          as.matrix(preview()[preview_selected(), params()$outputs])),
+        set_message, messages
+      )
+    }
   })
 
   # ---- DEA analysis ----
@@ -244,6 +260,8 @@ server <- function(input, output, session) {
 
     req(data(), dea.in(), dea.out())
 
+    check_data(dea.in(), dea.out())
+
     d <- compute_efficiency(
       dea.in(), dea.out(), rts = model_params$rts,
       orientation = model_params$orientation)
@@ -258,8 +276,6 @@ server <- function(input, output, session) {
         dea.in(), dea.out(), dea.prod()$unadj_values, model_params$rts,
         model_params$orientation
       )
-    }, warning = function(e) {
-      NULL
     }, error = function(e) {
       NULL
     })

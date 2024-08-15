@@ -18,6 +18,7 @@ Depends:
     shiny (>= 1.7.0)
 Imports:
     bslib (>= 0.6.0),
+    bsicons,
     cli (>= 3.6.0),
     ggplot2 (>= 3.3.0),
     haven (>= 2.5.0),
