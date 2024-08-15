@@ -150,6 +150,13 @@ check_nunits <- function(x, y, ref = FALSE) {
     }
     cli::cli_abort(c('Inconsistent number of units: ', 'x' = msg))
   }
+  if (nx < (ncol(x) * ncol(y)) || nx < (ncol(x) + ncol(y)) * 3) {
+    cli::cli_warn(
+      "The number of DMUs ({nx}) is lower than the recommended minimum. Consider adding more
+      DMUs. You should have at least {max(c(ncol(x) * ncol(y), (ncol(x) + ncol(y)) * 3))}
+      DMUs based on the number of inputs and outputs."
+    )
+  }
 }
 
 #' round_numeric
