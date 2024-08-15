@@ -101,22 +101,22 @@ check_balance <- function(data, id_var, time_var) {
 #' @param level Level of alert
 #' @param message The message to show the user
 #' @param object A reactive object to update
-#' @param append Boolean. If the message should be appended to the reative
+#' @param append Boolean. If the message should be appended to the reactive
 #' @noRd
 set_message <- function(level, message, object = NULL, append = FALSE) {
   classes <- switch(
     level,
-    warning = 'alert alert-warning',
-    error = 'alert alert-danger',
-    'alert alert-info'
+    warning = "alert alert-warning",
+    error = "alert alert-danger",
+    "alert alert-info"
   )
-  icon <- if (level == 'info') 'info-circle' else 'exclamation-circle'
-  div <- div(class = classes, list(bsicons::bs_icon(icon, class = 'me-2'), message))
+  icon <- if (level == "info") "info-circle" else "exclamation-circle"
+  div <- div(class = classes, list(bsicons::bs_icon(icon, class = "me-2"), message))
   # If we do not have a reactive, return the div
   if (is.null(object)) {
     return(div)
   }
-  # If we have a reactive object, set or append our div to the reative
+  # If we have a reactive object, set or append our div to the reactive
   if (append) {
     current_tags <- object()
     object(tagList(current_tags, div))
@@ -130,11 +130,11 @@ set_message <- function(level, message, object = NULL, append = FALSE) {
 #' the user
 #' @noRd
 catch_warnings <- function(expr, handler_expr, reactive, append = FALSE) {
-  if (shiny::isRunning() || as.logical(Sys.getenv('PIONEER_SUPPRESS_WARNINGS', FALSE))) {
+  if (shiny::isRunning() || as.logical(Sys.getenv("PIONEER_SUPPRESS_WARNINGS", FALSE))) {
     withCallingHandlers(expr, warning = \(w) {
       msg <- if (inherits(w, "rlang_warning")) cli::ansi_strip(w$message) else conditionMessage(w)
-      handler_expr('warning', msg, reactive)
-      tryInvokeRestart('muffleWarning')
+      handler_expr("warning", msg, reactive)
+      tryInvokeRestart("muffleWarning")
     })
   } else {
     expr
@@ -149,7 +149,7 @@ catch_exceptions <- function(expr, handler_expr, reactive, append = FALSE) {
   if (shiny::isRunning()) {
     tryCatch(catch_warnings(expr, handler_expr, reactive), error = \(e) {
       msg <- if (inherits(e, "rlang_error")) cli::ansi_strip(e$message) else conditionMessage(e)
-      handler_expr('error', msg, reactive)
+      handler_expr("error", msg, reactive)
       NULL
     })
   } else {
