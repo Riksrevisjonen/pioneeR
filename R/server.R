@@ -55,7 +55,8 @@ server <- function(input, output, session) {
   ) |> debounce(100)
   model_params <- reactiveValues(
     rts = NULL,
-    orientation = NULL
+    orientation = NULL,
+    cache_key = rand_id()
   )
   restoreVals <- reactiveValues(
     subset = NULL,
@@ -844,8 +845,6 @@ server <- function(input, output, session) {
   # ---- Bootstrap ----
 
   dea_boostrap <- reactive({
-    if (input$run_boot == 0)
-      return()
 
     # Set up bootstrap params
     rts <- isolate(model_params$rts)
@@ -870,7 +869,16 @@ server <- function(input, output, session) {
       range = res$range
     )
 
-  })
+  }) |>
+    # dea.prod() relies on dea.in() and dea.out(), so these are not needed in our key
+    bindCache(
+      model_params$rts, model_params$orientation, model_params$cache_key, input$boot_alpha,
+      input$boot_bw, input$boot_b, dea.prod(), cache = "session"
+    ) |>
+    # Bind the reactive to the action button to stop immediate execution
+    bindEvent(input$run_boot)
+
+  observeEvent(input$clear_boot_cache, { model_params$cache_key = rand_id() })
 
   output$boot_rts_warn <- renderUI({
     req(model_params$rts)

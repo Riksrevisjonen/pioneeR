@@ -235,7 +235,8 @@ ui <- function(request) { page_navbar(
               choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         ),
-        actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')
+        actionButton("run_boot", "Run bootstrap", class = "btn-primary btn-sm mb-2"),
+        actionButton("clear_boot_cache", "Clear cache", class = "btn-warning btn-sm")
       ),
       div(class = 'alert alert-info', role = 'alert', 'Bootstrap functionality is currently in preview'),
       uiOutput('boot_tbl')
