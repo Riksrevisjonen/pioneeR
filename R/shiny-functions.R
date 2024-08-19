@@ -60,7 +60,10 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
 
 #' @rdname run_pioneer
 #' @export
-runPioneeR <- run_pioneer
+runPioneeR <- function(x = NULL, port = NULL, ...) {
+  deprecation_warning(alternative = "run_pioneeR", next_release = TRUE)
+  run_pioneer(x = x, port = port, ...)
+}
 
 #' Unset environment variables
 #'
