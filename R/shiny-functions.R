@@ -113,7 +113,7 @@ set_message <- function(level, message, object = NULL, append = FALSE) {
     "alert alert-info"
   )
   icon <- if (level == "info") "info-circle" else "exclamation-circle"
-  div <- div(class = classes, list(bsicons::bs_icon(icon, class = "me-2"), message))
+  div <- div(class = classes, role = "alert", list(bsicons::bs_icon(icon, class = "me-2"), message))
   # If we do not have a reactive, return the div
   if (is.null(object)) {
     return(div)
