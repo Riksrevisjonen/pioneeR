@@ -11,6 +11,8 @@ is not needed.
 
 - Added a new exported function, `compute_malmquist()` for calculating productivity. This also removes the need for `{productivity}` as a dependency. (#81)
 - Further sub-components of the Malmquist index, including bias technical change and scale efficiency change, have been added to the results in the Malmquist analysis tab. (#81)
+- Added caching to the bootstrap function in the app (#88)
+- A warning is now generated if the power of the analysis is too low and more DMUs should be added for robust results (#83)
 
 # pioneeR 0.4.0
 
