@@ -19,8 +19,8 @@ When you plan the code, make sure to follow the same style as the rest of the pa
 
 To commit your changes to pioneeR follow these steps:
 
-1. [Fork](https://github.com/riksrevisjonen/pioneeR/fork) the repository and make changes in a new branch.
-2. Write relevant tests with `testthat` and make sure there are not errors or warnings when you run `devtools::check()`.
+1. Clone or [fork](https://github.com/riksrevisjonen/pioneeR/fork) the repository and make changes in a new branch.
+2. For new features or functionality, write tests with `testthat` and make sure there are no errors or warnings when you run `devtools::check()`.
 3. Add an entry to NEWS.md concisely describing what you have changed.
 4. Push the branch to GitHub and submit a [pull request](https://guides.github.com/activities/forking/#making-a-pull-request/).
 5. Discuss the changes with the maintainers and push any changes to your code.
