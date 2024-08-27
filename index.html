@@ -107,6 +107,16 @@
 <p>We welcome contributions to the pioneeR package. Please see our <a href="CONTRIBUTING.html">CONTRIBUTING.md</a> file for detailed guidelines of how to contribute.</p>
 </div>
 <div class="section level2">
+<h2 id="running-pioneer-on-shiny-server">Running pioneeR on Shiny server<a class="anchor" aria-label="anchor" href="#running-pioneer-on-shiny-server"></a>
+</h2>
+<p>If you plan to run pioneeR on Shiny server, you need to make a separate app file and deploy it to the directory in Shiny server where you want to run the app from. Since Shiny server automatically wraps the app in a call to <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">runApp()</a></code>, you cannot use the <code><a href="reference/run_pioneer.html">run_pioneer()</a></code> function directly. Instead, you need to set up a Shiny app with the internal <code>server()</code> and <code>ui()</code> functions. First, make sure that the pioneeR package is installed on the server and is available in Shiny server. In the directory where you want the pioneeR app to run from, create a new file <code>app.R</code> with the following content:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://riksrevisjonen.github.io/pioneeR/">pioneeR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">shiny</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span><span class="fu">pioneeR</span><span class="fu">:::</span><span class="va">ui</span>, <span class="fu">pioneeR</span><span class="fu">:::</span><span class="va">server</span><span class="op">)</span></span></code></pre></div>
+<p>pioneeR should now be available through the corresponding URL to your app directory.</p>
+</div>
+<div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h2>
 <p>The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book <em>Benchmarking with DEA, SFA, and R</em> (2011). The codebase is also inspired by the supplementary R package <a href="https://CRAN.R-project.org/package=Benchmarking" class="external-link">Benchmarking</a>.</p>
