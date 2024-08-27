@@ -125,3 +125,23 @@ round_numeric <- function(df, digits) {
   df[] <- lapply(df, function(x) if(is.numeric(x)) round(x, digits) else x)
   df
 }
+
+#' @param alternative An alternative function the user should migrate to
+#' @param next_release If the function will be removed in the next release
+#' @noRd
+deprecation_warning <- function(alternative = NULL, next_release = FALSE) {
+  caller <- as.character(sys.call(-1)[[1]])
+  when <- if (next_release) "the next release" else "a future release"
+  if (!is.null(alternative) && is.character(alternative)) {
+    cli::cli_warn(sprintf(
+      "%s() has been deprecated and will be removed in %s. Use %s() instead",
+      caller, when, alternative
+    ))
+  } else {
+    cli::cli_warn(sprintf(
+      "%s() has been deprecated and will be removed in %s.",
+      caller, when
+    ))
+  }
+  invisible()
+}

@@ -235,9 +235,14 @@ ui <- function(request) { page_navbar(
               choices = c('Excel' = 'xlsx', 'Stata' = 'dta', 'Comma separated values' = 'csv'))
           )
         ),
-        actionButton('run_boot', 'Run bootstrap', class = 'btn-primary btn-sm')
+        actionButton("run_boot", "Run bootstrap", class = "btn-primary btn-sm mb-2"),
+        actionButton("clear_boot_cache", "Clear cache", class = "btn-warning btn-sm")
       ),
-      div(class = 'alert alert-info', role = 'alert', 'Bootstrap functionality is currently in preview'),
+      set_message(
+        "info",
+        "Results are cached by default. You can clear the cache by pressing the button in the
+        sidebar. Press \"Run bootstrap\" to estimate the bootstrap"
+      ),
       uiOutput('boot_tbl')
     )
   ),

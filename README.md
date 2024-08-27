@@ -68,6 +68,18 @@ x <- run_pioneer()
 
 We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines of how to contribute.
 
+## Running pioneeR on Shiny server
+
+If you plan to run pioneeR on Shiny server, you need to make a separate app file and deploy it to the directory in Shiny server where you want to run the app from. Since Shiny server automatically wraps the app in a call to `runApp()`, you cannot use the `run_pioneer()` function directly. Instead, you need to set up a Shiny app with the internal `server()` and `ui()` functions. First, make sure that the pioneeR package is installed on the server and is available in Shiny server. In the directory where you want the pioneeR app to run from, create a new file `app.R` with the following content:
+
+```r
+library(pioneeR)
+
+shiny::shinyApp(pioneeR:::ui, pioneeR:::server)
+```
+
+pioneeR should now be available through the corresponding URL to your app directory.
+
 ## Acknowledgements
  
 The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book *Benchmarking with DEA, SFA, and R* (2011). The codebase is also inspired by the supplementary R package [Benchmarking](https://CRAN.R-project.org/package=Benchmarking).
