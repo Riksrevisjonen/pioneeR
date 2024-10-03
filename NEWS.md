@@ -1,11 +1,10 @@
-# pioneeR 0.4.0.9000
+# pioneeR 0.5.0
 
 ## Breaking changes
 
 - Results for the Malmquist index are now returned ala Farrell (not Shephard). This is consistent with how results
 for other models are currently presented in the app. Users should note that this changes the interpretation of the malmquist index for input-oriented models. See `?compute_malmquist()` for details. (#81)
-- Removed the select input box for returns to scale in the Malmquist analysis tab. The currently supported Malmquist index is the one defined by Färe & Grosskopf (1996). Components of the index is thus always computed based on the same returns to scale (either CRS or VRS depending on the specific component), so the select input box
-is not needed. 
+- Removed the select input box for returns to scale in the Malmquist analysis tab. The currently supported Malmquist index is the one defined by Färe & Grosskopf (1996). Components of the index is thus always computed based on the same returns to scale (either CRS or VRS depending on the specific component), so the select input box is not needed.
 
 ## Enhancements
 

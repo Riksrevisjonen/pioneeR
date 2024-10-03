@@ -84,7 +84,7 @@ pioneeR should now be available through the corresponding URL to your app direct
  
 The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book *Benchmarking with DEA, SFA, and R* (2011). The codebase is also inspired by the supplementary R package [Benchmarking](https://CRAN.R-project.org/package=Benchmarking).
 
-The implementation of the Malmquist index is based on the definitions given in *Intertemporal production frontiers: With dynamic DEA* by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package [productivity](https://cran.r-project.org/web/packages/productivity/index.html).
+The implementation of the Malmquist index is based on the definitions given in *Intertemporal production frontiers: With dynamic DEA* by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package [productivity](https://CRAN.R-project.org/package=productivity).
 
 ## License
 
