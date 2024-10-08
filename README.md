@@ -4,22 +4,22 @@ R package for running a Shiny app for DEA analysis. Full documentation is availa
 
 ## Installation
 
-pioneeR can be installed using the `remotes` package:
+pioneeR can be installed from CRAN:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR')
+install.packages("pioneeR")
 ```
 
-This will give you the lastest version of pioneeR, and is the recommended way for installing pioneeR at the moment. If you want to install the latest stable release, you can run the following command instead:
+Installing pioneeR from CRAN is the recommended way. However, if you want the bleeding edge version of pioneeR, you can install direectly from GitHub using the remotes package:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@stable')
+remotes::install_github("riksrevisjonen/pioneeR")
 ```
 
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
+remotes::install_github("riksrevisjonen/pioneeR@v0.5.0")
 ```
 
 ### Exporting reports as PDF
@@ -27,7 +27,7 @@ remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
 pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.org/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
 
 ```r
-install.packages('tinytex')
+install.packages("tinytex")
 tinytex::install_tinytex()
 ```
 
