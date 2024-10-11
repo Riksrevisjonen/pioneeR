@@ -1,16 +1,19 @@
 Package: pioneeR
-Title: Perform analysis of productivity using DEA
+Title: Productivity and Efficiency Analysis using DEA
 Version: 0.5.0
 Authors@R: c(
     person("Ove Haugland", "Jakobsen", role = c("aut", "cre"), email = "ohj@mac.com"),
-    person("Aleksander", "Eilertsen", role = "aut", email = "ale@riksrevisjonen.no"),
+    person("Aleksander Eilertsen", "Valberg", role = "aut", email = "ale@riksrevisjonen.no"),
     person("Jan Roar", "Beckstrøm", role = "ctb", email = "jrb@riksrevisjonen.no"),
     person("Lars Skaage", "Engebretsen", role = "ctb", email = "lse@riksrevisjonen.no"),
     person("Jonas", "Månsson", role = "ctb", email = "jonas.mansson@riksrevisjonen.no"),
     person("Joachim", "Sandnes", role = "ctb", email = "jsn@riksrevisjonen.no"),
     person(family = "Riksrevisjonen", role = "cph"))
-Description: Functions for measuring productivity using Data Envelopment Analysis (DEA).
-    Analyses can be performed in the console or with the provided Shiny app.
+Description: Measure productivity and efficiency using Data Envelopment Analysis 
+    (DEA). Available methods include DEA under different technology assumptions, 
+    bootstrapping of efficiency scores and calculation of the Malmquist 
+    productivity index. Analyses can be performed either in the console or with 
+    the provided Shiny app.
 License: GPL-3 | file LICENSE
 URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
 BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
