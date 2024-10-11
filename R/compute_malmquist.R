@@ -16,9 +16,20 @@
 #' @param id A string with the DMU id or name variable.
 #' @param time A string with the time period variable.
 #' @return A list of class `pioneer_mlm`
-#' @export
+#' @examples
+#' chnEconomy <- deaR::EconomyLong
+#' # Estimate Malmquist
+#' mod <- compute_malmquist(
+#'   data = chnEconomy, id = 'DMUs', time = 'Period',
+#'   input = c('Labor', 'Capital'), output = 'GIOV',
+#'   orientation = 'in')
+#' # Get summary
+#' summary(mod)
+#' # Convert to data frame
+#' df <- as.data.frame(mod)
 #' @references
 #' Färe, R., Grosskopf, S. (1996). _Intertemporal production frontiers: With dynamic DEA_. Springer.
+#' @export
 compute_malmquist <- function(
     data,
     input,
