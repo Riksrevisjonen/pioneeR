@@ -16,7 +16,20 @@ compute_scale_efficiency(x, y, orientation = c("in", "out"), digits = NULL)
 \item{digits}{An integer with the number of digits to round to. If \code{NULL} the
 values are kept unrounded.}
 }
+\value{
+A data frame containing the efficiency scores for CRS, VRS, the
+Scale Efficiency, the VRS to NIRS ratio, and a recommendation on whether to
+increase or decrease the size of the DMU.
+}
 \description{
 Calculate scale efficiency from a set of inputs and outputs and return a
 data.frame
+}
+\examples{
+# Create matrices with random values
+inputs <- matrix(runif(10, 1, 10), ncol = 2)
+outputs <- matrix(runif(10, 1, 10), ncol = 2)
+# Compute scale efficiency
+compute_scale_efficiency(inputs, outputs, orientation = 'out', digits = 2)
+
 }

@@ -19,6 +19,20 @@
 #' @param slack If `TRUE` slack values are calculated.
 #' @param peers If `TRUE` peers are added to the response.
 #'
+#' @examples
+#' # Get data
+#' fare89 <- deaR::Electric_plants
+#' # Estimate efficiency
+#' mod <- compute_dea(fare89,
+#'   input = c("Labor", "Fuel", "Capital"),
+#'   output = "Output",
+#'   id = "Plant",
+#'   rts = "vrs",
+#'   orientation = "in"
+#' )
+#' # Print the results
+#' print(mod)
+#'
 #' @return A list of class `pioneer_dea`
 #' @export
 compute_dea <- function(

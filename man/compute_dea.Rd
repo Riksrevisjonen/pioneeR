@@ -48,3 +48,18 @@ A list of class \code{pioneer_dea}
 Solve an input or output oriented DEA model under constant (\code{crs}), variable (\code{vrs}),
 non-increasing (\code{drs}), or non-decreasing (\code{irs}) returns to scale.
 }
+\examples{
+# Get data
+fare89 <- deaR::Electric_plants
+# Estimate efficiency
+mod <- compute_dea(fare89,
+  input = c("Labor", "Fuel", "Capital"),
+  output = "Output",
+  id = "Plant",
+  rts = "vrs",
+  orientation = "in"
+)
+# Print the results
+print(mod)
+
+}

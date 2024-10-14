@@ -2,12 +2,9 @@
 % Please edit documentation in R/shiny-functions.R
 \name{run_pioneer}
 \alias{run_pioneer}
-\alias{runPioneeR}
 \title{Run pioneeR}
 \usage{
 run_pioneer(x = NULL, port = NULL, ...)
-
-runPioneeR(x = NULL, port = NULL, ...)
 }
 \arguments{
 \item{x}{A data frame that should be loaded with the app. See details.}

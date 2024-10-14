@@ -7,17 +7,17 @@
 bootstrap_dea(dea, alpha = 0.05, bw_rule = "ucv", iterations = 2000)
 }
 \arguments{
-\item{dea}{An object of type pioneer_dea from \code{compute_dea()}}
+\item{dea}{An object of class 'pioneer_dea' from \code{compute_dea()}}
 
-\item{alpha}{One minus the confidence level required (defaults to 0.05)}
+\item{alpha}{One minus the confidence level required. Default is 0.05.}
 
 \item{bw_rule}{A string with the type of bandwidth rule to be used, or a number with the
 bandwidth parameter. See details.}
 
-\item{iterations}{The number of bootstrap iterations to be performed}
+\item{iterations}{Integer. The number of bootstrap iterations to perform. Default is 2000.}
 }
 \value{
-A list object of class \code{pioneer_bootstrap}
+An object of class 'pioneer_bootstrap' containing bootstrap results.
 }
 \description{
 Run bootstrap on a DEA model to estimate bias corrected efficiency scores and confidence
@@ -36,14 +36,16 @@ to replicate results where \code{h} is given, such as Simar & Wilson (1998). For
 applications of the bootstrap, the default of unbias cross validation is sensible.
 }
 \examples{
-\dontrun{
 # Get data
 fare89 <- deaR::Electric_plants
 # Estimate efficiency
-mod <- compute_dea(fare89, 'Plant', c('Labor', 'Fuel', 'Capital'), 'Output', 'vrs', 'in')
-# Run bootstrap
-boot <- bootstrap_dea(mod, iterations = 2000)
-}
+mod <- compute_dea(fare89,
+  input = c("Labor", "Fuel", "Capital"),
+  output = "Output",
+  id = "Plant",
+)
+# Run bootstrap. Reducing the number of iterations to save processing time
+boot <- bootstrap_dea(mod, iterations = 100)
 
 }
 \seealso{

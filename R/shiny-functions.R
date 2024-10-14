@@ -58,16 +58,12 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
 
 }
 
-#' @rdname run_pioneer
-#' @export
-runPioneeR <- function(x = NULL, port = NULL, ...) {
-  deprecation_warning(alternative = "run_pioneeR", next_release = TRUE)
-  run_pioneer(x = x, port = port, ...)
-}
-
 #' Unset environment variables
 #'
 #' Unsets the environment variables set by pioneeR
+#'
+#' @examples
+#' unset_env_vars()
 #'
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')

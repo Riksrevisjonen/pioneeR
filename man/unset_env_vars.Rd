@@ -9,3 +9,7 @@ unset_env_vars()
 \description{
 Unsets the environment variables set by pioneeR
 }
+\examples{
+unset_env_vars()
+
+}
