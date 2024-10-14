@@ -117,7 +117,7 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   data <- reactive({
-    # Return the active data object. This can be a data frame sent with the runPioneeR
+    # Return the active data object. This can be a data frame sent with the run_pioneer
     # call, a restored data object from a previous session, or a new dataset uploaded
     # by the user.
     reactives$data
