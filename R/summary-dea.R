@@ -9,25 +9,46 @@
 #' \[1, Inf\], bins are created with `1/bin`. Bin widths will be equal to models
 #' with range \[0, 1\].
 #'
-#' @param x A vector of efficiency scores or a Farrell object
+#' @param x A numeric vector of efficiency scores or an object of class `pioneer_dea`
 #'
-#' @return data.frame
+#' @examples
+#' # Load example data
+#' df <- deaR::Electric_plants
+#' # Compute efficiency scores
+#' prod <- compute_dea(
+#'   df,
+#'   input = c("Labor", "Fuel", "Capital"),
+#'   output = "Output",
+#'   rts = "vrs"
+#' )
+#' # Get a summary table of efficiency scores
+#' summary_tbl_dea(prod)
+#' # You can also create the table from a numeric vector of efficiency scores
+#' res <- as.data.frame(prod)
+#' summary_tbl_dea(res$efficiency)
+#'
+#' @return A [data.frame()] with summary statistics
 #'
 #' @export
 summary_tbl_dea <- function(x) {
-  UseMethod('summary_tbl_dea')
+  UseMethod("summary_tbl_dea")
 }
 
 #' @method summary_tbl_dea pioneer_dea
 #' @export
 summary_tbl_dea.pioneer_dea <- function(x) {
-  eff <- x$results$efficiency
+  eff <- x$efficiency
   summary_tbl_dea(eff)
 }
 
 #' @method summary_tbl_dea numeric
 #' @export
 summary_tbl_dea.numeric <- function(x) {
+  # Input validation
+  if (!is.numeric(x) || length(x) == 0) {
+    cli::cli_abort("Input must be a non-empty numeric vector")
+  }
+  # Remove missing
   x <- x[!is.na(x)]
   # Check if efficiency scores are in range [0, 1]
   range0 <- min(x) < 1L
@@ -35,13 +56,13 @@ summary_tbl_dea.numeric <- function(x) {
   # Values equal to 1 be in last bin for input and first bin for output orientation
   # Create new labels to use with the cut function
   labs <- if (range0) {
-    c(sprintf('%s <= E < %s', bins[1:10], bins[2:11]), 'E == 1')
+    c(sprintf("%s <= E < %s", bins[1:10], bins[2:11]), "E == 1")
   } else {
-    c('F == 1', sprintf('%.3f < F <= %.3f', bins[2:11], bins[3:12]))
+    c("F == 1", sprintf("%.3f < F <= %.3f", bins[2:11], bins[3:12]))
   }
   # If efficiency scores are in range [0, 1] bins must be closed on the left
   eff_bin <- cut(x, breaks =  bins, labels = labs, right = !range0)
   eff_df <- table(eff_bin) |> as.data.frame()
-  colnames(eff_df) <- c('Range', 'Frequency')
+  colnames(eff_df) <- c("Range", "Frequency")
   eff_df
 }

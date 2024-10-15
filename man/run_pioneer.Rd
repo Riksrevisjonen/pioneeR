@@ -9,9 +9,12 @@ run_pioneer(x = NULL, port = NULL, ...)
 \arguments{
 \item{x}{A data frame that should be loaded with the app. See details.}
 
-\item{port}{The TCP port that the application should listen on.}
+\item{port}{Integer. The TCP port that the application should listen on.}
 
 \item{...}{Other arguments to send to \code{\link[shiny]{runApp}}}
+}
+\value{
+None
 }
 \description{
 Run the pioneeR app on your local machine.
@@ -25,4 +28,13 @@ a data frame or a character string with the object name of the data frame you
 want to be loaded when the app launches. Note that you should only use data
 frame objects. If you have a tibble (from the tidyverse) or a data table, you
 can convert to an ordinary data.frame using \code{\link[base]{as.data.frame}}.
+}
+\examples{
+# Only run this example in interactive R sessions
+if (interactive()) {
+  df = deaR::Electric_plants
+  # Load app with data.frame and set port to 8080
+  run_pioneer(x = df, port = 8080)
+}
+
 }

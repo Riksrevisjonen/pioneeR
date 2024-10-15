@@ -6,6 +6,9 @@
 \usage{
 unset_env_vars()
 }
+\value{
+A logical vector, with elements being true if unsetting the variable succeeded
+}
 \description{
 Unsets the environment variables set by pioneeR
 }
