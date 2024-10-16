@@ -11,7 +11,7 @@ run_pioneer(x = NULL, port = NULL, ...)
 
 \item{port}{Integer. The TCP port that the application should listen on.}
 
-\item{...}{Other arguments to send to \code{\link[shiny]{runApp}}}
+\item{...}{Other arguments to send to \code{\link[shiny:runApp]{shiny::runApp()}}.}
 }
 \value{
 None
@@ -27,14 +27,17 @@ You can load a data object in your current environment to the app. You can pass
 a data frame or a character string with the object name of the data frame you
 want to be loaded when the app launches. Note that you should only use data
 frame objects. If you have a tibble (from the tidyverse) or a data table, you
-can convert to an ordinary data.frame using \code{\link[base]{as.data.frame}}.
+can convert to an ordinary data.frame using \code{\link[=as.data.frame]{as.data.frame()}}
 }
 \examples{
-# Only run this example in interactive R sessions
-if (interactive()) {
-  df = deaR::Electric_plants
-  # Load app with data.frame and set port to 8080
-  run_pioneer(x = df, port = 8080)
+\dontrun{
+# Load example data
+df = deaR::Electric_plants
+# Load the app (with a random port)
+run_pioneer()
+# Set a specific port number
+run_pioneer(port = 8080)
+# Load app with a specified dataset
+run_pioneer(x = df, port = 8080)
 }
-
 }

@@ -17,12 +17,18 @@
 #' @param time A string with the time period variable.
 #' @return A list of class `pioneer_mlm`
 #' @examples
+#' # Load example data
 #' chnEconomy <- deaR::EconomyLong
 #' # Estimate Malmquist
 #' mod <- compute_malmquist(
-#'   data = chnEconomy, id = 'DMUs', time = 'Period',
-#'   input = c('Labor', 'Capital'), output = 'GIOV',
+#'   data = chnEconomy,
+#'   id = 'DMUs',
+#'   time = 'Period',
+#'   input = c('Labor', 'Capital'),
+#'   output = 'GIOV',
 #'   orientation = 'in')
+#' # Print results
+#' print(mod)
 #' # Get summary
 #' summary(mod)
 #' # Convert to data frame

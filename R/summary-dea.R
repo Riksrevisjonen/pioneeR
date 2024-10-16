@@ -4,31 +4,29 @@
 #'
 #' @details
 #' The function will return a summary table for efficiency scores from a DEA model.
-#' Efficiency scores will be placed in 11 bins, where DMUs with an effciency score
+#' Efficiency scores will be placed in 11 bins, where DMUs with an efficiency score
 #' equal to 1 are placed in a separate bin. For output oriented models with range
 #' \[1, Inf\], bins are created with `1/bin`. Bin widths will be equal to models
 #' with range \[0, 1\].
 #'
 #' @param x A numeric vector of efficiency scores or an object of class `pioneer_dea`
 #'
+#' @return A [data.frame()] with summary statistics
 #' @examples
 #' # Load example data
-#' df <- deaR::Electric_plants
-#' # Compute efficiency scores
-#' prod <- compute_dea(
-#'   df,
+#' fare89 <- deaR::Electric_plants
+#' # Estimate efficiency
+#' mod <- compute_dea(
+#'   data = fare89,
 #'   input = c("Labor", "Fuel", "Capital"),
 #'   output = "Output",
 #'   rts = "vrs"
 #' )
 #' # Get a summary table of efficiency scores
-#' summary_tbl_dea(prod)
+#' summary_tbl_dea(mod)
 #' # You can also create the table from a numeric vector of efficiency scores
-#' res <- as.data.frame(prod)
+#' res <- as.data.frame(mod)
 #' summary_tbl_dea(res$efficiency)
-#'
-#' @return A [data.frame()] with summary statistics
-#'
 #' @export
 summary_tbl_dea <- function(x) {
   UseMethod("summary_tbl_dea")

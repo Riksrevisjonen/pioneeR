@@ -30,6 +30,6 @@ data.frame
 inputs <- matrix(runif(10, 1, 10), ncol = 2)
 outputs <- matrix(runif(10, 1, 10), ncol = 2)
 # Compute scale efficiency
-compute_scale_efficiency(inputs, outputs, orientation = 'out', digits = 2)
-
+res <- compute_scale_efficiency(
+  inputs, outputs, orientation = 'out', digits = 2)
 }

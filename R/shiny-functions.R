@@ -27,7 +27,7 @@ pioneer_scripts <- function() {
 #'
 #' @param x A data frame that should be loaded with the app. See details.
 #' @param port Integer. The TCP port that the application should listen on.
-#' @param ... Other arguments to send to \code{\link[shiny]{runApp}}
+#' @param ... Other arguments to send to [shiny::runApp()].
 #'
 #' @details
 #' Note that pioneeR must be loaded into the namespace with `library(pioneeR)`
@@ -37,18 +37,20 @@ pioneer_scripts <- function() {
 #' a data frame or a character string with the object name of the data frame you
 #' want to be loaded when the app launches. Note that you should only use data
 #' frame objects. If you have a tibble (from the tidyverse) or a data table, you
-#' can convert to an ordinary data.frame using \code{\link[base]{as.data.frame}}.
-#'
-#' @examples
-#' # Only run this example in interactive R sessions
-#' if (interactive()) {
-#'   df = deaR::Electric_plants
-#'   # Load app with data.frame and set port to 8080
-#'   run_pioneer(x = df, port = 8080)
-#' }
+#' can convert to an ordinary data.frame using [as.data.frame()]
 #'
 #' @return None
-#'
+#' @examples
+#' \dontrun{
+#' # Load example data
+#' df = deaR::Electric_plants
+#' # Load the app (with a random port)
+#' run_pioneer()
+#' # Set a specific port number
+#' run_pioneer(port = 8080)
+#' # Load app with a specified dataset
+#' run_pioneer(x = df, port = 8080)
+#' }
 #' @export
 run_pioneer <- function(x = NULL, port = NULL, ...) {
 
@@ -72,11 +74,9 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
 #'
 #' Unsets the environment variables set by pioneeR
 #'
+#' @return A logical vector, with elements being `TRUE` if unsetting the variable succeeded
 #' @examples
 #' unset_env_vars()
-#'
-#' @return A logical vector, with elements being true if unsetting the variable succeeded
-#'
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
 

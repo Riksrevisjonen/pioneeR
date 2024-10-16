@@ -44,17 +44,17 @@ create_matrix <- function(df, columns, id, normalize = FALSE) {
 #' @param digits An integer with the number of digits to round to. If `NULL` the
 #'   values are kept unrounded.
 #'
+#' @return A data frame containing the efficiency scores for CRS, VRS, the
+#'   Scale Efficiency, the VRS to NIRS ratio, and a recommendation on whether to
+#'   increase or decrease the size of the DMU.
+#'
 #' @examples
 #' # Create matrices with random values
 #' inputs <- matrix(runif(10, 1, 10), ncol = 2)
 #' outputs <- matrix(runif(10, 1, 10), ncol = 2)
 #' # Compute scale efficiency
-#' compute_scale_efficiency(inputs, outputs, orientation = 'out', digits = 2)
-#'
-#' @return A data frame containing the efficiency scores for CRS, VRS, the
-#'   Scale Efficiency, the VRS to NIRS ratio, and a recommendation on whether to
-#'   increase or decrease the size of the DMU.
-#'
+#' res <- compute_scale_efficiency(
+#'   inputs, outputs, orientation = 'out', digits = 2)
 #' @export
 compute_scale_efficiency <- function(
     x,

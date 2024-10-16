@@ -18,22 +18,25 @@
 #' @param super If `TRUE` super efficiency scores are calculated.
 #' @param slack If `TRUE` slack values are calculated.
 #' @param peers If `TRUE` peers are added to the response.
-#'
+#' @return A list of class `pioneer_dea`.
 #' @examples
-#' # Get data
+#' # Load example data
 #' fare89 <- deaR::Electric_plants
 #' # Estimate efficiency
-#' mod <- compute_dea(fare89,
+#' mod <- compute_dea(
+#'   data = fare89,
 #'   input = c("Labor", "Fuel", "Capital"),
 #'   output = "Output",
 #'   id = "Plant",
 #'   rts = "vrs",
 #'   orientation = "in"
 #' )
-#' # Print the results
+#' # Print results
 #' print(mod)
-#'
-#' @return A list of class `pioneer_dea`
+#' # Get summary
+#' summary(mod)
+#' # Convert to data frame
+#' df <- as.data.frame(mod)
 #' @export
 compute_dea <- function(
     data,
