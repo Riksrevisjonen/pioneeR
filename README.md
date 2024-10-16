@@ -66,7 +66,7 @@ x <- run_pioneer()
 
 ## Guideline for contribution
 
-We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines of how to contribute.
+We welcome contributions to the pioneeR package. Please see our [code of conduct](https://riksrevisjonen.github.io/pioneeR/CONTRIBUTING.html) for detailed guidelines on how to contribute.
 
 ## Running pioneeR on Shiny server
 
