@@ -13,3 +13,5 @@ tmp
 ^DOCKERFILE$
 ^README.Rmd$
 ^tests/script
+^cran-comments\.md$
+^CRAN-SUBMISSION$
