@@ -15,7 +15,7 @@ Description: Measure productivity and efficiency using Data Envelopment Analysis
     productivity index. Analyses can be performed either in the console or with 
     the provided Shiny app. See Banker, R.; Charnes, A.; Cooper, W.W. (1984)
     <doi:10.1287/mnsc.30.9.1078>, Färe, R.; Grosskopf, S. (1996) <doi:10.1007/978-94-009-1816-0>.
-License: GPL-3 + file LICENSE
+License: GPL-3
 URL: https://riksrevisjonen.github.io/pioneeR/, https://github.com/Riksrevisjonen/pioneeR
 BugReports: https://github.com/Riksrevisjonen/pioneeR/issues
 Depends:
