@@ -7,15 +7,24 @@
 create_matrix(df, columns, id, normalize = FALSE)
 }
 \arguments{
-\item{df}{A data.frame}
+\item{df}{A data.frame containing the data.}
 
-\item{columns}{A vector of column names that should be included in the matrix}
+\item{columns}{A character vector of column names to include in the matrix.}
 
-\item{id}{The name of the column with the DMU IDs}
+\item{id}{A character string specifying the column with DMU IDs.}
 
-\item{normalize}{If \code{TRUE}, all columns will be normalized with a mean of 1}
+\item{normalize}{A logical indicating whether to normalize the columns by their
+mean. Defaults to \code{FALSE}.}
+}
+\value{
+A matrix of inputs or outputs
 }
 \description{
 Create a matrix for input or output variables that can be used in DEA models
 from a supplied data.frame
+}
+\examples{
+df <- data.frame(id = 1:3, a = c(10, 20, 30), b = c(5, 15, 25))
+create_matrix(df, columns = c("a", "b"), id = "id", normalize = TRUE)
+
 }

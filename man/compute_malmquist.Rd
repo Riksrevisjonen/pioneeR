@@ -35,6 +35,24 @@ and values above one denote deterioration.
 
 Note that \code{compute_malmquist()} only works for balanced panel datasets.
 }
+\examples{
+# Load example data
+chnEconomy <- deaR::EconomyLong
+# Estimate Malmquist
+mod <- compute_malmquist(
+  data = chnEconomy,
+  id = 'DMUs',
+  time = 'Period',
+  input = c('Labor', 'Capital'),
+  output = 'GIOV',
+  orientation = 'in')
+# Print results
+print(mod)
+# Get summary
+summary(mod)
+# Convert to data frame
+df <- as.data.frame(mod)
+}
 \references{
 Färe, R., Grosskopf, S. (1996). \emph{Intertemporal production frontiers: With dynamic DEA}. Springer.
 }

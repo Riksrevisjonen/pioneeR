@@ -3,10 +3,17 @@
 #' Create a matrix for input or output variables that can be used in DEA models
 #' from a supplied data.frame
 #'
-#' @param df A data.frame
-#' @param columns A vector of column names that should be included in the matrix
-#' @param id The name of the column with the DMU IDs
-#' @param normalize If `TRUE`, all columns will be normalized with a mean of 1
+#' @param df A data.frame containing the data.
+#' @param columns A character vector of column names to include in the matrix.
+#' @param id A character string specifying the column with DMU IDs.
+#' @param normalize A logical indicating whether to normalize the columns by their
+#'   mean. Defaults to `FALSE`.
+#'
+#' @examples
+#' df <- data.frame(id = 1:3, a = c(10, 20, 30), b = c(5, 15, 25))
+#' create_matrix(df, columns = c("a", "b"), id = "id", normalize = TRUE)
+#'
+#' @return A matrix of inputs or outputs
 #'
 #' @export
 create_matrix <- function(df, columns, id, normalize = FALSE) {
@@ -37,6 +44,17 @@ create_matrix <- function(df, columns, id, normalize = FALSE) {
 #' @param digits An integer with the number of digits to round to. If `NULL` the
 #'   values are kept unrounded.
 #'
+#' @return A data frame containing the efficiency scores for CRS, VRS, the
+#'   Scale Efficiency, the VRS to NIRS ratio, and a recommendation on whether to
+#'   increase or decrease the size of the DMU.
+#'
+#' @examples
+#' # Create matrices with random values
+#' inputs <- matrix(runif(10, 1, 10), ncol = 2)
+#' outputs <- matrix(runif(10, 1, 10), ncol = 2)
+#' # Compute scale efficiency
+#' res <- compute_scale_efficiency(
+#'   inputs, outputs, orientation = 'out', digits = 2)
 #' @export
 compute_scale_efficiency <- function(
     x,
