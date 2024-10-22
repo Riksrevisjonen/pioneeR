@@ -41,15 +41,11 @@ pioneer_scripts <- function() {
 #'
 #' @return None
 #' @examples
-#' \dontrun{
-#' # Load example data
-#' df = deaR::Electric_plants
-#' # Load the app (with a random port)
-#' run_pioneer()
-#' # Set a specific port number
-#' run_pioneer(port = 8080)
-#' # Load app with a specified dataset
-#' run_pioneer(x = df, port = 8080)
+#' # Only run this example in interactive R sessions
+#' if (interactive()) {
+#'   df = deaR::Electric_plants
+#'   # Load app with data.frame and set port to 8080
+#'   run_pioneer(x = df, port = 8080)
 #' }
 #' @export
 run_pioneer <- function(x = NULL, port = NULL, ...) {

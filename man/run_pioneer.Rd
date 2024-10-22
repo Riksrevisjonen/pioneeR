@@ -30,14 +30,10 @@ frame objects. If you have a tibble (from the tidyverse) or a data table, you
 can convert to an ordinary data.frame using \code{\link[=as.data.frame]{as.data.frame()}}
 }
 \examples{
-\dontrun{
-# Load example data
-df = deaR::Electric_plants
-# Load the app (with a random port)
-run_pioneer()
-# Set a specific port number
-run_pioneer(port = 8080)
-# Load app with a specified dataset
-run_pioneer(x = df, port = 8080)
+# Only run this example in interactive R sessions
+if (interactive()) {
+  df = deaR::Electric_plants
+  # Load app with data.frame and set port to 8080
+  run_pioneer(x = df, port = 8080)
 }
 }

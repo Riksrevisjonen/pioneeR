@@ -10,7 +10,7 @@ pioneeR can be installed from CRAN:
 install.packages("pioneeR")
 ```
 
-Installing pioneeR from CRAN is the recommended way. However, if you want the bleeding edge version of pioneeR, you can install direectly from GitHub using the remotes package:
+Installing pioneeR from CRAN is the recommended way. However, if you want the bleeding edge version of pioneeR, you can install directly from GitHub using the remotes package:
 
 ```r
 remotes::install_github("riksrevisjonen/pioneeR")
@@ -88,4 +88,4 @@ The implementation of the Malmquist index is based on the definitions given in *
 
 ## License
 
-The pioneeR package as a whole is licensed under the GPLv3. See the [LICENSE](LICENSE) file for more details.
+The pioneeR package as a whole is licensed under the GPLv3.
