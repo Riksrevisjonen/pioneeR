@@ -4,22 +4,22 @@ R package for running a Shiny app for DEA analysis. Full documentation is availa
 
 ## Installation
 
-pioneeR can be installed using the `remotes` package:
+pioneeR can be installed from CRAN:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR')
+install.packages("pioneeR")
 ```
 
-This will give you the lastest version of pioneeR, and is the recommended way for installing pioneeR at the moment. If you want to install the latest stable release, you can run the following command instead:
+Installing pioneeR from CRAN is the recommended way. However, if you want the bleeding edge version of pioneeR, you can install directly from GitHub using the remotes package:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@stable')
+remotes::install_github("riksrevisjonen/pioneeR")
 ```
 
 If you want to install a specific version of pioneeR, you can add the release version:
 
 ```r
-remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
+remotes::install_github("riksrevisjonen/pioneeR@v0.5.0")
 ```
 
 ### Exporting reports as PDF
@@ -27,7 +27,7 @@ remotes::install_github('riksrevisjonen/pioneeR@v0.4.0')
 pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the [`tinytex`-package](https://yihui.org/tinytex/) by Yihui Xie. Install LaTeX on your system by typing:
 
 ```r
-install.packages('tinytex')
+install.packages("tinytex")
 tinytex::install_tinytex()
 ```
 
@@ -66,7 +66,7 @@ x <- run_pioneer()
 
 ## Guideline for contribution
 
-We welcome contributions to the pioneeR package. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines of how to contribute.
+We welcome contributions to the pioneeR package. Please see our [code of conduct](https://riksrevisjonen.github.io/pioneeR/CONTRIBUTING.html) for detailed guidelines on how to contribute.
 
 ## Running pioneeR on Shiny server
 
@@ -84,8 +84,8 @@ pioneeR should now be available through the corresponding URL to your app direct
  
 The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book *Benchmarking with DEA, SFA, and R* (2011). The codebase is also inspired by the supplementary R package [Benchmarking](https://CRAN.R-project.org/package=Benchmarking).
 
-The implementation of the Malmquist index is based on the definitions given in *Intertemporal production frontiers: With dynamic DEA* by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package [productivity](https://cran.r-project.org/web/packages/productivity/index.html).
+The implementation of the Malmquist index is based on the definitions given in *Intertemporal production frontiers: With dynamic DEA* by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package [productivity](https://CRAN.R-project.org/package=productivity).
 
 ## License
 
-The pioneeR package as a whole is licensed under the GPLv3. See the [LICENSE](LICENSE) file for more details.
+The pioneeR package as a whole is licensed under the GPLv3.

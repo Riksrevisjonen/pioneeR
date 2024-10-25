@@ -26,8 +26,8 @@ pioneer_scripts <- function() {
 #' Run the pioneeR app on your local machine.
 #'
 #' @param x A data frame that should be loaded with the app. See details.
-#' @param port The TCP port that the application should listen on.
-#' @param ... Other arguments to send to \code{\link[shiny]{runApp}}
+#' @param port Integer. The TCP port that the application should listen on.
+#' @param ... Other arguments to send to [shiny::runApp()].
 #'
 #' @details
 #' Note that pioneeR must be loaded into the namespace with `library(pioneeR)`
@@ -37,8 +37,16 @@ pioneer_scripts <- function() {
 #' a data frame or a character string with the object name of the data frame you
 #' want to be loaded when the app launches. Note that you should only use data
 #' frame objects. If you have a tibble (from the tidyverse) or a data table, you
-#' can convert to an ordinary data.frame using \code{\link[base]{as.data.frame}}.
+#' can convert to an ordinary data.frame using [as.data.frame()]
 #'
+#' @return None
+#' @examples
+#' # Only run this example in interactive R sessions
+#' if (interactive()) {
+#'   df = deaR::Electric_plants
+#'   # Load app with data.frame and set port to 8080
+#'   run_pioneer(x = df, port = 8080)
+#' }
 #' @export
 run_pioneer <- function(x = NULL, port = NULL, ...) {
 
@@ -58,17 +66,13 @@ run_pioneer <- function(x = NULL, port = NULL, ...) {
 
 }
 
-#' @rdname run_pioneer
-#' @export
-runPioneeR <- function(x = NULL, port = NULL, ...) {
-  deprecation_warning(alternative = "run_pioneeR", next_release = TRUE)
-  run_pioneer(x = x, port = port, ...)
-}
-
 #' Unset environment variables
 #'
 #' Unsets the environment variables set by pioneeR
 #'
+#' @return A logical vector, with elements being `TRUE` if unsetting the variable succeeded
+#' @examples
+#' unset_env_vars()
 #' @export
 unset_env_vars <- \() Sys.unsetenv('PIONEER_DATA')
 
@@ -100,8 +104,8 @@ check_balance <- function(data, id_var, time_var) {
 
 }
 
-#' @param level Level of alert
-#' @param message The message to show the user
+#' @param level A character string with the level of alert
+#' @param message A character string with the message to show the user
 #' @param object A reactive object to update
 #' @param append Boolean. If the message should be appended to the reactive
 #' @noRd

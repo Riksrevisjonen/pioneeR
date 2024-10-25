@@ -7,24 +7,24 @@
 bootstrap_dea(dea, alpha = 0.05, bw_rule = "ucv", iterations = 2000)
 }
 \arguments{
-\item{dea}{An object of type pioneer_dea from \code{compute_dea()}}
+\item{dea}{An object of class 'pioneer_dea' from \code{compute_dea()}.}
 
-\item{alpha}{One minus the confidence level required (defaults to 0.05)}
+\item{alpha}{One minus the confidence level required. Default is 0.05.}
 
-\item{bw_rule}{A string with the type of bandwidth rule to be used, or a number with the
-bandwidth parameter. See details.}
+\item{bw_rule}{A string with the type of bandwidth rule to be used, or a number
+with the bandwidth parameter. See details.}
 
-\item{iterations}{The number of bootstrap iterations to be performed}
+\item{iterations}{The number of bootstrap iterations to perform. Default is 2000.}
 }
 \value{
-A list object of class \code{pioneer_bootstrap}
+A list of class \code{pioneer_bootstrap}.
 }
 \description{
-Run bootstrap on a DEA model to estimate bias corrected efficiency scores and confidence
-intervals
+Run bootstrap on a DEA model to estimate bias corrected efficiency scores and
+confidence intervals.
 }
 \details{
-In order to bootstrap a DEA model, you must first create a DEA model object using the
+In order to bootstrap a DEA model, you must first create a model object using the
 \code{compute_dea()} function. Note that you currently can only bootstrap models using
 constant or variable returns to scale (RTS). If you try to bootstrap a model using another
 RTS, the bootstrap will fail with an error message.
@@ -33,18 +33,24 @@ The bandwidth argument can be set to either \code{ucv} for unbiased cross valida
 \code{silverman} for the Silverman rule, or \code{scott} for the Scott rule. If you provide a
 number, this will be used directly as the bandwidth parameter \code{h}. This can be useful
 to replicate results where \code{h} is given, such as Simar & Wilson (1998). For most practical
-applications of the bootstrap, the default of unbias cross validation is sensible.
+applications of the bootstrap, the default value of unbiased cross validation is sensible.
 }
 \examples{
-\dontrun{
-# Get data
+# Load example data
 fare89 <- deaR::Electric_plants
 # Estimate efficiency
-mod <- compute_dea(fare89, 'Plant', c('Labor', 'Fuel', 'Capital'), 'Output', 'vrs', 'in')
-# Run bootstrap
-boot <- bootstrap_dea(mod, iterations = 2000)
-}
-
+mod <- compute_dea(
+  data = fare89,
+  input = c("Labor", "Fuel", "Capital"),
+  output = "Output",
+  id = "Plant",
+)
+# Run bootstrap. Reducing the number of iterations to save processing time
+boot <- bootstrap_dea(mod, iterations = 100)
+# Print results
+print(boot)
+# Get summary
+summary(boot)
 }
 \seealso{
 \code{\link[=compute_dea]{compute_dea()}}

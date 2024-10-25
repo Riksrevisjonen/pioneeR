@@ -42,9 +42,28 @@ compute_dea(
 \item{peers}{If \code{TRUE} peers are added to the response.}
 }
 \value{
-A list of class \code{pioneer_dea}
+A list of class \code{pioneer_dea}.
 }
 \description{
 Solve an input or output oriented DEA model under constant (\code{crs}), variable (\code{vrs}),
 non-increasing (\code{drs}), or non-decreasing (\code{irs}) returns to scale.
+}
+\examples{
+# Load example data
+fare89 <- deaR::Electric_plants
+# Estimate efficiency
+mod <- compute_dea(
+  data = fare89,
+  input = c("Labor", "Fuel", "Capital"),
+  output = "Output",
+  id = "Plant",
+  rts = "vrs",
+  orientation = "in"
+)
+# Print results
+print(mod)
+# Get summary
+summary(mod)
+# Convert to data frame
+df <- as.data.frame(mod)
 }
