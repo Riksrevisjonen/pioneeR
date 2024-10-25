@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,32 +46,74 @@
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A vector of efficiency scores or a Farrell object</p></dd>
+<dd><p>A numeric vector of efficiency scores or an object of class <code>pioneer_dea</code></p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>data.frame</p>
+    <p>A <code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame()</a></code> with summary statistics</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function will return a summary table for efficiency scores from a DEA model.
-Efficiency scores will be placed in 11 bins, where DMUs with an effciency score
+Efficiency scores will be placed in 11 bins, where DMUs with an efficiency score
 equal to 1 are placed in a separate bin. For output oriented models with range
 [1, Inf], bins are created with <code>1/bin</code>. Bin widths will be equal to models
 with range [0, 1].</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example data</span></span></span>
+<span class="r-in"><span><span class="va">fare89</span> <span class="op">&lt;-</span> <span class="fu">deaR</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/deaR/man/Electric_plants.html" class="external-link">Electric_plants</a></span></span></span>
+<span class="r-in"><span><span class="co"># Estimate efficiency</span></span></span>
+<span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="compute_dea.html">compute_dea</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">fare89</span>,</span></span>
+<span class="r-in"><span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Labor"</span>, <span class="st">"Fuel"</span>, <span class="st">"Capital"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  output <span class="op">=</span> <span class="st">"Output"</span>,</span></span>
+<span class="r-in"><span>  rts <span class="op">=</span> <span class="st">"vrs"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Get a summary table of efficiency scores</span></span></span>
+<span class="r-in"><span><span class="fu">summary_tbl_dea</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Range Frequency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0 &lt;= E &lt; 0.1         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.1 &lt;= E &lt; 0.2         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.2 &lt;= E &lt; 0.3         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.3 &lt;= E &lt; 0.4         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.4 &lt;= E &lt; 0.5         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.5 &lt;= E &lt; 0.6         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.6 &lt;= E &lt; 0.7         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.7 &lt;= E &lt; 0.8         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.8 &lt;= E &lt; 0.9         6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   0.9 &lt;= E &lt; 1         5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11         E == 1         8</span>
+<span class="r-in"><span><span class="co"># You can also create the table from a numeric vector of efficiency scores</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">summary_tbl_dea</span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">efficiency</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Range Frequency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    0 &lt;= E &lt; 0.1         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.1 &lt;= E &lt; 0.2         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.2 &lt;= E &lt; 0.3         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.3 &lt;= E &lt; 0.4         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.4 &lt;= E &lt; 0.5         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.5 &lt;= E &lt; 0.6         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.6 &lt;= E &lt; 0.7         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.7 &lt;= E &lt; 0.8         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.8 &lt;= E &lt; 0.9         6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   0.9 &lt;= E &lt; 1         5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11         E == 1         8</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen.</p>
+  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen Valberg.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

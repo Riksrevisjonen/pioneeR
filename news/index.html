@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,14 +32,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0.9000" id="pioneer-0409000">pioneeR 0.4.0.9000<a class="anchor" aria-label="anchor" href="#pioneer-0409000"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.5.0" id="pioneer-050">pioneeR 0.5.0<a class="anchor" aria-label="anchor" href="#pioneer-050"></a></h2><p class="text-muted">CRAN release: 2024-10-25</p>
 <div class="section level3">
-<h3 id="breaking-changes-0-4-0-9000">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0-9000"></a></h3>
+<h3 id="breaking-changes-0-5-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-5-0"></a></h3>
 <ul><li>Results for the Malmquist index are now returned ala Farrell (not Shephard). This is consistent with how results for other models are currently presented in the app. Users should note that this changes the interpretation of the malmquist index for input-oriented models. See <code>?compute_malmquist()</code> for details. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
 <li>Removed the select input box for returns to scale in the Malmquist analysis tab. The currently supported Malmquist index is the one defined by Färe &amp; Grosskopf (1996). Components of the index is thus always computed based on the same returns to scale (either CRS or VRS depending on the specific component), so the select input box is not needed.</li>
+<li>
+<code>runPioneeR()</code> has been removed to avoid confusion for new users with the release on CRAN.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="enhancements-0-4-0-9000">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-4-0-9000"></a></h3>
+<h3 id="enhancements-0-5-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-5-0"></a></h3>
 <ul><li>Added a new exported function, <code><a href="../reference/compute_malmquist.html">compute_malmquist()</a></code> for calculating productivity. This also removes the need for <code>{productivity}</code> as a dependency. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
 <li>Further sub-components of the Malmquist index, including bias technical change and scale efficiency change, have been added to the results in the Malmquist analysis tab. (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/81" class="external-link">#81</a>)</li>
 <li>Added caching to the bootstrap function in the app (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/88" class="external-link">#88</a>)</li>
@@ -88,7 +90,7 @@
 <ul><li>Layout changed to <code>layout_sidebar()</code> from the bslib package to improve UI and fix compatability with bslib &gt;= 0.6.0 and Boostrap 5.3 (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/44" class="external-link">#44</a>)</li>
 <li>Analysis report has been updated and simplified to make the results from the app easier to reproduce (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/35" class="external-link">#35</a>)</li>
 <li>
-<code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> has been renamed <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>. <code><a href="../reference/run_pioneer.html">runPioneeR()</a></code> will still work, but will be deprecated in a later version</li>
+<code>runPioneeR()</code> has been renamed <code><a href="../reference/run_pioneer.html">run_pioneer()</a></code>. <code>runPioneeR()</code> will still work, but will be deprecated in a later version</li>
 <li>Improvements to the user interface and user experience (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/57" class="external-link">#57</a>)</li>
 <li>For time series data, all columns are now available to select as year/time variable. If a column with values within the range [1900, 2100] exists, this column will automatically be selected (<a href="https://github.com/Riksrevisjonen/pioneeR/issues/41" class="external-link">#41</a>)</li>
 </ul></div>
@@ -116,11 +118,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen.</p>
+  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen Valberg.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

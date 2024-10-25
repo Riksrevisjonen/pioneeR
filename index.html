@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Perform productivity analyses in a web browser • pioneeR</title>
+<title>Productivity and Efficiency Analysis using DEA • pioneeR</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Perform productivity analyses in a web browser">
-<meta name="description" content="Application to conduct productivity and efficiency (DEA) analysis.">
-<meta property="og:description" content="Application to conduct productivity and efficiency (DEA) analysis.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Productivity and Efficiency Analysis using DEA">
+<meta name="description" content="Measure productivity and efficiency using Data Envelopment Analysis (DEA). Available methods include DEA under different technology assumptions, bootstrapping of efficiency scores and calculation of the Malmquist productivity index. Analyses can be performed either in the console or with the provided shiny app. See Banker, R.; Charnes, A.; Cooper, W.W. (1984) &lt;doi:10.1287/mnsc.30.9.1078&gt;, Färe, R.; Grosskopf, S. (1996) &lt;doi:10.1007/978-94-009-1816-0&gt;.">
+<meta property="og:description" content="Measure productivity and efficiency using Data Envelopment Analysis (DEA). Available methods include DEA under different technology assumptions, bootstrapping of efficiency scores and calculation of the Malmquist productivity index. Analyses can be performed either in the console or with the provided shiny app. See Banker, R.; Charnes, A.; Cooper, W.W. (1984) &lt;doi:10.1287/mnsc.30.9.1078&gt;, Färe, R.; Grosskopf, S. (1996) &lt;doi:10.1007/978-94-009-1816-0&gt;.">
 <meta property="og:image" content="https://riksrevisjonen.github.io/pioneeR/logo.png">
 </head>
 <body>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,21 +57,21 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>pioneeR can be installed using the <code>remotes</code> package:</p>
+<p>pioneeR can be installed from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR'</span><span class="op">)</span></span></code></pre></div>
-<p>This will give you the lastest version of pioneeR, and is the recommended way for installing pioneeR at the moment. If you want to install the latest stable release, you can run the following command instead:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pioneeR"</span><span class="op">)</span></span></code></pre></div>
+<p>Installing pioneeR from CRAN is the recommended way. However, if you want the bleeding edge version of pioneeR, you can install directly from GitHub using the remotes package:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@stable'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"riksrevisjonen/pioneeR"</span><span class="op">)</span></span></code></pre></div>
 <p>If you want to install a specific version of pioneeR, you can add the release version:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">'riksrevisjonen/pioneeR@v0.4.0'</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"riksrevisjonen/pioneeR@v0.5.0"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="exporting-reports-as-pdf">Exporting reports as PDF<a class="anchor" aria-label="anchor" href="#exporting-reports-as-pdf"></a>
 </h3>
 <p>pioneeR supports exporting the results of the DEA analysis as a PDF report. The PDF export function requires an installation of LaTeX to produce the PDF. The easiest way to install LaTeX, is to use the <a href="https://yihui.org/tinytex/" class="external-link"><code>tinytex</code>-package</a> by Yihui Xie. Install LaTeX on your system by typing:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'tinytex'</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tinytex"</span><span class="op">)</span></span>
 <span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/install_tinytex.html" class="external-link">install_tinytex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -104,7 +104,7 @@
 <div class="section level2">
 <h2 id="guideline-for-contribution">Guideline for contribution<a class="anchor" aria-label="anchor" href="#guideline-for-contribution"></a>
 </h2>
-<p>We welcome contributions to the pioneeR package. Please see our <a href="CONTRIBUTING.html">CONTRIBUTING.md</a> file for detailed guidelines of how to contribute.</p>
+<p>We welcome contributions to the pioneeR package. Please see our <a href="https://riksrevisjonen.github.io/pioneeR/CONTRIBUTING.html">code of conduct</a> for detailed guidelines on how to contribute.</p>
 </div>
 <div class="section level2">
 <h2 id="running-pioneer-on-shiny-server">Running pioneeR on Shiny server<a class="anchor" aria-label="anchor" href="#running-pioneer-on-shiny-server"></a>
@@ -120,17 +120,18 @@
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h2>
 <p>The DEA models in pioneeR are based on methods described by Peter Bogetoft and Lars Otto in their book <em>Benchmarking with DEA, SFA, and R</em> (2011). The codebase is also inspired by the supplementary R package <a href="https://CRAN.R-project.org/package=Benchmarking" class="external-link">Benchmarking</a>.</p>
-<p>The implementation of the Malmquist index is based on the definitions given in <em>Intertemporal production frontiers: With dynamic DEA</em> by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package <a href="https://cran.r-project.org/web/packages/productivity/index.html" class="external-link">productivity</a>.</p>
+<p>The implementation of the Malmquist index is based on the definitions given in <em>Intertemporal production frontiers: With dynamic DEA</em> by Färe and Grosskopf (1996). Our code is partly inspired by work done by K Hervé Dakpo, Yann Desjeux and Laure Latruffe in their R package <a href="https://CRAN.R-project.org/package=productivity" class="external-link">productivity</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
-<p>The pioneeR package as a whole is licensed under the GPLv3. See the <a href="LICENSE">LICENSE</a> file for more details.</p>
+<p>The pioneeR package as a whole is licensed under the GPLv3.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=pioneeR" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/Riksrevisjonen/pioneeR/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/Riksrevisjonen/pioneeR/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -139,9 +140,7 @@
 <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>
-<a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a> | file <a href="LICENSE-text.html">LICENSE</a>
-</li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
 
@@ -163,7 +162,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Ove Haugland Jakobsen <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Aleksander Eilertsen <br><small class="roles"> Author </small>  </li>
+<li>Aleksander Eilertsen Valberg <br><small class="roles"> Author </small>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -175,11 +174,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen.</p>
+  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen Valberg.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

@@ -9,7 +9,7 @@ Envelopment Analysis."><meta property="og:image" content="https://riksrevisjonen
 
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,16 +90,64 @@ and values above one denote deterioration.</p>
     <p>Färe, R., Grosskopf, S. (1996). <em>Intertemporal production frontiers: With dynamic DEA</em>. Springer.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example data</span></span></span>
+<span class="r-in"><span><span class="va">chnEconomy</span> <span class="op">&lt;-</span> <span class="fu">deaR</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/deaR/man/EconomyLong.html" class="external-link">EconomyLong</a></span></span></span>
+<span class="r-in"><span><span class="co"># Estimate Malmquist</span></span></span>
+<span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu">compute_malmquist</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">chnEconomy</span>,</span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="st">'DMUs'</span>,</span></span>
+<span class="r-in"><span>  time <span class="op">=</span> <span class="st">'Period'</span>,</span></span>
+<span class="r-in"><span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Labor'</span>, <span class="st">'Capital'</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  output <span class="op">=</span> <span class="st">'GIOV'</span>,</span></span>
+<span class="r-in"><span>  orientation <span class="op">=</span> <span class="st">'in'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Print results</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Malmquist scores:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1]        NA        NA        NA        NA        NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [8]        NA        NA        NA        NA        NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [15]        NA        NA        NA        NA        NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [22]        NA        NA        NA        NA        NA        NA        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [29]        NA        NA        NA 1.1780355 1.1912934 1.0813121 1.0472603</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [36] 1.1889356 1.1408227 1.1046565 1.0830010 1.1459807 1.1000532 1.0661701</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] 1.1117657 1.0299074 1.1872104 1.0860022 1.1015615 1.1441110 1.0747190</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [50] 0.9936366 1.2003931 1.3423497 1.1429375 1.1502118 1.1200655 1.2081663</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] 1.1379615 1.1576109 1.0796899 1.2619715 1.1855282 1.2366110 1.1565728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [64] 1.0970963 1.1173138 1.1763298 1.3196605 1.1138652 1.2625204 1.0291044</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [71] 1.1241910 1.0840453 1.0330009 1.1310008 1.0062198 1.1424261 1.0929556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [78] 1.1937091 1.0970270 1.1369533 1.0519112 1.1012828 1.5496943 1.1418819</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] 1.1614256 1.1561414 1.0955397 1.1984846 1.1208359 1.2027845 1.2082476</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [92] 1.0993345 1.0946658 1.0431310 1.0873712 1.1735938 1.1491537 1.3412337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [99] 1.1211711 1.0718728 1.0882051 1.0406440 0.9959118 1.0073886 1.1391823</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [106] 1.0554915 1.0020171 1.0578750 1.0327001 1.1369224 1.0580648 1.0306628</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [113] 1.0985916 1.0755866 1.0608294 1.0741206 1.0227697 1.1345259 1.3148455</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [120] 1.1169615 1.0026375 1.1976344 1.1254329 1.2062809 1.0862691 0.9835349</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [127] 0.9625288 0.8754982 1.1542688 1.0372490 1.0822687 0.9523534 0.9860017</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [134] 1.0378863 0.9392529 1.0341747 0.9656799 1.0530417 1.0015634 0.9421143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [141] 0.9678752 1.0176088 0.9487704 1.0296258 1.0024542 1.0332103 1.1219405</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [148] 1.0403226 0.9929593 1.1341202 1.0401633 0.9538121 0.9584683 0.9822538</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [155] 0.9254895</span>
+<span class="r-in"><span><span class="co"># Get summary</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean malmquist: 1.0974</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.8755  1.0332  1.0951  1.0974  1.1446  1.5497      31 </span>
+<span class="r-in"><span><span class="co"># Convert to data frame</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen.</p>
+  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen Valberg.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

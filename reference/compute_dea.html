@@ -9,7 +9,7 @@ non-increasing (drs), or non-decreasing (irs) returns to scale."><meta property=
 
     <a class="navbar-brand me-2" href="../index.html">pioneeR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,19 +96,49 @@ non-increasing (<code>drs</code>), or non-decreasing (<code>irs</code>) returns 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list of class <code>pioneer_dea</code></p>
+    <p>A list of class <code>pioneer_dea</code>.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example data</span></span></span>
+<span class="r-in"><span><span class="va">fare89</span> <span class="op">&lt;-</span> <span class="fu">deaR</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/deaR/man/Electric_plants.html" class="external-link">Electric_plants</a></span></span></span>
+<span class="r-in"><span><span class="co"># Estimate efficiency</span></span></span>
+<span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu">compute_dea</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">fare89</span>,</span></span>
+<span class="r-in"><span>  input <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Labor"</span>, <span class="st">"Fuel"</span>, <span class="st">"Capital"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  output <span class="op">=</span> <span class="st">"Output"</span>,</span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="st">"Plant"</span>,</span></span>
+<span class="r-in"><span>  rts <span class="op">=</span> <span class="st">"vrs"</span>,</span></span>
+<span class="r-in"><span>  orientation <span class="op">=</span> <span class="st">"in"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Print results</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Efficiency scores:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.8691291 1.0000000 1.0000000 0.9306542 1.0000000 0.9071361 0.8909196</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 0.8207811 0.8884630 0.8469025 0.9530535 1.0000000 0.9601672 1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] 1.0000000 0.8884514 1.0000000 1.0000000 0.9440624</span>
+<span class="r-in"><span><span class="co"># Get summary</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Technology is VRS and input oriented efficiency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mean efficiency: 0.9421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.8208  0.8897  0.9531  0.9421  1.0000  1.0000 </span>
+<span class="r-in"><span><span class="co"># Convert to data frame</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen.</p>
+  <p>Developed by Ove Haugland Jakobsen, Aleksander Eilertsen Valberg.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
