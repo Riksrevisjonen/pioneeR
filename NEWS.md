@@ -16,6 +16,18 @@ for other models are currently presented in the app. Users should note that this
 
 # pioneeR 0.4.0
 
+## Added stochastic frontier analysis
+
+- Using the BFGS algoritme in the optim funcion of R we fit the stochastic frontier model.
+- The following code now runs on my mac
+
+library(pioneeR)
+data(riceProdPhil, package = 'frontier')
+rice <- sfa( log( PROD ) ~ log(AREA) + log( LABOR ) + log( NPK ),
+             data = riceProdPhil, productivity = TRUE )
+rice$coef
+
+
 ## Breaking changes
 
 - pioneeR now depends on bslib 0.6.0 or higher (#73)
