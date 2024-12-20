@@ -1,3 +1,9 @@
+# pioneeR 0.5.0.9000
+
+## Bug fixes
+
+- Fixes a bug where labelled columns from Stata files would result in an infinite loop (#116)
+
 # pioneeR 0.5.0
 
 ## Breaking changes
